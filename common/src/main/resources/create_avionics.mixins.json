@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "ink.astrius.create_avionics.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "${mod_id}.refmap.json",
+  "mixins": [
+    "simulated.AltitudeSensorBlockEntityMixin",
+    "simulated.AnalogTransmissionBlockEntityMixin",
+    "simulated.ComputerCraftPeripheralsMixin",
+    "simulated.GimbalSensorBlockEntityMixin",
+    "simulated.LinkedTypewriterBlockEntityMixin",
+    "simulated.NavigationTargetMixin",
+    "aeronautics.HotAirBurnerBlockEntityMixin",
+    "aeronautics.SteamVentBlockEntityMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
