@@ -72,3 +72,50 @@ jobs:
           draft: false
           prerelease: ${{ contains(steps.vars.outputs.version, '-') }}
           files: release-artifacts/*.jar
+
+      - name: Regenerate updates.json on main
+        if: ${{ !contains(steps.vars.outputs.version, '-') }}
+        env:
+          MC_VERSION: '1.21.1'
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git checkout main
+          python3 - <<'PY'
+          import json, os, subprocess
+          mc = os.environ['MC_VERSION']
+          tags = subprocess.check_output(
+              ['git', 'tag', '--list', 'v*', '--sort=v:refname']
+          ).decode().split()
+          versions = [t[1:] for t in tags if '-' not in t[1:]]
+          if not versions:
+              raise SystemExit('no stable tags found')
+          latest = versions[-1]
+          entries = {}
+          for v in versions:
+              msg = subprocess.check_output(
+                  ['git', 'tag', '-l', '--format=%(contents:subject)', f'v{v}']
+              ).decode().strip()
+              entries[v] = msg or f'Release {v}'
+          out = {
+              'homepage': 'https://modrinth.com/mod/create-avionics',
+              mc: entries,
+              'promos': {
+                  f'{mc}-recommended': latest,
+                  f'{mc}-latest': latest,
+              },
+          }
+          with open('updates.json', 'w') as f:
+              json.dump(out, f, indent=2)
+              f.write('\n')
+          PY
+
+          if git diff --quiet -- updates.json; then
+            echo 'updates.json unchanged, skipping commit'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add updates.json
+          git commit -m "chore: update updates.json for ${{ steps.vars.outputs.tag }}"
+          git push origin main
