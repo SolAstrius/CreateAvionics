@@ -28,6 +28,9 @@ public class AnalogTransmissionPeripheral extends SimPeripheral<AnalogTransmissi
         return this.ext().getSignal();
     }
 
+    // Flips externallyControlled even when signal == current; calling
+    // setSignal(getSignal()) is the documented way to grab control without
+    // changing the value. releaseSignal() returns control to redstone.
     @LuaFunction(mainThread = true)
     public final void setSignal(final int signal) {
         this.ext().setExternallyControlled(true);

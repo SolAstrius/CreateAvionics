@@ -59,7 +59,10 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
 
     @LuaFunction
     public final String getGasType() {
-        final LiftingGasType t = this.data().getLiftingGasType();
+        return gasTypeId(this.data().getLiftingGasType());
+    }
+
+    private static String gasTypeId(final LiftingGasType t) {
         if (t instanceof SteamLiftingGas) return "steam";
         if (t instanceof DefaultLiftingGas) return "default";
         return "unknown";
@@ -129,11 +132,7 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
         if (!(b instanceof final ServerBalloon sb)) return List.of();
         final List<Map<String, Object>> out = new ArrayList<>();
         for (final LiftingGasHolder h : sb.getLiftingGasHolders()) {
-            final LiftingGasType t = h.type();
-            final String id = (t instanceof SteamLiftingGas) ? "steam"
-                            : (t instanceof DefaultLiftingGas) ? "default"
-                            : "unknown";
-            out.add(Map.of("type", id, "amount", h.data().amount));
+            out.add(Map.of("type", gasTypeId(h.type()), "amount", h.data().amount));
         }
         return out;
     }

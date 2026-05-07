@@ -15,6 +15,9 @@ public abstract class SimPeripheral<T extends BlockEntity> implements IPeriphera
         this.blockEntity = blockEntity;
     }
 
+    // Identity equality assumes SimPeripheralService caches one wrapper per
+    // BlockEntity. If it ever returns a fresh wrapper per getPeripheral call,
+    // CC will see spurious detach/attach churn.
     @Override
     public boolean equals(final IPeripheral iPeripheral) {
         return iPeripheral == this;

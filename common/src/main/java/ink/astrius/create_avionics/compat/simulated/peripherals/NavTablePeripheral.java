@@ -24,6 +24,10 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
         return "navigation_table";
     }
 
+    // hasTarget reports whether the nav table has resolved a live target
+    // (currentTarget). getTargetType / getTargetMetadata describe the held
+    // nav-table item itself — these can be populated even when no target is
+    // locked yet, so hasTarget() == false does not imply getTargetType() == nil.
     @LuaFunction
     public boolean hasTarget() {
         return this.blockEntity.currentTarget != null;
