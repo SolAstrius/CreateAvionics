@@ -57,7 +57,7 @@ jobs:
           shopt -s nullglob
           for jar in neoforge/build/libs/*.jar; do
             case "$jar" in
-              *-sources.jar|*-javadoc.jar|*-dev.jar|*-dev-shadow.jar) continue ;;
+              *-sources.jar|*-dev.jar|*-dev-shadow.jar) continue ;;
             esac
             cp "$jar" release-artifacts/
           done
