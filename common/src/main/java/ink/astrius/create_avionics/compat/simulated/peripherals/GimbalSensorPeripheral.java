@@ -94,11 +94,18 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
 
     /**
      * Get the local gravity vector expressed in body frame.
-     * The dimension's gravity (Sable default: {@code (0, -11.0, 0)} m/s² in
-     * world frame; per-dimension overridable via Sable's physics config)
-     * rotated into the contraption's body frame. Useful for attitude
-     * estimation: {@code atan2(g.x, -g.y)} ≈ roll, {@code atan2(g.z, -g.y)} ≈
-     * pitch — the same derivation {@link #getAngles} performs internally.
+     * The dimension's gravity in world frame, rotated into the contraption's
+     * body frame. Sable's stock default is {@code (0, -11.0, 0)} m/s² applied
+     * uniformly to every dimension (Overworld, Nether, End, modded — all the
+     * same out of the box). Other mods, modpacks, or datapacks can override
+     * per-dimension by shipping {@code data/<ns>/dimension_physics/<file>.json}
+     * with a {@code base_gravity} entry — e.g. a Moon dimension mod would set
+     * {@code [0, -1.6, 0]} and this sensor would faithfully report it without
+     * any Avionics-side change.
+     * <p>
+     * Useful for attitude estimation: {@code atan2(g.x, -g.y)} ≈ roll,
+     * {@code atan2(g.z, -g.y)} ≈ pitch — the same derivation {@link #getAngles}
+     * performs internally.
      *
      * @return A three-element list {gx, gy, gz} in m/s².
      */
