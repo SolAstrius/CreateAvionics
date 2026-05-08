@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "create:gearbox"
+    },
+    "B": {
+      "item": "create:precision_mechanism"
+    }
+  },
+  "pattern": [
+    "B",
+    "A"
+  ],
+  "result": {
+    "item": "create_radar:auto_yaw_controller"
+  },
+  "show_notification": true
+}
