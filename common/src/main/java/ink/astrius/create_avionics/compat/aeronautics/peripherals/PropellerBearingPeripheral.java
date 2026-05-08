@@ -122,8 +122,11 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
 
     /**
      * Get the bearing's current thrust output.
+     * Computed as {@code totalSailPower^1.5 × directionIndependentSpeed × configThrust}.
+     * This is the raw thrust; the goggle tooltip shows it scaled by airflow
+     * scaling and air pressure.
      *
-     * @return The thrust.
+     * @return The thrust in pixel-Newtons (pN), Sable's force unit.
      */
     @LuaFunction
     public final double getThrust() {
@@ -132,8 +135,9 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
 
     /**
      * Get the bearing's current airflow.
+     * Computed as {@code sqrt(totalSailPower) × directionIndependentSpeed × configAirflowMult}.
      *
-     * @return The airflow.
+     * @return The airflow in m/s.
      */
     @LuaFunction
     public final double getAirflow() {
@@ -143,7 +147,8 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
     /**
      * Get the bearing's total sail power.
      *
-     * @return The total sail power.
+     * @return Dimensionless: count of windmill-sail blocks in the assembled
+     *         contraption (1 per block tagged {@code create:windmill_sails}).
      */
     @LuaFunction
     public final double getSailPower() {

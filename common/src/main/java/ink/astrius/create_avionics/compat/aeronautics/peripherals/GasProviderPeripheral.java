@@ -50,8 +50,9 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
     /**
      * Get the current gas output rate.
      * Output = target × signal / 15 (burner), or target × efficiency × signal / 15 (vent).
+     * Added to the attached balloon's target volume every game tick.
      *
-     * @return The gas output rate.
+     * @return The gas output rate in m³ per tick (multiply by 20 for m³/s).
      */
     @LuaFunction
     public final double getGasOutput() {

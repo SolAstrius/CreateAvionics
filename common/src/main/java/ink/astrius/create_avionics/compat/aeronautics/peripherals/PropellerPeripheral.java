@@ -68,9 +68,10 @@ public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends Sim
     /**
      * Get the propeller's thrust output.
      * Direction-independent thrust (config-driven × current speed). Sign
-     * tracks the kinetic input.
+     * tracks the kinetic input. This is the raw, unscaled thrust; the in-game
+     * goggle tooltip shows {@code thrust × airflow-scaling × air-pressure}.
      *
-     * @return The thrust.
+     * @return The thrust in pixel-Newtons (pN), Sable's force unit.
      */
     @LuaFunction
     public final double getThrust() {
@@ -80,7 +81,7 @@ public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends Sim
     /**
      * Get the propeller's airflow.
      *
-     * @return The airflow.
+     * @return The airflow in m/s.
      */
     @LuaFunction
     public final double getAirflow() {

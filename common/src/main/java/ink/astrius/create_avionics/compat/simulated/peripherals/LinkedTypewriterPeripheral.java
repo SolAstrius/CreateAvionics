@@ -9,7 +9,14 @@ import java.util.List;
 
 /**
  * A typewriter that forwards keypresses to attached computers and exposes
- * the currently held keys.
+ * the currently held keys. Fires two events on attached computers:
+ * <ul>
+ *   <li>{@code key} — args: {@code key} (number, GLFW key code), {@code held}
+ *       (boolean, whether the matching entry is still alive).</li>
+ *   <li>{@code key_up} — args: {@code key} (number).</li>
+ * </ul>
+ * Use {@code os.pullEvent("key")} / {@code os.pullEvent("key_up")} to consume
+ * them.
  *
  * @cc.module linked_typewriter
  */
