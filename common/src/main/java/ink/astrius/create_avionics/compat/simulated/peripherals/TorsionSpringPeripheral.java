@@ -21,10 +21,11 @@ public class TorsionSpringPeripheral extends SimPeripheral<TorsionSpringBlockEnt
 
     /**
      * Set the spring's angular limit. Only takes effect while the spring is static.
+     * <p>Yields until the next server tick.
      *
      * @param limit The new angular limit.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public void setLimit(final int limit) {
         if(this.blockEntity.isSpringStatic()) {
             this.blockEntity.angleInput.setValue(limit);
