@@ -46,6 +46,11 @@ public class SimulatedCCIntegration implements SimModCompatibilityService {
         add(service, SimBlockEntityTypes.PHYSICS_ASSEMBLER, PhysicsAssemblerPeripheral::new);
         add(service, SimBlockEntityTypes.PORTABLE_ENGINE, PortableEnginePeripheral::new);
         add(service, SimBlockEntityTypes.STEERING_WHEEL, SteeringWheelPeripheral::new);
+        add(service, SimBlockEntityTypes.THROTTLE_LEVER, ThrottleLeverPeripheral::new);
+
+        add(service, SimBlockEntityTypes.LASER_POINTER, LaserPointerPeripheral::new);
+        add(service, SimBlockEntityTypes.LASER_SENSOR, LaserSensorPeripheral::new);
+        add(service, SimBlockEntityTypes.ROPE_WINCH, RopeWinchPeripheral::new);
 
         service.addWired(SimBlockEntityTypes.DOCKING_CONNECTOR, (blockEntity, direction) -> {
             if (blockEntity.getBlockState().getValue(DockingConnectorBlock.FACING) == direction) {

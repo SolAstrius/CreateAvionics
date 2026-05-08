@@ -12,10 +12,18 @@ ComputerCraft peripherals for [Create: Simulated][simulated] and
 - `physics_assembler` — query and command a Physics Assembler
 - `portable_engine` — fuel state, burn time, generated speed, stress capacity
 - `steering_wheel` — held state, angle, target angle, clamp parameters
+- `throttle_lever` — read state, drive lever position
+- `laser_pointer` — direction, range, firing state, color (read/write),
+  rainbow toggle
+- `laser_sensor` — power readout, closest pointer hit distance
+- `rope_winch` — current length, bounds, kinetic-driven movement speed
 - `hot_air_burner` *(requires Aeronautics)* — gas output, target amount,
   balloon coupling, boiler efficiency
 - `steam_vent` *(requires Aeronautics)* — same surface as `hot_air_burner`,
   scoped to steam
+- `wooden_propeller` / `andesite_propeller` / `smart_propeller`
+  *(requires Aeronautics)* — kinetic and rotation speed, thrust, airflow,
+  active state, axis. Also matched by the shared `propeller` type.
 
 **Extended readouts**
 - `gimbal_sensor` — body-frame angular velocity, gravity, linear acceleration;

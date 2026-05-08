@@ -8,6 +8,7 @@ import dev.simulated_team.simulated.service.SimPlatformService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import ink.astrius.create_avionics.CreateAvionics;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.GasProviderPeripheral;
+import ink.astrius.create_avionics.compat.aeronautics.peripherals.PropellerPeripheral;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -32,6 +33,10 @@ public class AeroCCIntegration implements SimModCompatibilityService {
 
         add(service, AeroBlockEntityTypes.HOT_AIR_BURNER, be -> new GasProviderPeripheral<>(be, "hot_air_burner"));
         add(service, AeroBlockEntityTypes.STEAM_VENT, be -> new GasProviderPeripheral<>(be, "steam_vent"));
+
+        add(service, AeroBlockEntityTypes.WOODEN_PROPELLER, be -> new PropellerPeripheral<>(be, "wooden_propeller"));
+        add(service, AeroBlockEntityTypes.ANDESITE_PROPELLER, be -> new PropellerPeripheral<>(be, "andesite_propeller"));
+        add(service, AeroBlockEntityTypes.SMART_PROPELLER, be -> new PropellerPeripheral<>(be, "smart_propeller"));
     }
 
     private static <T extends BlockEntity> void add(final SimPeripheralService service, final Supplier<BlockEntityType<T>> supplier, final SimPeripheralService.SimpleCapabilityGetter<T, IPeripheral> getter) {
