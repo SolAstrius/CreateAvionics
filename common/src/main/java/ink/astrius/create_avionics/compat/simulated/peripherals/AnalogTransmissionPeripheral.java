@@ -50,34 +50,34 @@ public class AnalogTransmissionPeripheral extends SimPeripheral<AnalogTransmissi
     // --- Rotation state ---
 
     @LuaFunction
-    public float getRotationModifier() {
+    public double getRotationModifier() {
         return this.blockEntity.getRotationModifier();
     }
 
     @LuaFunction
-    public float getInputSpeed() {
+    public double getInputSpeed() {
         return this.blockEntity.getSpeed();
     }
 
     @LuaFunction
-    public float getOutputSpeed() {
+    public double getOutputSpeed() {
         return this.blockEntity.getExtraKinetics().getSpeed();
     }
 
     @LuaFunction
-    public float getOutputTheoreticalSpeed() {
+    public double getOutputTheoreticalSpeed() {
         return this.blockEntity.getExtraKinetics().getTheoreticalSpeed();
     }
 
     // --- Stress ---
 
     @LuaFunction
-    public float getStressApplied() {
+    public double getStressApplied() {
         return this.blockEntity.calculateStressApplied();
     }
 
     @LuaFunction
-    public float getOutputStressApplied() {
+    public double getOutputStressApplied() {
         return this.blockEntity.getExtraKinetics().calculateStressApplied();
     }
 

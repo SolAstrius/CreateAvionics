@@ -31,7 +31,7 @@ public class LaserPointerPeripheral extends SimPeripheral<LaserPointerBlockEntit
     }
 
     @LuaFunction
-    public final float getRange() {
+    public final double getRange() {
         return this.blockEntity.getLaserRange();
     }
 

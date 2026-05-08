@@ -21,7 +21,7 @@ public class TorsionSpringPeripheral extends SimPeripheral<TorsionSpringBlockEnt
     }
 
     @LuaFunction
-    public float getAngle() {
+    public double getAngle() {
         return this.blockEntity.getAngle();
     }
 

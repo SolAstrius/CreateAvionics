@@ -42,37 +42,37 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
     }
 
     @LuaFunction
-    public final List<Float> getThrustVector() {
+    public final List<Double> getThrustVector() {
         final Vector3dc v = this.blockEntity.thrustDirection;
-        return List.of((float) v.x(), (float) v.y(), (float) v.z());
+        return List.of(v.x(), v.y(), v.z());
     }
 
     @LuaFunction
-    public final List<Float> getFacingVector() {
+    public final List<Double> getFacingVector() {
         final Vector3dc v = this.blockEntity.facingDirection;
-        return List.of((float) v.x(), (float) v.y(), (float) v.z());
+        return List.of(v.x(), v.y(), v.z());
     }
 
     // --- Rotation ---
 
     @LuaFunction
-    public final float getKineticSpeed() {
+    public final double getKineticSpeed() {
         return this.blockEntity.getSpeed();
     }
 
     @LuaFunction
-    public final float getRotationSpeed() {
+    public final double getRotationSpeed() {
         return this.blockEntity.getRotationSpeed();
     }
 
     @LuaFunction
-    public final float getAngularSpeed() {
+    public final double getAngularSpeed() {
         return this.blockEntity.getAngularSpeed();
     }
 
     // Visual angle in degrees (interpolated to current tick).
     @LuaFunction
-    public final float getAngle() {
+    public final double getAngle() {
         return this.blockEntity.getInterpolatedAngle(1.0f);
     }
 
@@ -89,7 +89,7 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
     }
 
     @LuaFunction
-    public final float getSailPower() {
+    public final double getSailPower() {
         return this.blockEntity.totalSailPower;
     }
 
@@ -101,7 +101,7 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
     // --- Stress ---
 
     @LuaFunction
-    public final float getStressApplied() {
+    public final double getStressApplied() {
         return this.blockEntity.calculateStressApplied();
     }
 

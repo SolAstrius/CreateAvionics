@@ -62,17 +62,17 @@ public class PortableEnginePeripheral extends SimPeripheral<PortableEngineBlockE
     // --- Kinetic output ---
 
     @LuaFunction
-    public float getSpeed() {
+    public double getSpeed() {
         return this.blockEntity.getSpeed();
     }
 
     @LuaFunction
-    public float getGeneratedSpeed() {
+    public double getGeneratedSpeed() {
         return this.blockEntity.getGeneratedSpeed();
     }
 
     @LuaFunction
-    public float getStressCapacity() {
+    public double getStressCapacity() {
         return this.blockEntity.calculateAddedStressCapacity();
     }
 }

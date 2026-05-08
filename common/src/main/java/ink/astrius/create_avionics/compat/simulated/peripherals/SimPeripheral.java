@@ -23,11 +23,11 @@ public abstract class SimPeripheral<T extends BlockEntity> implements IPeriphera
         return iPeripheral == this;
     }
 
-    public static List<Float> vecList(final Vec3 vec3) {
-        return List.of((float) vec3.x(), (float) vec3.y(), (float) vec3.z());
+    public static List<Double> vecList(final Vec3 vec3) {
+        return List.of(vec3.x(), vec3.y(), vec3.z());
     }
 
-    public static List<Float> vecList(final Vector3dc vec3) {
-        return List.of((float) vec3.x(), (float) vec3.y(), (float) vec3.z());
+    public static List<Double> vecList(final Vector3dc vec3) {
+        return List.of(vec3.x(), vec3.y(), vec3.z());
     }
 }

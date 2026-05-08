@@ -35,12 +35,12 @@ public class RopeWinchPeripheral extends SimPeripheral<RopeWinchBlockEntity> {
     // command rope length a script must drive the kinetics (e.g., via an
     // analog_transmission or steering_wheel-coupled gearbox).
     @LuaFunction
-    public final float getMovementSpeed() {
+    public final double getMovementSpeed() {
         return this.blockEntity.getMovementSpeed();
     }
 
     @LuaFunction
-    public final float getKineticSpeed() {
+    public final double getKineticSpeed() {
         return this.blockEntity.getSpeed();
     }
 }

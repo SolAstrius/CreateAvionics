@@ -121,9 +121,9 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
     }
 
     @LuaFunction
-    public final float getBalloonHeight() {
+    public final double getBalloonHeight() {
         final Balloon b = this.data().getBalloon();
-        return b != null ? b.getHeight() : 0f;
+        return b != null ? b.getHeight() : 0.0;
     }
 
     @LuaFunction

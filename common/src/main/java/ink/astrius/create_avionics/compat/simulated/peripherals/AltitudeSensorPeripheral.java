@@ -16,7 +16,7 @@ public class AltitudeSensorPeripheral extends SimPeripheral<AltitudeSensorBlockE
     }
 
     @LuaFunction
-    public float getHeight() {
+    public double getHeight() {
         return this.blockEntity.getWorldHeight();
     }
 

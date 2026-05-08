@@ -25,25 +25,25 @@ public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCa
 
     // Unit vector along the barrel in world frame.
     @LuaFunction
-    public final List<Float> getAimingVector() {
+    public final List<Double> getAimingVector() {
         return SimPeripheral.vecList(this.blockEntity.getAimingVector());
     }
 
     // World-frame position of the muzzle.
     @LuaFunction
-    public final List<Float> getBarrelPos() {
+    public final List<Double> getBarrelPos() {
         return SimPeripheral.vecList(this.blockEntity.getBarrelPos());
     }
 
     // --- Drive ---
 
     @LuaFunction
-    public final float getCogwheelSpeed() {
+    public final double getCogwheelSpeed() {
         return this.blockEntity.getCogwheelSpeed();
     }
 
     @LuaFunction
-    public final float getKineticSpeed() {
+    public final double getKineticSpeed() {
         return this.blockEntity.getSpeed();
     }
 

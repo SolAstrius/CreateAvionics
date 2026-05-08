@@ -21,7 +21,7 @@ public class SteeringWheelPeripheral extends SimPeripheral<SteeringWheelBlockEnt
 
     // Current visible wheel angle, degrees. Bounded by ±getMaxAngle().
     @LuaFunction
-    public float getAngle() {
+    public double getAngle() {
         return this.blockEntity.getAngle();
     }
 
@@ -32,7 +32,7 @@ public class SteeringWheelPeripheral extends SimPeripheral<SteeringWheelBlockEnt
 
     // Angle the pilot is currently commanding (what they're steering toward).
     @LuaFunction
-    public float getTargetAngle() {
+    public double getTargetAngle() {
         return this.blockEntity.targetAngle;
     }
 
@@ -49,7 +49,7 @@ public class SteeringWheelPeripheral extends SimPeripheral<SteeringWheelBlockEnt
 
     // Normalized to [-1, +1]. Convenient for mixing pilot input into autopilot commands.
     @LuaFunction
-    public float getNormalizedAngle() {
+    public double getNormalizedAngle() {
         final int max = this.blockEntity.angleInput.getValue();
         return max == 0 ? 0 : this.blockEntity.getAngle() / (float) max;
     }

@@ -53,7 +53,7 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
     }
 
     @LuaFunction
-    public Float getRelativeAngle() {
+    public double getRelativeAngle() {
         return this.blockEntity.getRelativeAngle();
     }
 

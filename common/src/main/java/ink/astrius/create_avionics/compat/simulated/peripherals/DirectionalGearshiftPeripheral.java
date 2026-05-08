@@ -55,7 +55,7 @@ public class DirectionalGearshiftPeripheral extends SimPeripheral<DirectionalGea
     }
 
     @LuaFunction
-    public final float getKineticSpeed() {
+    public final double getKineticSpeed() {
         return this.blockEntity.getSpeed();
     }
 }

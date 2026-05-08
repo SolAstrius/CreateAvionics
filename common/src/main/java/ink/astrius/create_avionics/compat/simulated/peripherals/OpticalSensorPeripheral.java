@@ -21,7 +21,7 @@ public class OpticalSensorPeripheral extends SimPeripheral<OpticalSensorBlockEnt
     }
 
     @LuaFunction
-    public float getDistance() {
+    public double getDistance() {
         return this.blockEntity.getHitBlockDistance();
     }
 
@@ -31,7 +31,7 @@ public class OpticalSensorPeripheral extends SimPeripheral<OpticalSensorBlockEnt
     }
 
     @LuaFunction
-    public float getRange() {
+    public double getRange() {
         return this.blockEntity.getLaserRange();
     }
 

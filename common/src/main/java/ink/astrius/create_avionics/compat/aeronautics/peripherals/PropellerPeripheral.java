@@ -34,14 +34,14 @@ public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends Sim
     }
 
     @LuaFunction
-    public final float getKineticSpeed() {
+    public final double getKineticSpeed() {
         return this.blockEntity.getSpeed();
     }
 
     // Smoothed angular speed used for visuals; lags getKineticSpeed by ~0.15
     // exponential lerp.
     @LuaFunction
-    public final float getRotationSpeed() {
+    public final double getRotationSpeed() {
         return this.blockEntity.rotationSpeed;
     }
 

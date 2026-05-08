@@ -16,7 +16,7 @@ public class VelocitySensorPeripheral extends SimPeripheral<VelocitySensorBlockE
     }
 
     @LuaFunction
-    public float getVelocity() {
+    public double getVelocity() {
         return this.blockEntity.getAdjustedVelocity();
     }
 
