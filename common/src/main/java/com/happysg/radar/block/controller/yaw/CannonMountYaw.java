@@ -1,6 +1,6 @@
 package com.happysg.radar.block.controller.yaw;
 
-import com.happysg.radar.compat.vs2.PhysicsHandler;
+import com.happysg.radar.compat.physics.PhysicsHandler;
 import com.happysg.radar.compat.cbc.VS2CannonTargeting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;

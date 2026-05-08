@@ -6,7 +6,7 @@ import com.happysg.radar.block.controller.id.IDManager;
 import com.happysg.radar.block.radar.behavior.IRadar;
 import com.happysg.radar.block.radar.track.RadarTrack;
 import com.happysg.radar.block.radar.track.TrackCategory;
-import com.happysg.radar.compat.vs2.PhysicsHandler;
+import com.happysg.radar.compat.physics.PhysicsHandler;
 import com.happysg.radar.config.RadarConfig;
 
 import com.mojang.blaze3d.systems.RenderSystem;

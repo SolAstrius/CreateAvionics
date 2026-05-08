@@ -3,7 +3,7 @@ package com.happysg.radar.block.monitor;
 
 import com.happysg.radar.block.radar.track.RadarTrack;
 import com.happysg.radar.compat.Mods;
-import com.happysg.radar.compat.vs2.PhysicsHandler;
+import com.happysg.radar.compat.physics.PhysicsHandler;
 import com.happysg.radar.config.RadarConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
