@@ -17,6 +17,8 @@ ComputerCraft peripherals for [Create: Simulated][simulated] and
   rainbow toggle
 - `laser_sensor` — power readout, closest pointer hit distance
 - `rope_winch` — current length, bounds, kinetic-driven movement speed
+- `directional_gearshift` — source axis, left/right power state, current
+  mode (`forward` / `reverse` / `stop` / `neutral`)
 - `hot_air_burner` *(requires Aeronautics)* — gas output, target amount,
   balloon coupling, boiler efficiency
 - `steam_vent` *(requires Aeronautics)* — same surface as `hot_air_burner`,
@@ -24,6 +26,14 @@ ComputerCraft peripherals for [Create: Simulated][simulated] and
 - `wooden_propeller` / `andesite_propeller` / `smart_propeller`
   *(requires Aeronautics)* — kinetic and rotation speed, thrust, airflow,
   active state, axis. Also matched by the shared `propeller` type.
+- `propeller_bearing` *(requires Aeronautics)* — kinetic, rotation, and
+  angular speed, thrust/airflow, sail power, stress, thrust handedness
+  (read/write), assembly state, assemble/disassemble commands.
+- `gyroscopic_propeller_bearing` *(requires Aeronautics)* — same surface
+  as `propeller_bearing` plus `setTilt` / `setStrictTilt` for scripted axis
+  control. Also matched by the shared `propeller_bearing` type.
+- `mounted_potato_cannon` *(requires Aeronautics)* — aim vector, muzzle
+  position, cogwheel speed, obstruction state, ammo type and count
 
 **Extended readouts**
 - `gimbal_sensor` — body-frame angular velocity, gravity, linear acceleration;

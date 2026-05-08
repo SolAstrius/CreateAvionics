@@ -8,6 +8,9 @@ import dev.simulated_team.simulated.service.SimPlatformService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import ink.astrius.create_avionics.CreateAvionics;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.GasProviderPeripheral;
+import ink.astrius.create_avionics.compat.aeronautics.peripherals.GyroscopicPropellerBearingPeripheral;
+import ink.astrius.create_avionics.compat.aeronautics.peripherals.MountedPotatoCannonPeripheral;
+import ink.astrius.create_avionics.compat.aeronautics.peripherals.PropellerBearingPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.PropellerPeripheral;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -37,6 +40,10 @@ public class AeroCCIntegration implements SimModCompatibilityService {
         add(service, AeroBlockEntityTypes.WOODEN_PROPELLER, be -> new PropellerPeripheral<>(be, "wooden_propeller"));
         add(service, AeroBlockEntityTypes.ANDESITE_PROPELLER, be -> new PropellerPeripheral<>(be, "andesite_propeller"));
         add(service, AeroBlockEntityTypes.SMART_PROPELLER, be -> new PropellerPeripheral<>(be, "smart_propeller"));
+
+        add(service, AeroBlockEntityTypes.PROPELLER_BEARING, PropellerBearingPeripheral::new);
+        add(service, AeroBlockEntityTypes.GYROSCOPIC_PROPELLER_BEARING, GyroscopicPropellerBearingPeripheral::new);
+        add(service, AeroBlockEntityTypes.MOUNTED_POTATO_CANNON, MountedPotatoCannonPeripheral::new);
     }
 
     private static <T extends BlockEntity> void add(final SimPeripheralService service, final Supplier<BlockEntityType<T>> supplier, final SimPeripheralService.SimpleCapabilityGetter<T, IPeripheral> getter) {
