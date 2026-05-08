@@ -33,6 +33,22 @@ dependencies {
     cctJavadoc "cc.tweaked:cct-javadoc:1.9.0"
 }
 
+// The default javadoc task (built into the standard tooling) doesn't know about
+// cct-javadoc's custom @cc.* tags and runs strict doclint. Register the tags
+// and turn off the missing-element checks; luaJavadoc is the task that actually
+// produces our peripheral docs.
+tasks.named('javadoc', Javadoc).configure {
+    def opts = options as StandardJavadocDocletOptions
+    opts.tags(
+        'cc.module:t:Module:',
+        'cc.tparam:m:Type Parameter:',
+        'cc.treturn:m:Returns:',
+        'cc.usage:a:Usage:',
+        'cc.see:a:See:',
+    )
+    opts.addStringOption('Xdoclint:all,-missing', '-quiet')
+}
+
 tasks.register('luaJavadoc', Javadoc) {
     description = 'Generate Lua stubs from @LuaFunction-annotated Java sources for illuaminate.'
     group = JavaBasePlugin.DOCUMENTATION_GROUP
