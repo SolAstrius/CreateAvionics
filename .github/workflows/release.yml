@@ -55,9 +55,9 @@ jobs:
         run: |
           mkdir -p release-artifacts
           shopt -s nullglob
-          for jar in neoforge/build/libs/*.jar common/build/libs/*.jar; do
+          for jar in neoforge/build/libs/*.jar; do
             case "$jar" in
-              *-sources.jar|*-dev.jar|*-dev-shadow.jar) continue ;;
+              *-sources.jar|*-javadoc.jar|*-dev.jar|*-dev-shadow.jar) continue ;;
             esac
             cp "$jar" release-artifacts/
           done
