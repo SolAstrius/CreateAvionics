@@ -72,6 +72,7 @@ public class LaserPointerPeripheral extends SimPeripheral<LaserPointerBlockEntit
 
     /**
      * Set the laser color.
+     * <p>Yields until the next server tick.
      *
      * @param color ARGB-packed color int.
      */
@@ -92,6 +93,7 @@ public class LaserPointerPeripheral extends SimPeripheral<LaserPointerBlockEntit
 
     /**
      * Toggle rainbow color mode.
+     * <p>Yields until the next server tick.
      *
      * @param rainbow True to enable rainbow mode.
      */

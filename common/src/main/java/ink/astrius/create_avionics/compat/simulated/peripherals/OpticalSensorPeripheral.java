@@ -63,6 +63,7 @@ public class OpticalSensorPeripheral extends SimPeripheral<OpticalSensorBlockEnt
 
     /**
      * Set the sensor's max range.
+     * <p>Yields until the next server tick.
      *
      * @param blocks The new range in blocks.
      */
