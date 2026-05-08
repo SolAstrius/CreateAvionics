@@ -68,7 +68,7 @@ public record DetectionConfig(boolean player, boolean vs2, boolean contraption, 
                 return new Color(RadarConfig.client().friendlyColor.get());
             }
         }
-        if (track.trackCategory() == TrackCategory.VS2) {
+        if (track.trackCategory() == TrackCategory.SUBLEVEL) {
             if (blacklistVS2.contains(track.id())) {
                 return new Color(RadarConfig.client().hostileColor.get());
             }
@@ -82,7 +82,7 @@ public record DetectionConfig(boolean player, boolean vs2, boolean contraption, 
     private boolean test(TrackCategory trackCategory) {
         if (trackCategory == TrackCategory.PLAYER) {
             return player;
-        } else if (Mods.VALKYRIENSKIES.isLoaded() && trackCategory == TrackCategory.VS2) {
+        } else if (Mods.VALKYRIENSKIES.isLoaded() && trackCategory == TrackCategory.SUBLEVEL) {
             return vs2;
         } else if (trackCategory == TrackCategory.CONTRAPTION) {
             return contraption;

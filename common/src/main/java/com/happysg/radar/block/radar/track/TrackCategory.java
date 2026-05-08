@@ -1,6 +1,5 @@
 package com.happysg.radar.block.radar.track;
 
-import com.happysg.radar.compat.Mods;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -10,7 +9,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.item.ItemEntity;
-import org.valkyrienskies.core.api.ships.Ship;
 
 
 public enum TrackCategory {
@@ -18,7 +16,7 @@ public enum TrackCategory {
     MOB,
     HOSTILE,
     ANIMAL,
-    VS2,
+    SUBLEVEL,
     PROJECTILE,
     CONTRAPTION,
     ITEM,
@@ -26,21 +24,20 @@ public enum TrackCategory {
 
 
     public static TrackCategory get(Entity entity) {
-            EntityType<?> type = entity.getType();
-            if (type.is(RadarEntityTypeTags.RADAR_HOSTILE)) return HOSTILE;
-            if (type.is(RadarEntityTypeTags.RADAR_ANIMAL)) return ANIMAL;
-            if (type.is(RadarEntityTypeTags.RADAR_MOB)) return MOB;
-            if (type.is(RadarEntityTypeTags.RADAR_PROJECTILE)) return PROJECTILE;
-            if (type.is(RadarEntityTypeTags.RADAR_ITEM)) return ITEM;
+        EntityType<?> type = entity.getType();
+        if (type.is(RadarEntityTypeTags.RADAR_HOSTILE)) return HOSTILE;
+        if (type.is(RadarEntityTypeTags.RADAR_ANIMAL)) return ANIMAL;
+        if (type.is(RadarEntityTypeTags.RADAR_MOB)) return MOB;
+        if (type.is(RadarEntityTypeTags.RADAR_PROJECTILE)) return PROJECTILE;
+        if (type.is(RadarEntityTypeTags.RADAR_ITEM)) return ITEM;
 
-            if (entity instanceof Player) return PLAYER;
-            if (Mods.VALKYRIENSKIES.isLoaded() && entity instanceof Ship) return VS2;
-            if (entity instanceof Enemy) return HOSTILE;
-            if (entity instanceof Animal) return ANIMAL;
-            if (entity instanceof Mob) return MOB;
-            if (entity instanceof Projectile) return PROJECTILE;
-            if (entity instanceof AbstractContraptionEntity) return CONTRAPTION;
-            if (entity instanceof ItemEntity) return ITEM;
-            return MISC;
+        if (entity instanceof Player) return PLAYER;
+        if (entity instanceof Enemy) return HOSTILE;
+        if (entity instanceof Animal) return ANIMAL;
+        if (entity instanceof Mob) return MOB;
+        if (entity instanceof Projectile) return PROJECTILE;
+        if (entity instanceof AbstractContraptionEntity) return CONTRAPTION;
+        if (entity instanceof ItemEntity) return ITEM;
+        return MISC;
     }
 }

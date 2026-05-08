@@ -105,7 +105,7 @@ public class NetworkFiltererBlockEntity extends BlockEntity {
     private boolean isVsShipStillLoaded(ServerLevel sl, @Nullable RadarTrack track) {
         if (!Mods.VALKYRIENSKIES.isLoaded()) return true;
         if (track == null) return true;
-        if (track.trackCategory() != TrackCategory.VS2) return true;
+        if (track.trackCategory() != TrackCategory.SUBLEVEL) return true;
 
         final long shipId;
         try {
@@ -289,7 +289,7 @@ public class NetworkFiltererBlockEntity extends BlockEntity {
                 }
             }
 
-            if (track != null && track.trackCategory() == TrackCategory.VS2) {
+            if (track != null && track.trackCategory() == TrackCategory.SUBLEVEL) {
                 long shipId = parseShipIdOrNeg(track.getId());
                 if (shipId != -1L) {
                     RadarContactRegistry.markLocked(sl, shipId, 10);

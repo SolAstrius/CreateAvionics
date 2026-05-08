@@ -164,7 +164,7 @@ public final class AutoTargetingHelper {
         }
 
         // VS2 -> transponder / name via IDManager
-        if (track.trackCategory() == TrackCategory.VS2) {
+        if (track.trackCategory() == TrackCategory.SUBLEVEL) {
             try {
                 long shipId = Long.parseLong(track.getId());
                 var rec = com.happysg.radar.block.controller.id.IDManager.getIDRecordByShipId(shipId);
@@ -208,7 +208,7 @@ public final class AutoTargetingHelper {
 //        }
 //
 //        // VS2 -> secretID (transponder)
-//        if (track.trackCategory() == TrackCategory.VS2) {
+//        if (track.trackCategory() == TrackCategory.SUBLEVEL) {
 //            IDManager.IDRecord rec = IDManager.getIDRecordByShipId(Long.parseLong(track.id()));
 //            if (rec == null) return null;
 //

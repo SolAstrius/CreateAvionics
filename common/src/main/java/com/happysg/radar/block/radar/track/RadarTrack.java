@@ -1,19 +1,13 @@
 package com.happysg.radar.block.radar.track;
 
 import com.happysg.radar.block.monitor.MonitorSprite;
-import com.happysg.radar.compat.cbc.CannonLead;
-import com.happysg.radar.compat.cbc.VelocityTracker;
 import com.happysg.radar.config.RadarConfig;
+import dev.ryanhcode.sable.companion.SubLevelAccess;
 import net.createmod.catnip.theme.Color;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.valkyrienskies.core.api.ships.Ship;
-
-import javax.annotation.Nullable;
-import java.util.UUID;
 
 
 public class RadarTrack {
@@ -25,8 +19,6 @@ public class RadarTrack {
     private final String entityType;
     private final float entityheight;
 
-    private Vec3 vector;
-
     public RadarTrack(String id, Vec3 position, Vec3 velocity, long scannedTime, TrackCategory trackCategory, String entityType, float entityheight) {
         this.id = id;
         this.position = position;
@@ -35,7 +27,6 @@ public class RadarTrack {
         this.trackCategory = trackCategory;
         this.entityType = entityType;
         this.entityheight = entityheight;
-
     }
 
     public RadarTrack(Entity entity) {
@@ -45,20 +36,20 @@ public class RadarTrack {
 
     public Color getColor() {
         return switch (trackCategory) {
-            case VS2 -> new Color(RadarConfig.client().VS2Color.get());
+            case SUBLEVEL -> new Color(RadarConfig.client().subLevelColor.get());
             case CONTRAPTION -> new Color(RadarConfig.client().contraptionColor.get());
             case PLAYER -> new Color(RadarConfig.client().playerColor.get());
             case ANIMAL -> new Color(RadarConfig.client().friendlyColor.get());
             case HOSTILE -> new Color(RadarConfig.client().hostileColor.get());
             case PROJECTILE -> new Color(RadarConfig.client().projectileColor.get());
-            case ITEM-> new Color(RadarConfig.client().itemcolor.get());
+            case ITEM -> new Color(RadarConfig.client().itemcolor.get());
             default -> Color.WHITE;
         };
     }
 
     public MonitorSprite getSprite() {
         return switch (trackCategory) {
-            case VS2, CONTRAPTION -> MonitorSprite.CONTRAPTION_HITBOX;
+            case SUBLEVEL, CONTRAPTION -> MonitorSprite.CONTRAPTION_HITBOX;
             case PLAYER -> MonitorSprite.PLAYER;
             case PROJECTILE -> MonitorSprite.PROJECTILE;
             default -> MonitorSprite.ENTITY_HITBOX;
@@ -74,7 +65,6 @@ public class RadarTrack {
                 TrackCategory.values()[tag.getInt("Category")],
                 tag.getString("entityType"),
                 tag.getFloat("eh")
-
         );
     }
 
@@ -91,8 +81,7 @@ public class RadarTrack {
         tag.putLong("scannedTime", scannedTime);
         tag.putInt("Category", trackCategory.ordinal());
         tag.putString("entityType", entityType);
-        tag.putFloat("eh", entityheight );
-
+        tag.putFloat("eh", entityheight);
         return tag;
     }
 
@@ -102,9 +91,9 @@ public class RadarTrack {
         scannedTime = entity.level().getGameTime();
     }
 
-    public void updateRadarTrack(Ship ship, Level level) {
-        position = RadarTrackUtil.getPosition(ship);
-        velocity = RadarTrackUtil.getVelocity(ship);
+    public void updateRadarTrack(SubLevelAccess subLevel, Level level) {
+        position = RadarTrackUtil.getPosition(subLevel);
+        velocity = RadarTrackUtil.getVelocity(subLevel);
         scannedTime = level.getGameTime();
     }
 
@@ -136,7 +125,9 @@ public class RadarTrack {
         this.scannedTime = scannedTime;
     }
 
-    public float getEnityHeight(){return entityheight;}
+    public float getEnityHeight() {
+        return entityheight;
+    }
 
     public TrackCategory getTrackCategory() {
         return trackCategory;
@@ -147,23 +138,28 @@ public class RadarTrack {
     }
 
 
-
-    // This is a bit of a jank quick fix, since ive migrated from a record.
+    // Quick-fix accessors that were originally generated when this was a record;
+    // kept for API compatibility with code that already calls them.
     public String id() {
         return getId();
     }
+
     public Vec3 position() {
         return getPosition();
     }
+
     public Vec3 velocity() {
         return getVelocity();
     }
+
     public long scannedTime() {
         return getScannedTime();
     }
+
     public TrackCategory trackCategory() {
         return getTrackCategory();
     }
+
     public String entityType() {
         return getEntityType();
     }
