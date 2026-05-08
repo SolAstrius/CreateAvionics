@@ -1,10 +1,11 @@
 {
   "homepage": "https://modrinth.com/mod/create-avionics",
   "1.21.1": {
-    "0.2.0": "Add propeller_bearing, gyroscopic, mounted_potato_cannon, directional_gearshift peripherals; fix laser_pointer method name"
+    "0.2.0": "Add propeller_bearing, gyroscopic, mounted_potato_cannon, directional_gearshift peripherals; fix laser_pointer method name",
+    "0.2.1": "Fix off-thread state mutation on setName/setTargetAmount/setLimit; ship docs site at solastrius.github.io/CreateAvionics"
   },
   "promos": {
-    "1.21.1-recommended": "0.2.0",
-    "1.21.1-latest": "0.2.0"
+    "1.21.1-recommended": "0.2.1",
+    "1.21.1-latest": "0.2.1"
   }
 }
