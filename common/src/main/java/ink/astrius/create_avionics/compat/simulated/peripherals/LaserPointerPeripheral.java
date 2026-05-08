@@ -32,7 +32,7 @@ public class LaserPointerPeripheral extends SimPeripheral<LaserPointerBlockEntit
 
     @LuaFunction
     public final float getRange() {
-        return this.blockEntity.getRaycastLength();
+        return this.blockEntity.getLaserRange();
     }
 
     // ARGB-packed color int as used by the block.
