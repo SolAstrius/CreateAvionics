@@ -120,8 +120,10 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
 
     /**
      * Get the distance to the resolved target.
+     * Computed in world frame between the table's projected world position
+     * and the target's world position.
      *
-     * @return The distance.
+     * @return The distance in blocks (= meters in Minecraft units).
      */
     @LuaFunction
     public double getDistanceToTarget() {
@@ -130,9 +132,11 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
 
     /**
      * Get the rate at which the table is closing on the target.
-     * Nav table samples distance every 11 ticks (0.55s); closure rate reflects that cadence.
+     * Nav table samples distance every 11 ticks (0.55s); closure rate reflects
+     * that cadence — short-window jitter is dominated by the sampling
+     * granularity.
      *
-     * @return The closure rate (distance per second).
+     * @return The closure rate in blocks/sec (positive = approaching).
      */
     @LuaFunction
     public double getClosureRate() {
@@ -141,8 +145,11 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
 
     /**
      * Get the vertical offset between target and the table's projected position.
+     * Both positions are in world frame (after projecting the table out of any
+     * sub-level), so this gives the signed altitude difference regardless of
+     * contraption orientation.
      *
-     * @return The signed vertical offset (target.y - self.y).
+     * @return The signed vertical offset {@code target.y - self.y} in blocks.
      */
     @LuaFunction
     public double getVerticalOffsetToTarget() {

@@ -10,6 +10,18 @@ import java.util.List;
 /**
  * Inertial measurement on the body frame: pitch/roll angles, angular rates,
  * gravity vector, and linear acceleration.
+ * <p>
+ * <b>Body frame.</b> "Body frame" means the host Sable sub-level's (i.e. the
+ * contraption's) frame, not the block's own local frame. At identity sub-level
+ * orientation, body axes equal world axes:
+ * <ul>
+ *   <li>body +X = world +X (Minecraft east)</li>
+ *   <li>body +Y = world +Y (up)</li>
+ *   <li>body +Z = world +Z (Minecraft south)</li>
+ * </ul>
+ * As the contraption rotates, body axes rotate with it. The block's mounting
+ * orientation does not affect any reading — two gimbal sensors placed in
+ * different orientations on the same contraption return identical values.
  *
  * @cc.module gimbal_sensor
  */
@@ -25,9 +37,16 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     }
 
     /**
-     * Get the gimbal pitch and roll angles in degrees.
+     * Get the contraption's pitch and roll angles in degrees.
+     * Both are derived from where world-down points in the body frame:
+     * <ul>
+     *   <li>{@code xAngle} — rotation about body-X (pitch). 0° = body-Y aligned with world-up.</li>
+     *   <li>{@code zAngle} — rotation about body-Z (roll). 0° = body-Y aligned with world-up.</li>
+     * </ul>
+     * Yaw is not measurable from gravity alone and is not reported here; use
+     * {@code navigation_table.getHeading()} for yaw.
      *
-     * @return A two-element list {xAngle, zAngle} in degrees.
+     * @return A two-element list {pitch, roll} in degrees.
      */
     @LuaFunction
     public List<Double> getAngles() {
@@ -35,9 +54,10 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     }
 
     /**
-     * Get the gimbal pitch and roll angles in radians.
+     * Get the contraption's pitch and roll angles in radians. See
+     * {@link #getAngles} for axis conventions.
      *
-     * @return A two-element list {xAngle, zAngle} in radians.
+     * @return A two-element list {pitch, roll} in radians.
      */
     @LuaFunction
     public List<Double> getAnglesRad() {
@@ -45,7 +65,12 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     }
 
     /**
-     * Get body-frame angular velocity in degrees/sec.
+     * Get the contraption's angular velocity in body frame.
+     * Components are rotation rates about each body axis:
+     * {@code wx} = pitch rate (about body-X, matches the sign of {@link #getAngles}'s
+     * pitch derivative); {@code wy} = yaw rate (about body-Y); {@code wz} =
+     * roll rate (about body-Z, matches the sign of {@link #getAngles}'s roll
+     * derivative). From Sable's rigid-body engine.
      *
      * @return A three-element list {wx, wy, wz} in degrees/sec.
      */
@@ -56,7 +81,8 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     }
 
     /**
-     * Get body-frame angular velocity in radians/sec.
+     * Get the contraption's angular velocity in body frame, in radians/sec.
+     * See {@link #getAngularRates} for axis conventions.
      *
      * @return A three-element list {wx, wy, wz} in radians/sec.
      */
@@ -67,9 +93,14 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     }
 
     /**
-     * Get the gravity vector in the body frame.
+     * Get the local gravity vector expressed in body frame.
+     * The dimension's gravity (typically {@code (0, -9.81, 0)} in world frame
+     * for the Overworld; varies per dimension via Sable config) rotated into
+     * the contraption's body frame. Useful for attitude estimation:
+     * {@code atan2(g.x, -g.y)} ≈ roll, {@code atan2(g.z, -g.y)} ≈ pitch — the
+     * same derivation {@link #getAngles} performs internally.
      *
-     * @return A three-element list {gx, gy, gz}.
+     * @return A three-element list {gx, gy, gz} in m/s².
      */
     @LuaFunction
     public List<Double> getGravity() {
@@ -78,10 +109,16 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     }
 
     /**
-     * Get linear acceleration in the body frame.
-     * m/s^2, body-frame, gravity not subtracted; finite-differenced at 20 Hz.
+     * Get the contraption's linear acceleration in body frame.
+     * Finite-differenced from Sable's linear velocity at the server tick rate
+     * (Δv × 20), then rotated into body frame. Has one tick of lag.
+     * <p>
+     * <b>Gravity is not subtracted.</b> A stationary contraption reads
+     * {@code -getGravity()} (the normal force from below feels like upward
+     * acceleration). To get proper acceleration in body frame, compute
+     * {@code accel - gravity} component-wise.
      *
-     * @return A three-element list {ax, ay, az}.
+     * @return A three-element list {ax, ay, az} in m/s².
      */
     @LuaFunction
     public List<Double> getLinearAcceleration() {
