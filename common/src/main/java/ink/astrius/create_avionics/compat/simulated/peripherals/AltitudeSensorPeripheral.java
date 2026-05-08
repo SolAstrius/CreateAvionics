@@ -36,14 +36,19 @@ public class AltitudeSensorPeripheral extends SimPeripheral<AltitudeSensorBlockE
 
     /**
      * Get the local air pressure at the sensor's altitude.
-     * Computed as {@code base_pressure × pressure_curve(y)} from the
-     * dimension's Sable physics config; the pressure curve is a Bezier function
-     * of altitude, so values fall off with height in a dimension-configurable
-     * way. Units are dimension-config-defined; in the Overworld defaults the
-     * raw value is roughly an atmosphere fraction (the goggle tooltip displays
-     * it ×100, suggesting "atm × 100" as the natural reading scale).
+     * <p>
+     * Unit is dimensionless "atmosphere fraction": 1.0 = sea-level pressure,
+     * 0.0 = vacuum (top of build height). The goggle tooltip displays this
+     * value as a percentage ({@code 1.00 → "100.00%"}).
+     * <p>
+     * Computed as {@code base_pressure × pressure_curve(y)} where on the
+     * Overworld defaults {@code base_pressure = 1.0} and the curve follows
+     * {@code exp(-0.004 × (y - seaLevel))} above sea level (so a 1/e pressure
+     * drop every ~250 blocks of altitude), clamped to a maximum of 1.5 below
+     * sea level, and tapering to 0 at {@code logicalHeight}. Per-dimension
+     * curves can override this via Sable's physics config.
      *
-     * @return The air pressure in dimension-defined units.
+     * @return The air pressure as a fraction of sea-level pressure.
      */
     @LuaFunction
     public double getAirPressure() {

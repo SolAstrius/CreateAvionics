@@ -94,11 +94,11 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
 
     /**
      * Get the local gravity vector expressed in body frame.
-     * The dimension's gravity (typically {@code (0, -9.81, 0)} in world frame
-     * for the Overworld; varies per dimension via Sable config) rotated into
-     * the contraption's body frame. Useful for attitude estimation:
-     * {@code atan2(g.x, -g.y)} ≈ roll, {@code atan2(g.z, -g.y)} ≈ pitch — the
-     * same derivation {@link #getAngles} performs internally.
+     * The dimension's gravity (Sable default: {@code (0, -11.0, 0)} m/s² in
+     * world frame; per-dimension overridable via Sable's physics config)
+     * rotated into the contraption's body frame. Useful for attitude
+     * estimation: {@code atan2(g.x, -g.y)} ≈ roll, {@code atan2(g.z, -g.y)} ≈
+     * pitch — the same derivation {@link #getAngles} performs internally.
      *
      * @return A three-element list {gx, gy, gz} in m/s².
      */
