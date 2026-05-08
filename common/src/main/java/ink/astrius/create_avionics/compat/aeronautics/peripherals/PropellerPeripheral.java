@@ -6,9 +6,14 @@ import ink.astrius.create_avionics.compat.simulated.peripherals.SimPeripheral;
 
 import java.util.Set;
 
-// Shared peripheral for all small propeller variants (wooden, andesite, smart).
-// Primary type follows the block id; the additional "propeller" type lets
-// scripts target every variant uniformly.
+/**
+ * Shared peripheral for all small propeller variants (wooden, andesite, smart).
+ * Reports axis, kinetic and rotation speed, thrust output, and active state.
+ * Primary type follows the block id; the additional "propeller" type lets
+ * scripts target every variant uniformly.
+ *
+ * @cc.module propeller
+ */
 public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends SimPeripheral<T> {
 
     private final String typeName;
@@ -28,35 +33,65 @@ public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends Sim
         return Set.of("propeller");
     }
 
+    /**
+     * Get the propeller's mounted direction.
+     *
+     * @return The serialized direction name.
+     */
     @LuaFunction
     public final String getAxis() {
         return this.blockEntity.getBlockDirection().getSerializedName();
     }
 
+    /**
+     * Get the propeller's kinetic input speed.
+     *
+     * @return The kinetic speed.
+     */
     @LuaFunction
     public final double getKineticSpeed() {
         return this.blockEntity.getSpeed();
     }
 
-    // Smoothed angular speed used for visuals; lags getKineticSpeed by ~0.15
-    // exponential lerp.
+    /**
+     * Get the propeller's smoothed rotation speed.
+     * Smoothed angular speed used for visuals; lags getKineticSpeed by ~0.15
+     * exponential lerp.
+     *
+     * @return The smoothed rotation speed.
+     */
     @LuaFunction
     public final double getRotationSpeed() {
         return this.blockEntity.rotationSpeed;
     }
 
-    // Direction-independent thrust (config-driven × current speed). Sign
-    // tracks the kinetic input.
+    /**
+     * Get the propeller's thrust output.
+     * Direction-independent thrust (config-driven × current speed). Sign
+     * tracks the kinetic input.
+     *
+     * @return The thrust.
+     */
     @LuaFunction
     public final double getThrust() {
         return this.blockEntity.getThrust();
     }
 
+    /**
+     * Get the propeller's airflow.
+     *
+     * @return The airflow.
+     */
     @LuaFunction
     public final double getAirflow() {
         return this.blockEntity.getAirflow();
     }
 
+    /**
+     * Check whether the propeller is currently active.
+     *
+     * @return True if active.
+     */
     @LuaFunction
     public final boolean isActive() {
         return this.blockEntity.isActive();

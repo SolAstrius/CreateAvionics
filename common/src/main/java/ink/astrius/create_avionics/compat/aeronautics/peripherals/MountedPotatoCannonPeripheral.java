@@ -10,6 +10,12 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
+/**
+ * A mounted potato cannon. Reports aim, drive speed, obstruction state, and
+ * loaded ammo.
+ *
+ * @cc.module mounted_potato_cannon
+ */
 public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCannonBlockEntity> {
 
     public MountedPotatoCannonPeripheral(final MountedPotatoCannonBlockEntity blockEntity) {
@@ -23,13 +29,21 @@ public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCa
 
     // --- Aim & geometry ---
 
-    // Unit vector along the barrel in world frame.
+    /**
+     * Get the cannon's aim direction.
+     *
+     * @return Unit vector along the barrel in world frame, as a 3-element list.
+     */
     @LuaFunction
     public final List<Double> getAimingVector() {
         return SimPeripheral.vecList(this.blockEntity.getAimingVector());
     }
 
-    // World-frame position of the muzzle.
+    /**
+     * Get the cannon's muzzle position.
+     *
+     * @return World-frame position of the muzzle, as a 3-element list.
+     */
     @LuaFunction
     public final List<Double> getBarrelPos() {
         return SimPeripheral.vecList(this.blockEntity.getBarrelPos());
@@ -37,11 +51,21 @@ public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCa
 
     // --- Drive ---
 
+    /**
+     * Get the speed of the driving cogwheel.
+     *
+     * @return The cogwheel speed.
+     */
     @LuaFunction
     public final double getCogwheelSpeed() {
         return this.blockEntity.getCogwheelSpeed();
     }
 
+    /**
+     * Get the cannon's kinetic input speed.
+     *
+     * @return The kinetic speed.
+     */
     @LuaFunction
     public final double getKineticSpeed() {
         return this.blockEntity.getSpeed();
@@ -49,12 +73,21 @@ public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCa
 
     // --- Obstruction ---
 
+    /**
+     * Check whether the barrel is currently obstructed.
+     *
+     * @return True if blocked.
+     */
     @LuaFunction
     public final boolean isBlocked() {
         return this.blockEntity.isBlocked();
     }
 
-    // Distance along the barrel to the obstruction. Returns nil if clear.
+    /**
+     * Get the distance to a barrel obstruction, if any.
+     *
+     * @return Distance along the barrel to the obstruction. Returns nil if clear.
+     */
     @LuaFunction
     public final Double getBlockedLength() {
         return this.blockEntity.isBlocked() ? this.blockEntity.getBlockedLength() : null;
@@ -62,18 +95,32 @@ public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCa
 
     // --- Ammo ---
 
+    /**
+     * Check whether the cannon has ammo loaded.
+     *
+     * @return True if ammo is loaded.
+     */
     @LuaFunction
     public final boolean hasAmmo() {
         return !this.ammoStack().isEmpty();
     }
 
+    /**
+     * Get the count of loaded ammo.
+     *
+     * @return The ammo stack size.
+     */
     @LuaFunction
     public final int getAmmoCount() {
         return this.ammoStack().getCount();
     }
 
-    // Registry id of the loaded ammo item (e.g. "minecraft:potato"), or nil
-    // if the cannon is empty.
+    /**
+     * Get the registry id of the loaded ammo item.
+     *
+     * @return Registry id of the loaded ammo item (e.g. "minecraft:potato"), or nil
+     *         if the cannon is empty.
+     */
     @LuaFunction
     public final String getAmmoType() {
         final ItemStack stack = this.ammoStack();

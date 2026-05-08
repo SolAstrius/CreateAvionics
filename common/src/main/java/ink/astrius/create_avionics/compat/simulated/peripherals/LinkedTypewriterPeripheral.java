@@ -7,6 +7,12 @@ import ink.astrius.create_avionics.api.simulated.LinkedTypewriterExt;
 
 import java.util.List;
 
+/**
+ * A typewriter that forwards keypresses to attached computers and exposes
+ * the currently held keys.
+ *
+ * @cc.module linked_typewriter
+ */
 public class LinkedTypewriterPeripheral extends SimPeripheral<LinkedTypewriterBlockEntity> {
 
     public LinkedTypewriterPeripheral(final LinkedTypewriterBlockEntity blockEntity) {
@@ -28,6 +34,11 @@ public class LinkedTypewriterPeripheral extends SimPeripheral<LinkedTypewriterBl
         ((LinkedTypewriterExt) this.blockEntity).getComputerHandler().detach(computer);
     }
 
+    /**
+     * Get the list of currently pressed key codes.
+     *
+     * @return A list of key codes.
+     */
     @LuaFunction
     public final List<Integer> getPressedKeyCodes() {
         return this.blockEntity.getPressedKeys();

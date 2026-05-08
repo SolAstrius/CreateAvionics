@@ -16,8 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// The shared additional type "gas_provider" lets scripts target every heater
-// regardless of block kind.
+/**
+ * Shared peripheral for gas-output blocks (burners, vents) that fill balloons.
+ * Reports gas output, signal, gas type, target amount, and balloon state. The
+ * shared additional type "gas_provider" lets scripts target every heater
+ * regardless of block kind.
+ *
+ * @cc.module gas_provider
+ */
 public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeripheral<T> {
 
     private final String typeName;
@@ -41,22 +47,42 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
         return (GasProviderData) this.blockEntity;
     }
 
-    // Output = target × signal / 15 (burner), or target × efficiency × signal / 15 (vent).
+    /**
+     * Get the current gas output rate.
+     * Output = target × signal / 15 (burner), or target × efficiency × signal / 15 (vent).
+     *
+     * @return The gas output rate.
+     */
     @LuaFunction
     public final double getGasOutput() {
         return this.data().getGasOutput();
     }
 
+    /**
+     * Check whether the provider can currently output gas.
+     *
+     * @return True if active.
+     */
     @LuaFunction
     public final boolean isActive() {
         return this.data().canOutputGas();
     }
 
+    /**
+     * Get the redstone signal strength driving output.
+     *
+     * @return The signal strength, 0..15.
+     */
     @LuaFunction
     public final int getSignalStrength() {
         return this.data().getSignalStrength();
     }
 
+    /**
+     * Get the id of the gas this provider produces.
+     *
+     * @return The gas type id ("steam", "default", or "unknown").
+     */
     @LuaFunction
     public final String getGasType() {
         return gasTypeId(this.data().getLiftingGasType());
@@ -68,64 +94,117 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
         return "unknown";
     }
 
+    /**
+     * Get the configured target gas amount.
+     *
+     * @return The target amount.
+     */
     @LuaFunction
     public final int getTargetAmount() {
         return this.data().getTargetAmount();
     }
 
-    // Clamped internally to the scroll-value's min/max.
+    /**
+     * Set the target gas amount. Clamped internally to the scroll-value's min/max.
+     *
+     * @param amount The new target amount.
+     */
     @LuaFunction
     public final void setTargetAmount(final int amount) {
         this.data().setTargetAmount(amount);
     }
 
-    // 0..1. Burners are always 1.0; vents track boiler heat.
+    /**
+     * Get the boiler efficiency. 0..1. Burners are always 1.0; vents track boiler heat.
+     *
+     * @return The boiler efficiency in [0, 1].
+     */
     @LuaFunction
     public final double getBoilerEfficiency() {
         return this.data().getBoilerEfficiency();
     }
 
+    /**
+     * Check whether a balloon is currently attached.
+     *
+     * @return True if a balloon is present.
+     */
     @LuaFunction
     public final boolean hasBalloon() {
         return this.data().getBalloon() != null;
     }
 
+    /**
+     * Get the attached balloon's capacity.
+     *
+     * @return The balloon's capacity, or 0 if none.
+     */
     @LuaFunction
     public final int getBalloonCapacity() {
         final Balloon b = this.data().getBalloon();
         return b != null ? b.getCapacity() : 0;
     }
 
+    /**
+     * Get the balloon's currently filled volume.
+     *
+     * @return The filled volume, or 0 if no server-side balloon.
+     */
     @LuaFunction
     public final double getBalloonFilledVolume() {
         final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalFilledVolume() : 0.0;
     }
 
+    /**
+     * Get the balloon's target volume.
+     *
+     * @return The target volume, or 0 if no server-side balloon.
+     */
     @LuaFunction
     public final double getBalloonTargetVolume() {
         final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalTargetVolume() : 0.0;
     }
 
+    /**
+     * Get the per-tick volume change of the balloon.
+     *
+     * @return The signed volume change, or 0 if no server-side balloon.
+     */
     @LuaFunction
     public final double getBalloonVolumeChange() {
         final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalVolumeChange() : 0.0;
     }
 
+    /**
+     * Get the balloon's lift force.
+     *
+     * @return The lift, or 0 if no server-side balloon.
+     */
     @LuaFunction
     public final double getBalloonLift() {
         final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalLift() : 0.0;
     }
 
+    /**
+     * Get the balloon's height.
+     *
+     * @return The height, or 0 if no balloon.
+     */
     @LuaFunction
     public final double getBalloonHeight() {
         final Balloon b = this.data().getBalloon();
         return b != null ? b.getHeight() : 0.0;
     }
 
+    /**
+     * Get the balloon's gas mix as a list of {type, amount} entries.
+     *
+     * @return A list of gas mix entries.
+     */
     @LuaFunction
     public final List<Map<String, Object>> getBalloonGasMix() {
         final Balloon b = this.data().getBalloon();
