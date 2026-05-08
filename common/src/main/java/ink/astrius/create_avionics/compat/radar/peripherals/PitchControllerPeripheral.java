@@ -29,9 +29,6 @@ public class PitchControllerPeripheral extends SimPeripheral<AutoPitchController
 
     @LuaFunction(mainThread = true)
     public final void stopAuto() {
-        if (this.blockEntity.firingControl != null) {
-            this.blockEntity.firingControl.resetTarget();
-        }
-        this.blockEntity.isRunning = false;
+        this.blockEntity.stopAuto();
     }
 }
