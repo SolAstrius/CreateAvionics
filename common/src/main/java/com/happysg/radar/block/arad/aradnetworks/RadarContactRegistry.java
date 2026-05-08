@@ -2,28 +2,32 @@ package com.happysg.radar.block.arad.aradnetworks;
 
 import net.minecraft.server.level.ServerLevel;
 
+import java.util.UUID;
+
 public final class RadarContactRegistry {
     private RadarContactRegistry() {}
 
-    public static void markInRange(ServerLevel level, long shipId, int ttlTicks) {
-        RadarContactRegistryData.get(level).markInRange(shipId, ttlTicks);
+    public static void markInRange(final ServerLevel level, final UUID subLevelId, final int ttlTicks) {
+        RadarContactRegistryData.get(level).markInRange(subLevelId, ttlTicks);
     }
 
-    public static void markLocked(ServerLevel level, long shipId, int ttlTicks) {
-        RadarContactRegistryData.get(level).markLocked(shipId, ttlTicks);
-    }
-    public static boolean isInRange(ServerLevel level, long shipId) {
-        return RadarContactRegistryData.get(level).isInRange(shipId);
+    public static void markLocked(final ServerLevel level, final UUID subLevelId, final int ttlTicks) {
+        RadarContactRegistryData.get(level).markLocked(subLevelId, ttlTicks);
     }
 
-    public static boolean isLocked(ServerLevel level, long shipId) {
-        return RadarContactRegistryData.get(level).isLocked(shipId);
-    }
-    public static void unLock(ServerLevel level, long shipId){
-        RadarContactRegistryData.get(level).unlockShip(shipId);
+    public static boolean isInRange(final ServerLevel level, final UUID subLevelId) {
+        return RadarContactRegistryData.get(level).isInRange(subLevelId);
     }
 
-    public static void tickDecay(ServerLevel level) {
+    public static boolean isLocked(final ServerLevel level, final UUID subLevelId) {
+        return RadarContactRegistryData.get(level).isLocked(subLevelId);
+    }
+
+    public static void unLock(final ServerLevel level, final UUID subLevelId) {
+        RadarContactRegistryData.get(level).unlock(subLevelId);
+    }
+
+    public static void tickDecay(final ServerLevel level) {
         RadarContactRegistryData.get(level).tickDecay();
     }
 }

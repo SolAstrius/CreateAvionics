@@ -8,6 +8,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 public class RadarContactRegistryData extends SavedData {
 
@@ -16,11 +17,11 @@ public class RadarContactRegistryData extends SavedData {
 
     private static final String DATA_NAME = "create_radar_contact_registry";
 
-    private final Map<Long, Entry> entries = new HashMap<>();
+    private final Map<UUID, Entry> entries = new HashMap<>();
 
     // ===== access =====
 
-    public static RadarContactRegistryData get(ServerLevel level) {
+    public static RadarContactRegistryData get(final ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
                 new SavedData.Factory<>(
                         RadarContactRegistryData::new,
@@ -42,7 +43,7 @@ public class RadarContactRegistryData extends SavedData {
         public int inRangeTtl;
         public int lockedTtl;
 
-        public Entry(int inRangeTtl, int lockedTtl) {
+        public Entry(final int inRangeTtl, final int lockedTtl) {
             this.inRangeTtl = inRangeTtl;
             this.lockedTtl = lockedTtl;
         }
@@ -50,48 +51,44 @@ public class RadarContactRegistryData extends SavedData {
 
     // ===== core API (range/lock) =====
 
-    // i call this any tick a target is within detection range
-    public void markInRange(long shipId, int ttlTicks) {
+    public void markInRange(final UUID subLevelId, int ttlTicks) {
         if (ttlTicks <= 0) ttlTicks = DEFAULT_IN_RANGE_TTL;
 
-        Entry e = entries.get(shipId);
+        final Entry e = entries.get(subLevelId);
         if (e == null) {
-            entries.put(shipId, new Entry(ttlTicks, 0));
+            entries.put(subLevelId, new Entry(ttlTicks, 0));
         } else {
             e.inRangeTtl = Math.max(e.inRangeTtl, ttlTicks);
         }
-
         setDirty();
     }
 
-    // i call this any tick a target is actively locked
-    public void markLocked(long shipId, int ttlTicks) {
+    public void markLocked(final UUID subLevelId, int ttlTicks) {
         if (ttlTicks <= 0) ttlTicks = DEFAULT_LOCK_TTL;
 
-        Entry e = entries.get(shipId);
+        final Entry e = entries.get(subLevelId);
         if (e == null) {
-            entries.put(shipId, new Entry(0, ttlTicks));
+            entries.put(subLevelId, new Entry(0, ttlTicks));
         } else {
             e.lockedTtl = Math.max(e.lockedTtl, ttlTicks);
         }
-
         setDirty();
     }
 
-    public boolean isInRange(long shipId) {
-        Entry e = entries.get(shipId);
+    public boolean isInRange(final UUID subLevelId) {
+        final Entry e = entries.get(subLevelId);
         return e != null && e.inRangeTtl > 0;
     }
 
-    public boolean isLocked(long shipId) {
-        Entry e = entries.get(shipId);
+    public boolean isLocked(final UUID subLevelId) {
+        final Entry e = entries.get(subLevelId);
         return e != null && e.lockedTtl > 0;
     }
 
     // highest state wins
-    public RadarContactState getState(long shipId) {
-        if (isLocked(shipId)) return RadarContactState.LOCKED;
-        if (isInRange(shipId)) return RadarContactState.IN_RANGE;
+    public RadarContactState getState(final UUID subLevelId) {
+        if (isLocked(subLevelId)) return RadarContactState.LOCKED;
+        if (isInRange(subLevelId)) return RadarContactState.IN_RANGE;
         return null;
     }
 
@@ -99,11 +96,11 @@ public class RadarContactRegistryData extends SavedData {
         if (entries.isEmpty()) return;
 
         boolean changed = false;
-        Iterator<Map.Entry<Long, Entry>> it = entries.entrySet().iterator();
+        final Iterator<Map.Entry<UUID, Entry>> it = entries.entrySet().iterator();
 
         while (it.hasNext()) {
-            Map.Entry<Long, Entry> me = it.next();
-            Entry e = me.getValue();
+            final Map.Entry<UUID, Entry> me = it.next();
+            final Entry e = me.getValue();
 
             if (e.inRangeTtl > 0) e.inRangeTtl--;
             if (e.lockedTtl > 0) e.lockedTtl--;
@@ -111,75 +108,43 @@ public class RadarContactRegistryData extends SavedData {
             if (e.inRangeTtl <= 0 && e.lockedTtl <= 0) {
                 it.remove();
             }
-
             changed = true;
         }
 
         if (changed) setDirty();
     }
 
-    // ===== LockRegistryData compatibility API =====
-
-    public static final int DEFAULT_TTL_TICKS = DEFAULT_LOCK_TTL;
-
-    public void lockShip(long shipId, int ttlTicks) {
-        markLocked(shipId, ttlTicks);
-    }
-
-    public void unlockShip(long shipId) {
-        Entry e = entries.get(shipId);
+    public void unlock(final UUID subLevelId) {
+        final Entry e = entries.get(subLevelId);
         if (e == null) return;
 
         if (e.lockedTtl != 0) {
             e.lockedTtl = 0;
             if (e.inRangeTtl <= 0) {
-                entries.remove(shipId);
+                entries.remove(subLevelId);
             }
             setDirty();
         }
     }
 
-    public boolean isShipLocked(long shipId) {
-        return isLocked(shipId);
-    }
-
     // ===== persistence =====
 
-    public static RadarContactRegistryData load(CompoundTag tag, HolderLookup.Provider registries) {
-        RadarContactRegistryData data = new RadarContactRegistryData();
+    public static RadarContactRegistryData load(final CompoundTag tag, final HolderLookup.Provider registries) {
+        final RadarContactRegistryData data = new RadarContactRegistryData();
 
-        CompoundTag shipsTag = tag.getCompound("Ships");
-        for (String key : shipsTag.getAllKeys()) {
+        final CompoundTag subsTag = tag.getCompound("SubLevels");
+        for (final String key : subsTag.getAllKeys()) {
             try {
-                long shipId = Long.parseLong(key);
-                CompoundTag eTag = shipsTag.getCompound(key);
-                int inRange = eTag.getInt("InRange");
-                int locked = eTag.getInt("Locked");
+                final UUID id = UUID.fromString(key);
+                final CompoundTag eTag = subsTag.getCompound(key);
+                final int inRange = eTag.getInt("InRange");
+                final int locked = eTag.getInt("Locked");
 
                 if (inRange > 0 || locked > 0) {
-                    data.entries.put(shipId, new Entry(inRange, locked));
+                    data.entries.put(id, new Entry(inRange, locked));
                 }
-            } catch (NumberFormatException ignored) {
-                // i ignore invalid keys
-            }
-        }
-
-        if (tag.contains("LockedShips")) {
-            CompoundTag lockedShips = tag.getCompound("LockedShips");
-            for (String key : lockedShips.getAllKeys()) {
-                try {
-                    long shipId = Long.parseLong(key);
-                    int ttl = lockedShips.getInt(key);
-                    if (ttl > 0) {
-                        Entry e = data.entries.get(shipId);
-                        if (e == null) {
-                            data.entries.put(shipId, new Entry(0, ttl));
-                        } else {
-                            e.lockedTtl = Math.max(e.lockedTtl, ttl);
-                        }
-                    }
-                } catch (NumberFormatException ignored) {
-                }
+            } catch (final IllegalArgumentException ignored) {
+                // skip malformed UUID keys
             }
         }
 
@@ -187,21 +152,19 @@ public class RadarContactRegistryData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        CompoundTag shipsTag = new CompoundTag();
+    public CompoundTag save(final CompoundTag tag, final HolderLookup.Provider registries) {
+        final CompoundTag subsTag = new CompoundTag();
 
-        for (var e : entries.entrySet()) {
-            Entry entry = e.getValue();
+        for (final var e : entries.entrySet()) {
+            final Entry entry = e.getValue();
             if (entry.inRangeTtl <= 0 && entry.lockedTtl <= 0) continue;
 
-            CompoundTag eTag = new CompoundTag();
+            final CompoundTag eTag = new CompoundTag();
             eTag.putInt("InRange", entry.inRangeTtl);
             eTag.putInt("Locked", entry.lockedTtl);
-            shipsTag.put(Long.toString(e.getKey()), eTag);
+            subsTag.put(e.getKey().toString(), eTag);
         }
-
-        tag.put("Ships", shipsTag);
-
+        tag.put("SubLevels", subsTag);
         return tag;
     }
 }
