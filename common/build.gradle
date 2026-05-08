@@ -26,6 +26,31 @@ configurations {
         canBeResolved = false
         canBeConsumed = true
     }
+    cctJavadoc
+}
+
+dependencies {
+    cctJavadoc "cc.tweaked:cct-javadoc:1.9.0"
+}
+
+tasks.register('luaJavadoc', Javadoc) {
+    description = 'Generate Lua stubs from @LuaFunction-annotated Java sources for illuaminate.'
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+
+    source = sourceSets.main.java
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = layout.buildDirectory.dir('docs/luaJavadoc').get().asFile
+
+    def opts = options as StandardJavadocDocletOptions
+    opts.docletpath = configurations.cctJavadoc.files.toList()
+    opts.doclet = 'cc.tweaked.javadoc.LuaDoclet'
+    opts.addStringOption('project-root', rootProject.projectDir.absolutePath)
+    opts.noTimestamp(false)
+
+    // cct-javadoc 1.9.0 is compiled against JDK 25; the javadoc tool must match.
+    javadocTool = javaToolchains.javadocToolFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 artifacts {

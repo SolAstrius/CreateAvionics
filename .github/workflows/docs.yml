@@ -1,0 +1,68 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  ILLUAMINATE_VERSION: 0.1.0-83-g1131f68
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Generate Lua stubs from @LuaFunction sources
+        run: ./gradlew :common:luaJavadoc --stacktrace
+
+      - name: Download illuaminate
+        run: |
+          set -euo pipefail
+          mkdir -p .bin
+          curl -sSLo .bin/illuaminate \
+            "https://squiddev.cc/illuaminate/bin/cc/squiddev/illuaminate/${ILLUAMINATE_VERSION}/illuaminate-${ILLUAMINATE_VERSION}-linux-x86_64"
+          chmod +x .bin/illuaminate
+          .bin/illuaminate --version
+
+      - name: Build docs site
+        run: .bin/illuaminate doc-gen
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/illuaminate
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
