@@ -4,6 +4,13 @@ import dan200.computercraft.api.lua.LuaFunction;
 import dev.simulated_team.simulated.content.blocks.throttle_lever.ThrottleLeverBlockEntity;
 import net.minecraft.util.Mth;
 
+/**
+ * A 16-position physical lever. Its state is the analog redstone signal it
+ * emits (before any block-state inversion); writing it both updates the lever
+ * and plays the click sound.
+ *
+ * @cc.module throttle_lever
+ */
 public class ThrottleLeverPeripheral extends SimPeripheral<ThrottleLeverBlockEntity> {
 
     public ThrottleLeverPeripheral(final ThrottleLeverBlockEntity blockEntity) {
@@ -15,16 +22,22 @@ public class ThrottleLeverPeripheral extends SimPeripheral<ThrottleLeverBlockEnt
         return "throttle_lever";
     }
 
-    // Returns the lever state 0..15. Equals the analog redstone signal the
-    // block emits before any block-state inversion is applied.
+    /**
+     * Get the current lever state.
+     *
+     * @return The lever state, 0..15.
+     */
     @LuaFunction
     public final int getState() {
         return this.blockEntity.getState();
     }
 
-    // setSignal mirrors the upstream public setter: drives the state, plays
-    // the click sound, and sendData. Unlike analog_transmission there is no
-    // externallyControlled flag — a player can still change the lever.
+    /**
+     * Drive the lever to a new state. A player can still change it afterwards —
+     * unlike {@code analog_transmission} there is no externally-controlled flag.
+     *
+     * @param signal The target state, clamped to 0..15.
+     */
     @LuaFunction(mainThread = true)
     public final void setSignal(final int signal) {
         this.blockEntity.setSignal(Mth.clamp(signal, 0, 15));

@@ -43,7 +43,7 @@ jobs:
           set -euo pipefail
           mkdir -p .bin
           curl -sSLo .bin/illuaminate \
-            "https://squiddev.cc/illuaminate/bin/cc/squiddev/illuaminate/${ILLUAMINATE_VERSION}/illuaminate-${ILLUAMINATE_VERSION}-linux-x86_64"
+            "https://squiddev.cc/illuaminate/bin/${ILLUAMINATE_VERSION}/illuaminate-linux-x86_64"
           chmod +x .bin/illuaminate
           .bin/illuaminate --version
 
