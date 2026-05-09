@@ -14,7 +14,8 @@
   (site
     (title "Create: Avionics")
     (url https://solastrius.github.io/CreateAvionics/)
-    (source-link https://github.com/SolAstrius/CreateAvionics/blob/${commit}/${path}#L${line}))
+    (source-link https://github.com/SolAstrius/CreateAvionics/blob/${commit}/${path}#L${line})
+    (head doc/head.html))
 
   (module-kinds
     (peripheral Peripherals)

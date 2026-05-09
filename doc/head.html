@@ -1,0 +1,28 @@
+<!-- Client-side Lua syntax highlighting for guide code blocks.
+     illuaminate emits <pre class="highlight"> wrappers but does not tokenize
+     markdown-fenced code; cc-tweaked has a custom TSX post-processor for this,
+     we just lean on highlight.js. -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer">
+<script defer
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+<script defer
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof hljs === 'undefined') return;
+    document.querySelectorAll('pre.highlight').forEach(function (el) {
+      // Skip blocks illuaminate already tokenized server-side (e.g. @cc.usage
+      // examples); those have data-lua-kind and pre-emitted spans.
+      if (el.dataset.luaKind || el.querySelector('span')) return;
+      el.classList.add('language-lua');
+      hljs.highlightElement(el);
+    });
+  });
+</script>
