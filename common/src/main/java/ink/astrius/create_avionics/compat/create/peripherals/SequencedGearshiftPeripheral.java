@@ -123,7 +123,7 @@ public class SequencedGearshiftPeripheral extends KineticPeripheral<SequencedGea
     /**
      * Get the full instruction queue.
      * <p>
-     * Returns up to {@value #MAX_INSTRUCTIONS} entries (the in-game GUI's
+     * Returns up to 5 entries (the in-game GUI's
      * capacity). The last entry is always {@code end}. Each entry is a table:
      * <ul>
      *   <li>{@code type}: one of {@code turn_angle}, {@code turn_distance},
@@ -149,7 +149,7 @@ public class SequencedGearshiftPeripheral extends KineticPeripheral<SequencedGea
     /**
      * Replace the instruction queue.
      * <p>
-     * Accepts a 1-indexed Lua list of up to {@value #MAX_INSTRUCTIONS} entries.
+     * Accepts a 1-indexed Lua list of up to 5 entries.
      * Each entry is a table with:
      * <ul>
      *   <li>{@code type} (required): {@code turn_angle}, {@code turn_distance},

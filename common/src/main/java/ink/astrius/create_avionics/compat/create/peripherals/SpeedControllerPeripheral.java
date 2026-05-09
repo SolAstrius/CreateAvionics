@@ -72,7 +72,7 @@ public class SpeedControllerPeripheral extends KineticPeripheral<SpeedController
     }
 
     @LuaFunction
-    public final float getTargetSpeed() {
+    public final double getTargetSpeed() {
         return this.targetSpeed.getValue();
     }
 }
