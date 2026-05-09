@@ -4,6 +4,13 @@ ComputerCraft peripherals for [Create: Simulated][simulated] and
 [Create: Aeronautics][aeronautics]. Drop-in: requires unmodified Simulated
 1.2.1+, no fork or patch needed.
 
+**[📖 Docs][docs]** · **[Modrinth][modrinth]** · **[Releases][releases]**
+
+The docs site documents every peripheral's Lua API, units, body-frame
+conventions, and includes a [guide on `mainThread` setters and the
+`parallel.waitForAll` idiom][mainthread-guide] that you'll want before
+writing tight control loops.
+
 ## Peripherals
 
 **Net-new**
@@ -80,3 +87,7 @@ MIT, see LICENSE.md and NOTICE.md.
 
 [simulated]: https://github.com/Creators-of-Aeronautics/Simulated-Project
 [aeronautics]: https://modrinth.com/mod/create-aeronautics
+[docs]: https://solastrius.github.io/CreateAvionics/
+[modrinth]: https://modrinth.com/mod/create-avionics
+[releases]: https://github.com/SolAstrius/CreateAvionics/releases
+[mainthread-guide]: https://solastrius.github.io/CreateAvionics/guide/mainthread.html
