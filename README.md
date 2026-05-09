@@ -6,56 +6,13 @@ ComputerCraft peripherals for [Create: Simulated][simulated] and
 
 **[📖 Docs][docs]** · **[Modrinth][modrinth]** · **[Releases][releases]**
 
-The docs site documents every peripheral's Lua API, units, body-frame
-conventions, and includes a [guide on `mainThread` setters and the
-`parallel.waitForAll` idiom][mainthread-guide] that you'll want before
-writing tight control loops.
+## What's in the box
 
-## Peripherals
-
-**Net-new**
-- `analog_transmission` — read and drive the rotational signal of an Analog
-  Transmission, with optional override of redstone input
-- `physics_assembler` — query and command a Physics Assembler
-- `portable_engine` — fuel state, burn time, generated speed, stress capacity
-- `steering_wheel` — held state, angle, target angle, clamp parameters
-- `throttle_lever` — read state, drive lever position
-- `laser_pointer` — direction, range, firing state, color (read/write),
-  rainbow toggle
-- `laser_sensor` — power readout, closest pointer hit distance
-- `rope_winch` — current length, bounds, kinetic-driven movement speed
-- `directional_gearshift` — source axis, left/right power state, current
-  mode (`forward` / `reverse` / `stop` / `neutral`)
-- `hot_air_burner` *(requires Aeronautics)* — gas output, target amount,
-  balloon coupling, boiler efficiency
-- `steam_vent` *(requires Aeronautics)* — same surface as `hot_air_burner`,
-  scoped to steam
-- `wooden_propeller` / `andesite_propeller` / `smart_propeller`
-  *(requires Aeronautics)* — kinetic and rotation speed, thrust, airflow,
-  active state, axis. Also matched by the shared `propeller` type.
-- `propeller_bearing` *(requires Aeronautics)* — kinetic, rotation, and
-  angular speed, thrust/airflow, sail power, stress, thrust handedness
-  (read/write), assembly state, assemble/disassemble commands.
-- `gyroscopic_propeller_bearing` *(requires Aeronautics)* — same surface
-  as `propeller_bearing` plus `setTilt` / `setStrictTilt` for scripted axis
-  control. Also matched by the shared `propeller_bearing` type.
-- `mounted_potato_cannon` *(requires Aeronautics)* — aim vector, muzzle
-  position, cogwheel speed, obstruction state, ammo type and count
-
-**Extended readouts**
-- `gimbal_sensor` — body-frame angular velocity, gravity, linear acceleration;
-  Rad-suffixed angle variants
-- `altitude_sensor` — vertical speed
-- `velocity_sensor` — sensing axis
-- `navigation_table` — distance, closure rate, orientation, heading, target
-  metadata, forward-error bearing
-- `optical_sensor` — laser range, no-hit detection
-- `linked_typewriter` — `key` and `key_up` events on attached computers
-
-The full upstream peripheral set (`directional_link`, `docking_connector`,
-`modulating_link`, `nameplate`, `swivel_bearing`, `torsion_spring`) is
-republished verbatim so this addon owns the entire CC surface. See NOTICE.md
-for attribution.
+A full set of CC: Tweaked peripherals for every instrumentable Simulated
+and Aeronautics block — flight sensors, scriptable controls, propulsion,
+links, comms. The [docs site][docs] has the full API reference with units
+and body-frame conventions; before writing tight control loops, read the
+[guide on `mainThread` setters and the `parallel.waitForAll` idiom][mainthread-guide].
 
 ## Override mechanism
 
