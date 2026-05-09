@@ -59,6 +59,7 @@ public abstract class GimbalSensorBlockEntityMixin implements GimbalSensorExt {
             if (this.createAvionics$hasLastLinearVelocity) {
                 currentLinearVelocity.sub(this.createAvionics$lastLinearVelocity, this.createAvionics$linearAccelerationBody).mul(20.0);
                 serverSubLevel.logicalPose().orientation().transformInverse(this.createAvionics$linearAccelerationBody);
+                this.createAvionics$linearAccelerationBody.sub(this.createAvionics$gravityBody);
             } else {
                 this.createAvionics$linearAccelerationBody.zero();
                 this.createAvionics$hasLastLinearVelocity = true;

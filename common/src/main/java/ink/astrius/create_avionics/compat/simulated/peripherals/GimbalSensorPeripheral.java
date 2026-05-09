@@ -116,14 +116,21 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
     }
 
     /**
-     * Get the contraption's linear acceleration in body frame.
-     * Finite-differenced from Sable's linear velocity at the server tick rate
-     * (Δv × 20), then rotated into body frame. Has one tick of lag.
+     * Get the contraption's proper acceleration in body frame — what an
+     * onboard accelerometer would read.
      * <p>
-     * <b>Gravity is not subtracted.</b> A stationary contraption reads
-     * {@code -getGravity()} (the normal force from below feels like upward
-     * acceleration). To get proper acceleration in body frame, compute
-     * {@code accel - gravity} component-wise.
+     * Computed as {@code (Δv × 20) - gravity_body}: finite-differenced
+     * inertial velocity at the server tick rate, with body-frame gravity
+     * subtracted out. Has one tick of lag.
+     * <p>
+     * Conventions:
+     * <ul>
+     *   <li>Stationary or constant-velocity contraption reads
+     *       {@code -getGravity()} (the normal force "felt" by the body).</li>
+     *   <li>Free-falling contraption reads zero.</li>
+     *   <li>To recover inertial acceleration (rate-of-change of body
+     *       velocity), add {@code getGravity()} component-wise.</li>
+     * </ul>
      *
      * @return A three-element list {ax, ay, az} in m/s².
      */
