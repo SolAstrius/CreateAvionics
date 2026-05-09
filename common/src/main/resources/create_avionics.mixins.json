@@ -11,6 +11,9 @@
     "simulated.GimbalSensorBlockEntityMixin",
     "simulated.LinkedTypewriterBlockEntityMixin",
     "simulated.NavigationTargetMixin",
+    "simulated.CompassNavigationTargetMixin",
+    "simulated.RecoveryCompassNavigationTargetMixin",
+    "simulated.MapNavigationTargetMixin",
     "aeronautics.HotAirBurnerBlockEntityMixin",
     "aeronautics.SteamVentBlockEntityMixin"
   ],

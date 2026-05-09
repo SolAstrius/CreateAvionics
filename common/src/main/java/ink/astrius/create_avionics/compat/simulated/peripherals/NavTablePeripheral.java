@@ -61,8 +61,52 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
 
     /**
      * Get item-specific metadata for the held nav-table item.
+     * <p>
+     * Each nav-target type decides its own keys and value types — there is no
+     * fixed schema, and what's in the map depends entirely on which item is
+     * held. Use {@link #getTargetType} to branch before reading keys. Returns
+     * {@code {}} (empty map, not nil) when no item is held or the held item's
+     * type exposes no metadata.
+     * <p>
+     * Built-in target types and the keys they expose:
+     * <table>
+     *   <caption>Per-target metadata schema</caption>
+     *   <tr><th>{@code getTargetType()}</th><th>Keys</th><th>Notes</th></tr>
+     *   <tr>
+     *     <td>{@code simulated:compass}</td>
+     *     <td>{@code kind} ("lodestone" | "spawn"),
+     *         {@code sublevel_id} (string, lodestone only)</td>
+     *     <td>"spawn" is the fallback used when the compass isn't bound to a
+     *         tracked sub-level; {@code sublevel_id} is the tracker UUID.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>{@code simulated:recovery_compass}</td>
+     *     <td>{@code placer_uuid} (string, optional)</td>
+     *     <td>UUID of the player whose death location the compass tracks.
+     *         Absent until a player has placed the compass into the table.</td>
+     *   </tr>
+     *   <tr>
+     *     <td>{@code simulated:map}</td>
+     *     <td>{@code map_id} (number, optional)</td>
+     *     <td>Numeric id of the underlying map item. Absent if the held stack
+     *         carries no MAP_ID data component (e.g. a blank map).</td>
+     *   </tr>
+     *   <tr>
+     *     <td>{@code simulated:magnet}</td>
+     *     <td>—</td>
+     *     <td>Static target (10 blocks north of the table); no useful
+     *         metadata, returns {@code {}}.</td>
+     *   </tr>
+     * </table>
+     * <p>
+     * Compat target types from upstream Simulated (e.g.
+     * {@code simulated:explorers_compass}, {@code simulated:natures_compass})
+     * register only when their host mod is present and currently expose no
+     * metadata. Third-party {@code NavigationTarget} implementations can
+     * publish their own keys by implementing
+     * {@code NavigationTargetExt#getPeripheralMetadata} via mixin.
      *
-     * @return A map of metadata key/value pairs.
+     * @return A map of target-type-specific metadata, or an empty map.
      */
     @LuaFunction
     public Map<String, Object> getTargetMetadata() {
