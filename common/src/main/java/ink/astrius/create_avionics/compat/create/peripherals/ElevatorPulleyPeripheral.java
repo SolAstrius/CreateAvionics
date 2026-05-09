@@ -304,7 +304,7 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      *       at the destination Y — door logic triggers accordingly.</li>
      * </ul>
      * Bounded to the cabin's reachable range ({@code minContactY ..
-     * maxContactY}); {@link LuaException} if outside.
+     * maxContactY}); throws {@code LuaException} if outside.
      * <p>Yields until the next server tick.
      *
      * @param y The destination Y coordinate.

@@ -85,7 +85,7 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
      * @return The network's total stress demand.
      */
     @LuaFunction
-    public final float getStress() {
+    public final double getStress() {
         return this.blockEntity.getNetworkStress();
     }
 
@@ -101,7 +101,7 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
      * @return The network's total stress capacity.
      */
     @LuaFunction
-    public final float getStressCapacity() {
+    public final double getStressCapacity() {
         return this.blockEntity.getNetworkCapacity();
     }
 

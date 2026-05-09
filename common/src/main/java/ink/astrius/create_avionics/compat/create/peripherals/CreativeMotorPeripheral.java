@@ -71,7 +71,7 @@ public class CreativeMotorPeripheral extends KineticPeripheral<CreativeMotorBloc
     }
 
     @LuaFunction
-    public final float getGeneratedSpeed() {
+    public final double getGeneratedSpeed() {
         return this.generatedSpeed.getValue();
     }
 }
