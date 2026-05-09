@@ -9,7 +9,7 @@ import dev.simulated_team.simulated.content.blocks.rope.rope_winch.RopeWinchBloc
  *
  * @cc.module rope_winch
  */
-public class RopeWinchPeripheral extends SimPeripheral<RopeWinchBlockEntity> {
+public class RopeWinchPeripheral extends SimKineticPeripheral<RopeWinchBlockEntity> {
 
     public RopeWinchPeripheral(final RopeWinchBlockEntity blockEntity) {
         super(blockEntity);
@@ -64,13 +64,4 @@ public class RopeWinchPeripheral extends SimPeripheral<RopeWinchBlockEntity> {
         return this.blockEntity.getMovementSpeed();
     }
 
-    /**
-     * Get the input shaft kinetic speed.
-     *
-     * @return The kinetic speed.
-     */
-    @LuaFunction
-    public final double getKineticSpeed() {
-        return this.blockEntity.getSpeed();
-    }
 }

@@ -3,7 +3,7 @@ package ink.astrius.create_avionics.compat.aeronautics.peripherals;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.propeller_bearing.PropellerBearingBlockEntity;
-import ink.astrius.create_avionics.compat.simulated.peripherals.SimPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.SimKineticPeripheral;
 import net.minecraft.core.Direction;
 import org.joml.Vector3dc;
 
@@ -18,7 +18,7 @@ import java.util.Set;
  *
  * @cc.module propeller_bearing
  */
-public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> extends SimPeripheral<T> {
+public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> extends SimKineticPeripheral<T> {
 
     private final String typeName;
 
@@ -77,16 +77,6 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
     }
 
     // --- Rotation ---
-
-    /**
-     * Get the bearing's input shaft kinetic speed.
-     *
-     * @return The kinetic speed.
-     */
-    @LuaFunction
-    public final double getKineticSpeed() {
-        return this.blockEntity.getSpeed();
-    }
 
     /**
      * Get the bearing's rotation speed.
@@ -163,18 +153,6 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
     @LuaFunction
     public final boolean isActive() {
         return this.blockEntity.isActive();
-    }
-
-    // --- Stress ---
-
-    /**
-     * Get the stress applied by the bearing.
-     *
-     * @return The applied stress.
-     */
-    @LuaFunction
-    public final double getStressApplied() {
-        return this.blockEntity.calculateStressApplied();
     }
 
     // --- Thrust direction (scriptable scroll-option) ---

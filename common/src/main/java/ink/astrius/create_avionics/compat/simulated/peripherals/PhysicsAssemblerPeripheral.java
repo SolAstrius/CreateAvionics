@@ -33,7 +33,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      *
      * @return True if assembled.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public boolean isAssembled() {
         return this.getMassData() != null;
     }
@@ -43,7 +43,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      *
      * @return The mass, or 0 if not assembled.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public double getMass() {
         final MassData data = this.getMassData();
         return data == null ? 0.0 : data.getMass();
@@ -54,7 +54,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      *
      * @return A three-element list {x, y, z}.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public List<Double> getCenterOfMass() {
         final MassData data = this.getMassData();
         if (data == null) return List.of(0.0, 0.0, 0.0);
@@ -69,7 +69,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      *
      * @return A nine-element list of tensor entries.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public List<Double> getInertiaTensor() {
         final MassData data = this.getMassData();
         if (data == null) return List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -79,6 +79,31 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
                 m.m01(), m.m11(), m.m21(),
                 m.m02(), m.m12(), m.m22()
         );
+    }
+
+    /**
+     * Get the UUID of the sub-level this assembler belongs to, or nil if the
+     * assembler isn't currently sitting on a sub-level (e.g. placed on
+     * stationary ground). Stable for the life of the contraption.
+     *
+     * @return The sub-level UUID string, or nil.
+     */
+    @LuaFunction(mainThread = true)
+    public String getSubLevelId() {
+        final SubLevel subLevel = Sable.HELPER.getContaining(this.blockEntity);
+        return subLevel == null ? null : subLevel.getUniqueId().toString();
+    }
+
+    /**
+     * Get the display name of the sub-level this assembler belongs to, or
+     * nil if there's no sub-level or the sub-level has no name set.
+     *
+     * @return The sub-level name, or nil.
+     */
+    @LuaFunction(mainThread = true)
+    public String getSubLevelName() {
+        final SubLevel subLevel = Sable.HELPER.getContaining(this.blockEntity);
+        return subLevel == null ? null : subLevel.getName();
     }
 
     private MassData getMassData() {

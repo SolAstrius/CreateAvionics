@@ -15,7 +15,15 @@
     "simulated.RecoveryCompassNavigationTargetMixin",
     "simulated.MapNavigationTargetMixin",
     "aeronautics.HotAirBurnerBlockEntityMixin",
-    "aeronautics.SteamVentBlockEntityMixin"
+    "aeronautics.SteamVentBlockEntityMixin",
+    "create.ComputerBehaviourMixin",
+    "create.ElevatorContactBlockEntityMixin",
+    "create.ElevatorPulleyBlockEntityMixin",
+    "create.KineticBlockEntityComputerHookMixin",
+    "create.LinearActuatorBlockEntityMixin",
+    "create.MechanicalBearingBlockEntityMixin",
+    "create.SequencedGearshiftBlockEntityMixin",
+    "create.SequencedInstructionAccessor"
   ],
   "client": [],
   "server": [],

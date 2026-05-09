@@ -11,7 +11,7 @@ import net.minecraft.core.Direction;
  *
  * @cc.module directional_gearshift
  */
-public class DirectionalGearshiftPeripheral extends SimPeripheral<DirectionalGearshiftBlockEntity> {
+public class DirectionalGearshiftPeripheral extends SimKineticPeripheral<DirectionalGearshiftBlockEntity> {
 
     public DirectionalGearshiftPeripheral(final DirectionalGearshiftBlockEntity blockEntity) {
         super(blockEntity);
@@ -31,16 +31,6 @@ public class DirectionalGearshiftPeripheral extends SimPeripheral<DirectionalGea
     public final String getSourceAxis() {
         final Direction d = this.blockEntity.getSourceFacing();
         return d == null ? null : d.getSerializedName();
-    }
-
-    /**
-     * Check whether the gearshift has a kinetic source connected.
-     *
-     * @return True if a source is connected.
-     */
-    @LuaFunction
-    public final boolean hasSource() {
-        return this.blockEntity.getSourceFacing() != null;
     }
 
     /**
@@ -84,13 +74,4 @@ public class DirectionalGearshiftPeripheral extends SimPeripheral<DirectionalGea
         return "stop";
     }
 
-    /**
-     * Get the input shaft kinetic speed.
-     *
-     * @return The kinetic speed.
-     */
-    @LuaFunction
-    public final double getKineticSpeed() {
-        return this.blockEntity.getSpeed();
-    }
 }

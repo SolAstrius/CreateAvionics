@@ -3,6 +3,7 @@ package ink.astrius.create_avionics.compat.aeronautics.peripherals;
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.eriksonn.aeronautics.content.blocks.mounted_potato_cannon.MountedPotatoCannonBlockEntity;
 import dev.eriksonn.aeronautics.content.blocks.mounted_potato_cannon.MountedPotatoCannonInventory;
+import ink.astrius.create_avionics.compat.simulated.peripherals.SimKineticPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.SimPeripheral;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +17,7 @@ import java.util.List;
  *
  * @cc.module mounted_potato_cannon
  */
-public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCannonBlockEntity> {
+public class MountedPotatoCannonPeripheral extends SimKineticPeripheral<MountedPotatoCannonBlockEntity> {
 
     public MountedPotatoCannonPeripheral(final MountedPotatoCannonBlockEntity blockEntity) {
         super(blockEntity);
@@ -59,16 +60,6 @@ public class MountedPotatoCannonPeripheral extends SimPeripheral<MountedPotatoCa
     @LuaFunction
     public final double getCogwheelSpeed() {
         return this.blockEntity.getCogwheelSpeed();
-    }
-
-    /**
-     * Get the cannon's kinetic input speed.
-     *
-     * @return The kinetic speed.
-     */
-    @LuaFunction
-    public final double getKineticSpeed() {
-        return this.blockEntity.getSpeed();
     }
 
     // --- Obstruction ---

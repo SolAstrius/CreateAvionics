@@ -9,7 +9,7 @@ import dev.simulated_team.simulated.content.blocks.steering_wheel.SteeringWheelB
  *
  * @cc.module steering_wheel
  */
-public class SteeringWheelPeripheral extends SimPeripheral<SteeringWheelBlockEntity> {
+public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelBlockEntity> {
 
     public SteeringWheelPeripheral(final SteeringWheelBlockEntity blockEntity) {
         super(blockEntity);

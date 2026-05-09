@@ -9,7 +9,7 @@ import dev.simulated_team.simulated.content.blocks.torsion_spring.TorsionSpringB
  *
  * @cc.module torsion_spring
  */
-public class TorsionSpringPeripheral extends SimPeripheral<TorsionSpringBlockEntity>{
+public class TorsionSpringPeripheral extends SimKineticPeripheral<TorsionSpringBlockEntity>{
     public TorsionSpringPeripheral(final TorsionSpringBlockEntity blockEntity) {
         super(blockEntity);
     }

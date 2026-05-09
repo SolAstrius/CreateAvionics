@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  *
  * @cc.module portable_engine
  */
-public class PortableEnginePeripheral extends SimPeripheral<PortableEngineBlockEntity> {
+public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngineBlockEntity> {
 
     public PortableEnginePeripheral(final PortableEngineBlockEntity blockEntity) {
         super(blockEntity);
@@ -98,32 +98,13 @@ public class PortableEnginePeripheral extends SimPeripheral<PortableEngineBlockE
     // --- Kinetic output ---
 
     /**
-     * Get the engine's current output shaft speed.
-     *
-     * @return The kinetic speed.
-     */
-    @LuaFunction
-    public double getSpeed() {
-        return this.blockEntity.getSpeed();
-    }
-
-    /**
-     * Get the engine's generated speed.
+     * Get the engine's generated speed (the speed the engine sources into
+     * its network when running, before kinetic-graph propagation).
      *
      * @return The generated speed.
      */
     @LuaFunction
     public double getGeneratedSpeed() {
         return this.blockEntity.getGeneratedSpeed();
-    }
-
-    /**
-     * Get the stress capacity the engine adds to the network.
-     *
-     * @return The added stress capacity.
-     */
-    @LuaFunction
-    public double getStressCapacity() {
-        return this.blockEntity.calculateAddedStressCapacity();
     }
 }

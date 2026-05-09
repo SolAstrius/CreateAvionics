@@ -13,7 +13,7 @@ import net.minecraft.util.Mth;
  *
  * @cc.module analog_transmission
  */
-public class AnalogTransmissionPeripheral extends SimPeripheral<AnalogTransmissionBlockEntity> {
+public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTransmissionBlockEntity> {
 
     public AnalogTransmissionPeripheral(final AnalogTransmissionBlockEntity blockEntity) {
         super(blockEntity);
@@ -87,16 +87,6 @@ public class AnalogTransmissionPeripheral extends SimPeripheral<AnalogTransmissi
     }
 
     /**
-     * Get the input shaft speed.
-     *
-     * @return The input speed.
-     */
-    @LuaFunction
-    public double getInputSpeed() {
-        return this.blockEntity.getSpeed();
-    }
-
-    /**
      * Get the output shaft speed.
      *
      * @return The output speed.
@@ -119,36 +109,16 @@ public class AnalogTransmissionPeripheral extends SimPeripheral<AnalogTransmissi
     // --- Stress ---
 
     /**
-     * Get the stress applied on the input side.
+     * Get the output-side stress impact (post-ratio kinetic accounting).
      *
-     * @return The applied stress.
+     * @return The output stress impact.
      */
     @LuaFunction
-    public double getStressApplied() {
-        return this.blockEntity.calculateStressApplied();
-    }
-
-    /**
-     * Get the stress applied on the output side.
-     *
-     * @return The output applied stress.
-     */
-    @LuaFunction
-    public double getOutputStressApplied() {
+    public double getOutputStressImpact() {
         return this.blockEntity.getExtraKinetics().calculateStressApplied();
     }
 
     // --- Health ---
-
-    /**
-     * Check whether the transmission is overstressed.
-     *
-     * @return True if overstressed.
-     */
-    @LuaFunction
-    public boolean isOverstressed() {
-        return this.blockEntity.isOverStressed();
-    }
 
     /**
      * Check whether the transmission is oversaturated.

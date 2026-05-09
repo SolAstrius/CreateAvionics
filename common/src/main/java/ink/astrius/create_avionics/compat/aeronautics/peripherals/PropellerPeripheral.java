@@ -2,7 +2,7 @@ package ink.astrius.create_avionics.compat.aeronautics.peripherals;
 
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.eriksonn.aeronautics.content.blocks.propeller.small.BasePropellerBlockEntity;
-import ink.astrius.create_avionics.compat.simulated.peripherals.SimPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.SimKineticPeripheral;
 
 import java.util.Set;
 
@@ -14,7 +14,7 @@ import java.util.Set;
  *
  * @cc.module propeller
  */
-public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends SimPeripheral<T> {
+public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends SimKineticPeripheral<T> {
 
     private final String typeName;
 
@@ -44,19 +44,9 @@ public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends Sim
     }
 
     /**
-     * Get the propeller's kinetic input speed.
-     *
-     * @return The kinetic speed.
-     */
-    @LuaFunction
-    public final double getKineticSpeed() {
-        return this.blockEntity.getSpeed();
-    }
-
-    /**
      * Get the propeller's smoothed rotation speed.
-     * Smoothed angular speed used for visuals; lags getKineticSpeed by ~0.15
-     * exponential lerp.
+     * Smoothed angular speed used for visuals; lags {@link #getSpeed} by
+     * ~0.15 exponential lerp.
      *
      * @return The smoothed rotation speed.
      */
