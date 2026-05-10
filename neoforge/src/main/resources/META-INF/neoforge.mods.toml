@@ -65,3 +65,10 @@ type="optional"
 versionRange="[${aeronautics_mod_version},)"
 ordering="AFTER"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="offroad"
+type="optional"
+versionRange="[${offroad_mod_version},)"
+ordering="AFTER"
+side="BOTH"

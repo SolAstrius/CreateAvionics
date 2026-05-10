@@ -49,6 +49,7 @@ if (project.name == "common") {
 
         compileOnly("dev.simulated_team.simulated:simulated-common-${minecraft_version}:${simulated_version}")
         compileOnly("dev.eriksonn.aeronautics:aeronautics-common-${minecraft_version}:${aeronautics_version}")
+        compileOnly("dev.ryanhcode.offroad:offroad-common-${minecraft_version}:${offroad_version}")
 
         compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:${sable_companion_version}")
         compileOnly("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
@@ -100,6 +101,7 @@ processResources {
             'neoforge_loader_version_range': neoforge_loader_version_range,
             'simulated_mod_version'        : simulated_mod_version,
             'aeronautics_mod_version'      : aeronautics_mod_version,
+            'offroad_mod_version'          : offroad_mod_version,
             'create_mod_version'           : create_mod_version,
             'sable_mod_version'            : sable_mod_version,
             'flywheel_mod_version'         : flywheel_mod_version,

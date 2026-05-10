@@ -1,2 +1,3 @@
 ink.astrius.create_avionics.compat.simulated.SimulatedCCIntegration
 ink.astrius.create_avionics.compat.aeronautics.AeroCCIntegration
+ink.astrius.create_avionics.compat.offroad.OffroadCCIntegration

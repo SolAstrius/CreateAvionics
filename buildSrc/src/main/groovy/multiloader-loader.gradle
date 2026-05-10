@@ -33,6 +33,7 @@ dependencies {
 
     implementation("dev.simulated_team.simulated:simulated-neoforge-${minecraft_version}:${simulated_version}")
     implementation("dev.eriksonn.aeronautics:aeronautics-neoforge-${minecraft_version}:${aeronautics_version}")
+    implementation("dev.ryanhcode.offroad:offroad-neoforge-${minecraft_version}:${offroad_version}")
 
     compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${computercraft_tweaked_version}")
     compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${computercraft_tweaked_version}")

@@ -17,6 +17,7 @@
     "aeronautics.GyroscopicPropellerBearingBlockEntityMixin",
     "aeronautics.HotAirBurnerBlockEntityMixin",
     "aeronautics.SteamVentBlockEntityMixin",
+    "offroad.WheelMountBlockEntityMixin",
     "create.ComputerBehaviourMixin",
     "create.ElevatorContactBlockEntityMixin",
     "create.ElevatorPulleyBlockEntityMixin",
