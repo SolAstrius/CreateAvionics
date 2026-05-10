@@ -51,7 +51,6 @@ public class MechanicalBearingPeripheral extends KineticPeripheral<MechanicalBea
      * Assemble the bearing's contraption. Equivalent to a player right-clicking
      * the bearing with an empty hand while it's not running. No-op if already
      * assembled.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void assemble() {
@@ -62,7 +61,6 @@ public class MechanicalBearingPeripheral extends KineticPeripheral<MechanicalBea
 
     /**
      * Disassemble the bearing's contraption.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void disassemble() {
@@ -142,7 +140,6 @@ public class MechanicalBearingPeripheral extends KineticPeripheral<MechanicalBea
     /**
      * Set the bearing's rotation mode. Matches the in-game scroll option on
      * the bearing.
-     * <p>Yields until the next server tick.
      *
      * @param mode {@code rotate_place}, {@code rotate_place_returned}, or
      *             {@code rotate_never_place}.

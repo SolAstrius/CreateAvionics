@@ -46,7 +46,6 @@ public class SwivelBearingPeripheral extends SimKineticPeripheral<SwivelBearingB
      * Assemble the bearing's contraption into a sub-level.
      * Equivalent to a player right-clicking the bearing with an empty hand
      * while it's not yet assembled. No-op if already assembled.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void assemble() {
@@ -57,7 +56,6 @@ public class SwivelBearingPeripheral extends SimKineticPeripheral<SwivelBearingB
 
     /**
      * Disassemble the bearing's sub-level back into world blocks.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void disassemble() {

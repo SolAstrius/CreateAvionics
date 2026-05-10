@@ -99,7 +99,6 @@ public class ElevatorContactPeripheral extends SyncedPeripheral<ElevatorContactB
     /**
      * Set this contact's short name. Same field a player edits in the
      * right-click screen. Propagates to display links on the column.
-     * <p>Yields until the next server tick.
      *
      * @param shortName The new short name.
      */
@@ -110,7 +109,6 @@ public class ElevatorContactPeripheral extends SyncedPeripheral<ElevatorContactB
 
     /**
      * Set this contact's long name.
-     * <p>Yields until the next server tick.
      *
      * @param longName The new long name.
      */
@@ -137,7 +135,6 @@ public class ElevatorContactPeripheral extends SyncedPeripheral<ElevatorContactB
 
     /**
      * Set the contact's door-control mode.
-     * <p>Yields until the next server tick.
      *
      * @param mode One of {@code all}, {@code north}, {@code east},
      *             {@code south}, {@code west}, {@code none}.
@@ -206,7 +203,6 @@ public class ElevatorContactPeripheral extends SyncedPeripheral<ElevatorContactB
      * Call the elevator to this floor — programmatic equivalent of a redstone
      * pulse on the contact, or the in-cabin Contraption Controls UI selecting
      * this floor. Same code path as the floor-select packet handler.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void call() throws LuaException {

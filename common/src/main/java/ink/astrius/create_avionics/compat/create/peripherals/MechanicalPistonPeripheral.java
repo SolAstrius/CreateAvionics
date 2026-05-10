@@ -60,7 +60,6 @@ public class MechanicalPistonPeripheral extends KineticPeripheral<MechanicalPist
     /**
      * Assemble the piston's contraption. Equivalent to a player right-clicking
      * the piston with an empty hand. No-op if already assembled.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void assemble() {
@@ -71,7 +70,6 @@ public class MechanicalPistonPeripheral extends KineticPeripheral<MechanicalPist
 
     /**
      * Disassemble the piston's contraption.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void disassemble() {
@@ -168,7 +166,6 @@ public class MechanicalPistonPeripheral extends KineticPeripheral<MechanicalPist
 
     /**
      * Set the piston's movement mode. Matches the in-game scroll option.
-     * <p>Yields until the next server tick.
      *
      * @param mode {@code move_place}, {@code move_place_returned}, or
      *             {@code move_never_place}.

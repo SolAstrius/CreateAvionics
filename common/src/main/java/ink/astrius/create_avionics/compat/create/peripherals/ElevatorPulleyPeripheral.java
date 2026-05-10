@@ -70,7 +70,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
     /**
      * Assemble the pulley's cabin. Equivalent to a player right-clicking the
      * pulley with an empty hand while it's stopped. No-op if already assembled.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void assemble() {
@@ -81,7 +80,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
 
     /**
      * Disassemble the pulley's cabin.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void disassemble() {
@@ -155,8 +153,7 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      * Get the opaque id of this cabin's column, or nil when unassembled.
      * Matches {@code Create_ElevatorContact.getColumnId()} on every contact
      * on the same column — equality-comparable for cross-peripheral grouping.
-     * <p>Yields until the next server tick (column resolution touches
-     * server-thread-only state).
+     * <p>Column resolution touches server-thread-only state.
      *
      * @return The column id, or nil.
      */
@@ -169,7 +166,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
     /**
      * Get the Y level the cabin is currently heading to, or nil when no
      * target is selected (e.g. just-assembled and idle, or unassembled).
-     * <p>Yields until the next server tick.
      *
      * @return The target Y, or nil.
      */
@@ -186,7 +182,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      * Get the list of floors on this cabin's column, ordered bottom-to-top.
      * Each entry is a table {@code {y, short_name, long_name}}. Returns nil
      * when unassembled.
-     * <p>Yields until the next server tick.
      *
      * @return A list of floor tables, or nil.
      */
@@ -219,7 +214,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      * <p>
      * Same shape as one entry of {@link #getFloors}: {@code {y, short_name,
      * long_name}}.
-     * <p>Yields until the next server tick.
      *
      * @return The current floor table, or nil.
      */
@@ -249,7 +243,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      *       {@code north}, ...)</li>
      * </ul>
      * Returns nil when unassembled or the column is unavailable.
-     * <p>Yields until the next server tick.
      *
      * @return A list of contact tables, or nil.
      */
@@ -285,7 +278,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      * Halt the cabin at its current Y (sets the target to the current
      * position). The cabin decelerates smoothly and parks. Equivalent to
      * {@link #setTargetY} with {@link #getCurrentY}; convenience.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void stop() throws LuaException {
@@ -305,7 +297,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      * </ul>
      * Bounded to the cabin's reachable range ({@code minContactY ..
      * maxContactY}); throws {@code LuaException} if outside.
-     * <p>Yields until the next server tick.
      *
      * @param y The destination Y coordinate.
      */
@@ -329,7 +320,6 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
      * Send the cabin to the floor at the given world Y. Equivalent to a
      * redstone pulse on that floor's contact, or a player using an in-cabin
      * Contraption Controls UI to pick the floor.
-     * <p>Yields until the next server tick.
      *
      * @param y The destination floor's Y coordinate.
      */

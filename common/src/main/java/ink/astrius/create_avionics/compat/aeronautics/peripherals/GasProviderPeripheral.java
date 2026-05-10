@@ -107,7 +107,6 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
 
     /**
      * Set the target gas amount. Clamped internally to the scroll-value's min/max.
-     * <p>Yields until the next server tick.
      *
      * @param amount The new target amount.
      */

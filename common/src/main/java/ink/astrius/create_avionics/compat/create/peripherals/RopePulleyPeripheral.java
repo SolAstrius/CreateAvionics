@@ -57,7 +57,6 @@ public class RopePulleyPeripheral extends KineticPeripheral<PulleyBlockEntity> {
     /**
      * Assemble the pulley's contraption. Equivalent to a player right-clicking
      * the pulley with an empty hand. No-op if already assembled.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void assemble() {
@@ -69,7 +68,6 @@ public class RopePulleyPeripheral extends KineticPeripheral<PulleyBlockEntity> {
     /**
      * Disassemble the pulley's contraption. Restores rope blocks and the
      * magnet block beneath the rope chain.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void disassemble() {
@@ -165,7 +163,6 @@ public class RopePulleyPeripheral extends KineticPeripheral<PulleyBlockEntity> {
 
     /**
      * Set the pulley's movement mode. Matches the in-game scroll option.
-     * <p>Yields until the next server tick.
      *
      * @param mode {@code move_place}, {@code move_place_returned}, or
      *             {@code move_never_place}.

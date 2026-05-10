@@ -165,7 +165,6 @@ public class SequencedGearshiftPeripheral extends KineticPeripheral<SequencedGea
      * Halts any running sequence ({@code run(-1)}) before applying. Auto-appends
      * an {@code end} terminator if the last entry isn't already {@code end}.
      * After this call, use {@link #start} to begin executing the new queue.
-     * <p>Yields until the next server tick.
      *
      * @param instructions A list of instruction tables.
      */
@@ -206,7 +205,6 @@ public class SequencedGearshiftPeripheral extends KineticPeripheral<SequencedGea
      * Start executing the instruction queue from index 0.
      * Equivalent to a redstone rising edge on a non-computer-attached gearshift.
      * No-op if the gearshift has zero kinetic input.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void start() {
@@ -215,7 +213,6 @@ public class SequencedGearshiftPeripheral extends KineticPeripheral<SequencedGea
 
     /**
      * Halt any running sequence and return to idle.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void stop() {

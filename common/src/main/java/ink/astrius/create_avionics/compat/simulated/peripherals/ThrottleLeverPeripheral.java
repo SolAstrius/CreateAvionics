@@ -35,7 +35,6 @@ public class ThrottleLeverPeripheral extends SimPeripheral<ThrottleLeverBlockEnt
     /**
      * Drive the lever to a new state. A player can still change it afterwards —
      * unlike {@code analog_transmission} there is no externally-controlled flag.
-     * <p>Yields until the next server tick.
      *
      * @param signal The target state, clamped to 0..15.
      */

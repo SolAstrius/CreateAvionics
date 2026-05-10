@@ -169,7 +169,6 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
 
     /**
      * Set the bearing's thrust handedness.
-     * <p>Yields until the next server tick.
      *
      * @param handedness "right_handed" or "left_handed".
      */
@@ -197,7 +196,6 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
 
     /**
      * Assemble the bearing's contraption.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void assemble() {
@@ -206,7 +204,6 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
 
     /**
      * Disassemble the bearing's contraption.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void disassemble() {

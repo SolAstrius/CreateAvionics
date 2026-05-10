@@ -20,7 +20,6 @@ public class NamePlatePeripheral extends SimPeripheral<NameplateBlockEntity>{
 
     /**
      * Set the nameplate's displayed name.
-     * <p>Yields until the next server tick.
      *
      * @param newName The new name.
      */

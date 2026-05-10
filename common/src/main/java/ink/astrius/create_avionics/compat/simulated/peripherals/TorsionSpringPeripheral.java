@@ -21,7 +21,6 @@ public class TorsionSpringPeripheral extends SimKineticPeripheral<TorsionSpringB
 
     /**
      * Set the spring's angular limit. Only takes effect while the spring is static.
-     * <p>Yields until the next server tick.
      *
      * @param limit The new angular limit.
      */

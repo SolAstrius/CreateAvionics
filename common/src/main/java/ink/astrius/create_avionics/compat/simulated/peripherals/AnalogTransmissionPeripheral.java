@@ -45,7 +45,6 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * Flips externallyControlled even when signal == current; calling
      * setSignal(getSignal()) is the documented way to grab control without
      * changing the value. releaseSignal() returns control to redstone.
-     * <p>Yields until the next server tick.
      *
      * @param signal The target signal, clamped to 0..15.
      */
@@ -57,7 +56,6 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
 
     /**
      * Release external control and return signal driving to redstone.
-     * <p>Yields until the next server tick.
      */
     @LuaFunction(mainThread = true)
     public final void releaseSignal() {
