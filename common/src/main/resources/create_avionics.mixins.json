@@ -14,6 +14,7 @@
     "simulated.CompassNavigationTargetMixin",
     "simulated.RecoveryCompassNavigationTargetMixin",
     "simulated.MapNavigationTargetMixin",
+    "aeronautics.GyroscopicPropellerBearingBlockEntityMixin",
     "aeronautics.HotAirBurnerBlockEntityMixin",
     "aeronautics.SteamVentBlockEntityMixin",
     "create.ComputerBehaviourMixin",
