@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: read
 
 concurrency:
   group: pages
@@ -35,6 +36,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Generate Lua stubs from @LuaFunction sources
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :common:luaJavadoc --stacktrace
 
       - name: Download illuaminate

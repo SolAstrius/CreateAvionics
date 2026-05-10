@@ -30,7 +30,10 @@ configurations {
 }
 
 dependencies {
-    cctJavadoc "cc.tweaked:cct-javadoc:1.9.0"
+    // Patched fork (https://github.com/SolAstrius/cct-javadoc) — adds a
+    // "Yields" aside for @LuaFunction(mainThread = true). Pinned until upstream
+    // accepts the change.
+    cctJavadoc "cc.tweaked:cct-javadoc:1.10.0-mainthread.1"
 }
 
 // The default javadoc task (built into the standard tooling) doesn't know about
@@ -63,7 +66,7 @@ tasks.register('luaJavadoc', Javadoc) {
     opts.addStringOption('project-root', rootProject.projectDir.absolutePath)
     opts.noTimestamp(false)
 
-    // cct-javadoc 1.9.0 is compiled against JDK 25; the javadoc tool must match.
+    // cct-javadoc is compiled against JDK 25; the javadoc tool must match.
     javadocTool = javaToolchains.javadocToolFor {
         languageVersion = JavaLanguageVersion.of(25)
     }

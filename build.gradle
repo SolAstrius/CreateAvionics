@@ -41,5 +41,23 @@ subprojects {
                 includeGroup("cc.tweaked")
             }
         }
+
+        // Patched cct-javadoc fork (https://github.com/SolAstrius/cct-javadoc).
+        // Provides the mainThread = true → "Yields" aside in generated Lua docs.
+        maven {
+            name = "GitHubPackagesCctJavadoc"
+            url = "https://maven.pkg.github.com/SolAstrius/cct-javadoc"
+            content {
+                includeModule("cc.tweaked", "cct-javadoc")
+            }
+            credentials {
+                username = providers.gradleProperty("gpr.user")
+                    .orElse(providers.environmentVariable("GITHUB_ACTOR"))
+                    .orElse("anonymous").get()
+                password = providers.gradleProperty("gpr.token")
+                    .orElse(providers.environmentVariable("GITHUB_TOKEN"))
+                    .orElse("").get()
+            }
+        }
     }
 }
