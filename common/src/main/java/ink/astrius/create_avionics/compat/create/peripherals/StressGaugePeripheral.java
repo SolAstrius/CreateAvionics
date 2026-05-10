@@ -147,10 +147,12 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
      * Get the id of the speed-zone anchor this gauge belongs to. Every block
      * within a single speed-zone reports the same anchor — useful for
      * grouping peripherals into rotation-coherent regions.
+     * <p>Anchor resolution walks the kinetic graph through neighbouring
+     * block entities, so it must run on the server thread.
      *
      * @return The subnetwork anchor id.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final String getSubnetworkAnchorId() {
         return KineticReadback.subnetworkAnchorId(this.blockEntity);
     }
