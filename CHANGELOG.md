@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-05-11
+
+### Added
+
+- `gyroscopic_propeller_bearing`: persistent manual-target override that
+  replaces the bearing's automatic gravity tracking. `setManualTarget`,
+  `clearManualTarget`, `getManualTarget`. State is synced to the client
+  and persisted across save/load. The bearing's 12° cone clamp, redstone
+  power gate, and stabilization-strength gate still apply on top.
+  `setManualTarget` rejects non-finite components and zero-length vectors
+  to avoid propagating NaN through Sable physics.
+- `gyroscopic_propeller_bearing`: diagnostic reads — `getBlockNormal`,
+  `getTiltAngle` (degrees off normal), `getStabilizationStrength` (the
+  `[0, 1]` gain combining "contraption assembled / spinning ≥ 1 RPM /
+  not in disassembly slowdown").
+- Public API
+  `ink.astrius.create_avionics.api.aero.GyroscopicPropellerBearingExt`
+  — mixin-supplied interface for downstream addons driving the override
+  from Java.
+
+### Removed
+
+- `gyroscopic_propeller_bearing.setTilt` and
+  `gyroscopic_propeller_bearing.setStrictTilt`. These never appeared on
+  the live peripheral in 0.3.0 — CC silently dropped them because
+  `List<Double>` is not a supported `@LuaFunction` parameter type. Even
+  with marshalling corrected they would not have delivered on their
+  documented contract: they are single-tick step primitives that the
+  bearing's own physics tick overwrites on the next tick. Use
+  `setManualTarget` instead.
+
 ## [0.3.0] - 2026-05-10
 
 ### Added
