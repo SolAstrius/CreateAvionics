@@ -33,7 +33,7 @@ dependencies {
     // Patched fork (https://github.com/SolAstrius/cct-javadoc) — adds a
     // "Yields" aside for @LuaFunction(mainThread = true). Pinned until upstream
     // accepts the change.
-    cctJavadoc "cc.tweaked:cct-javadoc:1.10.0-mainthread.1"
+    cctJavadoc "cc.tweaked:cct-javadoc:1.10.0-mainthread.2"
 }
 
 // The default javadoc task (built into the standard tooling) doesn't know about

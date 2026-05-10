@@ -66,11 +66,25 @@ public class SpeedControllerPeripheral extends KineticPeripheral<SpeedController
         return "Create_RotationSpeedController";
     }
 
+    /**
+     * Set the controller's target output speed in RPM. Sign sets direction;
+     * the controller scales its input shaft to match. Clamped to the in-game
+     * scroll-value range (-256..+256 RPM).
+     *
+     * @param speed The target output speed in RPM.
+     */
     @LuaFunction(mainThread = true)
     public final void setTargetSpeed(int speed) {
         this.targetSpeed.setValue(speed);
     }
 
+    /**
+     * Get the controller's currently configured target output speed in RPM.
+     * Reflects the value last set via {@link #setTargetSpeed} or the in-game
+     * scroll wheel — not the live shaft speed (which depends on the input).
+     *
+     * @return The configured target speed in RPM.
+     */
     @LuaFunction
     public final double getTargetSpeed() {
         return this.targetSpeed.getValue();

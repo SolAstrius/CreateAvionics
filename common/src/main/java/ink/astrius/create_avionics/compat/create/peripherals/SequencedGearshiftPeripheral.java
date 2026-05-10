@@ -90,16 +90,37 @@ public class SequencedGearshiftPeripheral extends KineticPeripheral<SequencedGea
 
     // --- Inherited Create surface (verbatim) ---
 
+    /**
+     * Rotate the output shaft by a number of degrees, then halt. Equivalent
+     * to a single {@code turn_angle} instruction enqueued ahead of an
+     * {@code end} terminator and started immediately.
+     *
+     * @cc.tparam number degrees Degrees to turn (1..360, sign sets direction).
+     * @cc.tparam[opt] number speedModifier -2..+2 (FORWARD = 1 default).
+     */
     @LuaFunction(mainThread = true)
     public final void rotate(IArguments arguments) throws LuaException {
         runInstruction(arguments, SequencerInstructions.TURN_ANGLE);
     }
 
+    /**
+     * Move the output shaft by a number of blocks (translating through a
+     * piston/pulley downstream), then halt. Equivalent to a single
+     * {@code turn_distance} instruction.
+     *
+     * @cc.tparam number blocks Blocks to travel (1..128, sign sets direction).
+     * @cc.tparam[opt] number speedModifier -2..+2 (FORWARD = 1 default).
+     */
     @LuaFunction(mainThread = true)
     public final void move(IArguments arguments) throws LuaException {
         runInstruction(arguments, SequencerInstructions.TURN_DISTANCE);
     }
 
+    /**
+     * Check whether the gearshift is currently executing an instruction.
+     *
+     * @return True if running.
+     */
     @LuaFunction
     public final boolean isRunning() {
         return !this.blockEntity.isIdle();

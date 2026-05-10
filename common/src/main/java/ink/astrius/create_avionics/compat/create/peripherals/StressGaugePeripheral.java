@@ -120,41 +120,93 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
     // both are always 0 for a gauge, and the latter would shadow the
     // network-total method above.
 
+    /**
+     * Get this block's opaque self-id within the kinetic SCADA topology.
+     * Stable identity for cross-peripheral grouping; equality-comparable
+     * with {@code getSourceId} / {@code getNetworkId} on neighbours.
+     *
+     * @return The self-id.
+     */
     @LuaFunction
     public final String getSelfId() {
         return KineticReadback.selfId(this.blockEntity);
     }
 
+    /**
+     * Get the id of the block whose rotation this gauge is reading from
+     * (the upstream kinetic source one hop away). Nil when no source.
+     *
+     * @return The source id, or nil.
+     */
     @LuaFunction
     public final String getSourceId() {
         return KineticReadback.sourceId(this.blockEntity);
     }
 
+    /**
+     * Get the id of the speed-zone anchor this gauge belongs to. Every block
+     * within a single speed-zone reports the same anchor — useful for
+     * grouping peripherals into rotation-coherent regions.
+     *
+     * @return The subnetwork anchor id.
+     */
     @LuaFunction
     public final String getSubnetworkAnchorId() {
         return KineticReadback.subnetworkAnchorId(this.blockEntity);
     }
 
+    /**
+     * Get the id of the entire kinetic network this gauge is part of. All
+     * peripherals on the same network — across all speed zones — share this
+     * id.
+     *
+     * @return The network id.
+     */
     @LuaFunction
     public final String getNetworkId() {
         return KineticReadback.networkId(this.blockEntity);
     }
 
+    /**
+     * Get the SCADA kind classifier for this block. Stressometers report
+     * {@code "passthrough"} (they read from the network without modifying
+     * speed or topology).
+     *
+     * @return The kind classifier.
+     */
     @LuaFunction
     public final String getKind() {
         return KineticReadback.kindOf(this.blockEntity);
     }
 
+    /**
+     * Get the gauge's current shaft speed in RPM (signed). Same value Create
+     * exposes natively.
+     *
+     * @return The current speed in RPM.
+     */
     @LuaFunction
     public final double getSpeed() {
         return this.blockEntity.getSpeed();
     }
 
+    /**
+     * Check whether the gauge currently has a kinetic source feeding it.
+     * False on a disconnected gauge or one in a stalled network.
+     *
+     * @return True if a source is present.
+     */
     @LuaFunction
     public final boolean hasSource() {
         return this.blockEntity.hasSource();
     }
 
+    /**
+     * Check whether the kinetic network this gauge is on is overstressed.
+     * Mirrors the {@code overstressed} event but pollable on demand.
+     *
+     * @return True if overstressed.
+     */
     @LuaFunction
     public final boolean isOverstressed() {
         return this.blockEntity.isOverStressed();

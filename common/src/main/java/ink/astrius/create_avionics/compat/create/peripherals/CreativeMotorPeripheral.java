@@ -65,11 +65,25 @@ public class CreativeMotorPeripheral extends KineticPeripheral<CreativeMotorBloc
         return "Create_CreativeMotor";
     }
 
+    /**
+     * Set the motor's target rotation speed in rotations per minute. Negative
+     * values reverse the motor; clamped to the in-game GUI's range
+     * (-256..+256 RPM).
+     *
+     * @param speed The target speed in RPM.
+     */
     @LuaFunction(mainThread = true)
     public final void setGeneratedSpeed(int speed) {
         this.generatedSpeed.setValue(speed);
     }
 
+    /**
+     * Get the motor's currently configured rotation speed in RPM. Sign and
+     * magnitude match the value last set via {@link #setGeneratedSpeed} or
+     * the in-game scroll wheel.
+     *
+     * @return The configured speed in RPM.
+     */
     @LuaFunction
     public final double getGeneratedSpeed() {
         return this.generatedSpeed.getValue();
