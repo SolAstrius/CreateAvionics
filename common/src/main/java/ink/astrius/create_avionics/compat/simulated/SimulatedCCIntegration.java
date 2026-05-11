@@ -4,6 +4,7 @@ import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dev.simulated_team.simulated.compat.computercraft.peripherals.DirectionalLinkPeripheral;
 import dev.simulated_team.simulated.compat.computercraft.peripherals.DockingConnectorPeripheral;
+import dev.simulated_team.simulated.compat.computercraft.peripherals.ModulatingLinkPeripheral;
 import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlock;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.service.ServiceUtil;
