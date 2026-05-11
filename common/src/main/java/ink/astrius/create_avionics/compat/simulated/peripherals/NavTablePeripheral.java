@@ -19,15 +19,10 @@ import java.util.Map;
  *
  * @cc.module navigation_table
  */
-public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
+public class NavTablePeripheral extends dev.simulated_team.simulated.compat.computercraft.peripherals.NavTablePeripheral {
 
     public NavTablePeripheral(final NavTableBlockEntity blockEntity) {
         super(blockEntity);
-    }
-
-    @Override
-    public String getType() {
-        return "navigation_table";
     }
 
     /**
@@ -122,9 +117,10 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
      *
      * @return The relative angle in degrees.
      */
+    @Override
     @LuaFunction
-    public double getRelativeAngle() {
-        return this.blockEntity.getRelativeAngle();
+    public Float getRelativeAngle() {
+        return super.getRelativeAngle();
     }
 
     /**
@@ -132,9 +128,10 @@ public class NavTablePeripheral extends SimPeripheral<NavTableBlockEntity> {
      *
      * @return The relative angle in radians.
      */
+    @Override
     @LuaFunction
     public double getRelativeAngleRad() {
-        return Math.toRadians(this.blockEntity.getRelativeAngle());
+        return super.getRelativeAngleRad();
     }
 
     /**

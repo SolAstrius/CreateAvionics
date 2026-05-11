@@ -90,7 +90,7 @@ public class SwivelBearingPeripheral extends SimKineticPeripheral<SwivelBearingB
 
     /**
      * Get the id of the bearing's paired plate block, or nil if no plate is
-     * linked. Same id flavor as {@link #getSelfId} on a peripheral wrapped
+     * linked. Same id flavor as {@code getSelfId} on a peripheral wrapped
      * around the plate; equality-comparable.
      *
      * @return The plate's id, or nil.

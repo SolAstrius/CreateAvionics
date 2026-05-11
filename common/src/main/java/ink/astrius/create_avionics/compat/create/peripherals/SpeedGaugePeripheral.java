@@ -44,7 +44,7 @@ import org.jetbrains.annotations.NotNull;
  * {@code getSourceId}, {@code getSubnetworkAnchorId}, {@code getNetworkId},
  * {@code getKind} (returns {@code "passthrough"} on a Speedometer),
  * {@code hasSource}, {@code isOverstressed}, plus per-block
- * {@code getStressImpact} / {@code getStressCapacity} (both 0 on a gauge,
+ * {@code getStressImpact} / {@code getStressContribution} (both 0 on a gauge,
  * harmless). Speedometer becomes a topology probe in addition to its
  * traditional role.
  *

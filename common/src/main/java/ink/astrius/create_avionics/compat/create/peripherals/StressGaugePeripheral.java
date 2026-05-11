@@ -46,17 +46,14 @@ import org.jetbrains.annotations.NotNull;
  * {@link #getKind}, {@link #getSpeed}, {@link #hasSource},
  * {@link #isOverstressed}.
  * <p>
- * <b>Important — {@link #getStressCapacity} semantics differ here:</b> on the
- * Stressometer this method returns the <em>network total</em> capacity (Create's
- * gauge behavior), <em>not</em> the per-block contribution that the same
- * method name returns on every other kinetic peripheral in this addon
- * (propellers, bearings, gearshifts, motors, etc.). Likewise {@link #getStress}
- * is the network total, not a per-block value. The Stressometer is the only
- * peripheral that exposes network-wide stress totals; everywhere else
- * {@code getStressCapacity} / {@code getStressImpact} mean a single block's
- * own contribution / draw. Per-block stress methods are intentionally absent
- * here (they would always be 0 on a gauge and would collide with the
- * network-total methods).
+ * <b>Stress methods on this peripheral are network-wide totals.</b>
+ * {@link #getStress} and {@link #getStressCapacity} sum across every consumer
+ * and source on the network — Create's gauge semantics, preserved. Every other
+ * kinetic peripheral in this addon (propellers, bearings, gearshifts, motors,
+ * etc.) instead exposes per-block values under the distinct names
+ * {@code getStressImpact} (draw) and {@code getStressContribution} (capacity
+ * added). Per-block methods are intentionally absent on the Stressometer —
+ * they would always be 0 on a gauge.
  *
  * @cc.module Create_Stressometer
  */
@@ -90,13 +87,10 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
     }
 
     /**
-     * Get the current total stress capacity of this block's kinetic network.
-     * <p>
-     * <b>Note on semantics:</b> on the Stressometer this returns the
-     * <em>network's total</em> capacity (sum of every source's contribution).
-     * On every other kinetic peripheral in this addon, the same method name
-     * returns the <em>per-block</em> contribution. The Stressometer is the
-     * exception by design — its job is exposing network totals.
+     * Get the current total stress capacity of this block's kinetic network —
+     * sum of every source's contribution. Distinct from the per-block
+     * {@code getStressContribution} exposed on every other kinetic peripheral
+     * in this addon, which reports a single block's own contribution.
      *
      * @return The network's total stress capacity.
      */
@@ -116,9 +110,8 @@ public class StressGaugePeripheral extends SyncedPeripheral<StressGaugeBlockEnti
     }
 
     // --- Avionics: kinetic SCADA pack ---
-    // Per-block getStressImpact / getStressCapacity intentionally omitted;
-    // both are always 0 for a gauge, and the latter would shadow the
-    // network-total method above.
+    // Per-block getStressImpact / getStressContribution intentionally omitted;
+    // both are always 0 for a gauge, and exposing them here would only add noise.
 
     /**
      * Get this block's opaque self-id within the kinetic SCADA topology.

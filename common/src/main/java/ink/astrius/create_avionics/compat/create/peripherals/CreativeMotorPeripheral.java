@@ -43,7 +43,7 @@ import org.jetbrains.annotations.NotNull;
  * {@code getSourceId}, {@code getSubnetworkAnchorId}, {@code getNetworkId},
  * {@code getKind} (returns {@code "generator"}), {@code getSpeed},
  * {@code hasSource}, {@code isOverstressed}, {@code getStressImpact} (0
- * — motors don't draw stress), {@code getStressCapacity} (the per-block
+ * — motors don't draw stress), {@code getStressContribution} (the per-block
  * capacity the motor contributes; non-zero while running). The motor is
  * typically the network root, and its {@code getSelfId} is the
  * {@code getNetworkId} every block downstream of it reports.

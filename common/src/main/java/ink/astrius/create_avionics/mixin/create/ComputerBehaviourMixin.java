@@ -1,7 +1,7 @@
 package ink.astrius.create_avionics.mixin.create;
 
 import com.simibubi.create.compat.computercraft.implementation.ComputerBehaviour;
-import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
+import com.simibubi.create.compat.computercraft.implementation.peripherals.*;
 import com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity;
 import com.simibubi.create.content.contraptions.piston.MechanicalPistonBlockEntity;
 import com.simibubi.create.content.contraptions.elevator.ElevatorContactBlockEntity;
@@ -17,8 +17,8 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import ink.astrius.create_avionics.compat.create.peripherals.CreativeMotorPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.ElevatorContactPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.ElevatorPulleyPeripheral;
-import ink.astrius.create_avionics.compat.create.peripherals.MechanicalBearingPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.GantryShaftPeripheral;
+import ink.astrius.create_avionics.compat.create.peripherals.MechanicalBearingPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.MechanicalPistonPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.RopePulleyPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.SequencedGearshiftPeripheral;

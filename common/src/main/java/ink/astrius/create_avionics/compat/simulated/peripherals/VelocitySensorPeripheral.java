@@ -18,15 +18,10 @@ import dev.simulated_team.simulated.content.blocks.velocity_sensor.VelocitySenso
  *
  * @cc.module velocity_sensor
  */
-public class VelocitySensorPeripheral extends SimPeripheral<VelocitySensorBlockEntity> {
+public class VelocitySensorPeripheral extends dev.simulated_team.simulated.compat.computercraft.peripherals.VelocitySensorPeripheral {
 
     public VelocitySensorPeripheral(final VelocitySensorBlockEntity blockEntity) {
         super(blockEntity);
-    }
-
-    @Override
-    public String getType() {
-        return "velocity_sensor";
     }
 
     /**
@@ -39,9 +34,10 @@ public class VelocitySensorPeripheral extends SimPeripheral<VelocitySensorBlockE
      *
      * @return The signed velocity in m/s.
      */
+    @Override
     @LuaFunction
-    public double getVelocity() {
-        return this.blockEntity.getAdjustedVelocity();
+    public float getVelocity() {
+        return super.getVelocity();
     }
 
     /**

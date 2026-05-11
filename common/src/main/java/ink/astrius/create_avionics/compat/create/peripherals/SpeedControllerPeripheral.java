@@ -44,7 +44,7 @@ import org.jetbrains.annotations.NotNull;
  * {@code getSourceId}, {@code getSubnetworkAnchorId}, {@code getNetworkId},
  * {@code getKind} (returns {@code "split_shaft"}), {@code getSpeed},
  * {@code hasSource}, {@code isOverstressed}, {@code getStressImpact},
- * {@code getStressCapacity}. The speed controller is a speed-zone boundary
+ * {@code getStressContribution}. The speed controller is a speed-zone boundary
  * (one of the few block kinds that returns {@code "split_shaft"}), so its
  * {@code getSelfId} is the natural anchor id every block downstream of it
  * reports for {@code getSubnetworkAnchorId}.

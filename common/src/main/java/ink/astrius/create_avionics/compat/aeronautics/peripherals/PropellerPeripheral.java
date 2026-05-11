@@ -45,7 +45,7 @@ public class PropellerPeripheral<T extends BasePropellerBlockEntity> extends Sim
 
     /**
      * Get the propeller's smoothed rotation speed.
-     * Smoothed angular speed used for visuals; lags {@link #getSpeed} by
+     * Smoothed angular speed used for visuals; lags {@code getSpeed} by
      * ~0.15 exponential lerp.
      *
      * @return The smoothed rotation speed.
