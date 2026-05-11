@@ -9,9 +9,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
- * Shared logic for the kinetic SCADA pack. Used by both
- * {@link KineticPeripheral} (Create-side, on top of {@code SyncedPeripheral})
- * and the Avionics-side {@code SimKineticPeripheral}.
+ * Shared logic for the kinetic SCADA pack. Used by
+ * {@link ink.astrius.create_avionics.compat.simulated.peripherals.generic.KineticSource},
+ * the {@code GenericSource} that provides the pack to every kinetic peripheral.
  */
 public final class KineticReadback {
 

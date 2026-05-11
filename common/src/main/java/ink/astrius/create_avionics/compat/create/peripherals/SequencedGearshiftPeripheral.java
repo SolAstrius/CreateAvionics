@@ -65,9 +65,10 @@ import java.util.Vector;
  * {@code getSourceId}, {@code getSubnetworkAnchorId}, {@code getNetworkId},
  * {@code getKind} (returns {@code "split_shaft"}), {@code getSpeed},
  * {@code hasSource}, {@code isOverstressed}, {@code getStressImpact},
- * {@code getStressCapacity}. The gearshift is a speed-zone boundary, so its
- * {@code getSelfId} is the anchor id every block downstream reports for
- * {@code getSubnetworkAnchorId}.
+ * {@code getStressContribution}. Inherited from {@code KineticScadaSurface}
+ * via {@code KineticPeripheral}; not declared here. The gearshift is a
+ * speed-zone boundary, so its {@code getSelfId} is the anchor id every block
+ * downstream reports for {@code getSubnetworkAnchorId}.
  * <p>
  * Type stays {@code Create_SequencedGearshift} — atypical for Avionics (which
  * uses snake_case) but required for script compatibility.
