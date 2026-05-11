@@ -12,26 +12,22 @@ import ink.astrius.create_avionics.api.simulated.AltitudeSensorExt;
  *
  * @cc.module altitude_sensor
  */
-public class AltitudeSensorPeripheral extends SimPeripheral<AltitudeSensorBlockEntity> {
+public class AltitudeSensorPeripheral extends dev.simulated_team.simulated.compat.computercraft.peripherals.AltitudeSensorPeripheral {
 
     public AltitudeSensorPeripheral(final AltitudeSensorBlockEntity blockEntity) {
         super(blockEntity);
-    }
-
-    @Override
-    public String getType() {
-        return "altitude_sensor";
     }
 
     /**
      * Get the sensor's current world altitude.
      *
      * @return The block's world-frame Y coordinate, in blocks (= meters in
-     *         Minecraft units).
+     * Minecraft units).
      */
+    @Override
     @LuaFunction
-    public double getHeight() {
-        return this.blockEntity.getWorldHeight();
+    public float getHeight() {
+        return super.getHeight();
     }
 
     /**
@@ -50,9 +46,10 @@ public class AltitudeSensorPeripheral extends SimPeripheral<AltitudeSensorBlockE
      *
      * @return The air pressure as a fraction of sea-level pressure.
      */
+    @Override
     @LuaFunction
     public double getAirPressure() {
-        return this.blockEntity.getAirPressure();
+        return super.getAirPressure();
     }
 
     /**
