@@ -1,6 +1,5 @@
 package ink.astrius.create_avionics.compat.aeronautics;
 
-import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
 import dev.simulated_team.simulated.service.ServiceUtil;
@@ -8,11 +7,11 @@ import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.service.SimPlatformService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import ink.astrius.create_avionics.CreateAvionics;
+import ink.astrius.create_avionics.compat.aeronautics.peripherals.GasProviderPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.GyroscopicPropellerBearingPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.MountedPotatoCannonPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.PropellerBearingPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.PropellerPeripheral;
-import ink.astrius.create_avionics.compat.aeronautics.peripherals.generic.GasProviderGenericSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -35,7 +34,8 @@ public class AeroCCIntegration implements SimModCompatibilityService {
 
         final SimPeripheralService service = ServiceUtil.load(SimPeripheralService.class);
 
-        ComputerCraftAPI.registerGenericSource(new GasProviderGenericSource());
+        add(service, AeroBlockEntityTypes.HOT_AIR_BURNER, be -> new GasProviderPeripheral<>(be, "hot_air_burner"));
+        add(service, AeroBlockEntityTypes.STEAM_VENT, be -> new GasProviderPeripheral<>(be, "steam_vent"));
 
         add(service, AeroBlockEntityTypes.WOODEN_PROPELLER, be -> new PropellerPeripheral<>(be, "wooden_propeller"));
         add(service, AeroBlockEntityTypes.ANDESITE_PROPELLER, be -> new PropellerPeripheral<>(be, "andesite_propeller"));

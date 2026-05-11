@@ -1,28 +1,50 @@
-package ink.astrius.create_avionics.compat.aeronautics.peripherals.generic;
+package ink.astrius.create_avionics.compat.aeronautics.peripherals;
 
-import dan200.computercraft.api.lua.GenericSource;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.Balloon;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.ServerBalloon;
+import dev.eriksonn.aeronautics.content.blocks.hot_air.lifting_gas.DefaultLiftingGas;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.lifting_gas.LiftingGasHolder;
+import dev.eriksonn.aeronautics.content.blocks.hot_air.lifting_gas.LiftingGasType;
+import dev.eriksonn.aeronautics.content.blocks.hot_air.lifting_gas.SteamLiftingGas;
 import ink.astrius.create_avionics.api.aero.GasProviderData;
+import ink.astrius.create_avionics.compat.simulated.peripherals.SimPeripheral;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Shared peripheral for gas-output blocks (burners, vents) that fill balloons.
  * Reports gas output, signal, gas type, target amount, and balloon state. The
- * shared additional type "gas_provider" lets scripts target every heater
+ * shared additional type {@code gas_provider} lets scripts target every heater
  * regardless of block kind.
  *
  * @cc.module gas_provider
  */
-public class GasProviderGenericSource implements GenericSource {
+public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeripheral<T> {
+
+    private final String typeName;
+
+    public GasProviderPeripheral(final T blockEntity, final String typeName) {
+        super(blockEntity);
+        this.typeName = typeName;
+    }
+
     @Override
-    public String id() {
-        return "gas_provider";
+    public String getType() {
+        return this.typeName;
+    }
+
+    @Override
+    public Set<String> getAdditionalTypes() {
+        return Set.of("gas_provider");
+    }
+
+    private GasProviderData data() {
+        return (GasProviderData) this.blockEntity;
     }
 
     /**
@@ -33,8 +55,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The gas output rate in m³ per tick (multiply by 20 for m³/s).
      */
     @LuaFunction
-    public final double getGasOutput(GasProviderData data) {
-        return data.getGasOutput();
+    public final double getGasOutput() {
+        return this.data().getGasOutput();
     }
 
     /**
@@ -43,8 +65,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return True if active.
      */
     @LuaFunction
-    public final boolean isActive(GasProviderData data) {
-        return data.canOutputGas();
+    public final boolean isActive() {
+        return this.data().canOutputGas();
     }
 
     /**
@@ -53,18 +75,27 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The signal strength, 0..15.
      */
     @LuaFunction
-    public final int getSignalStrength(GasProviderData data) {
-        return data.getSignalStrength();
+    public final int getSignalStrength() {
+        return this.data().getSignalStrength();
     }
 
     /**
-     * Get the id of the gas this provider produces.
+     * Get the id of the gas this provider produces. Known stock types return
+     * stable lowercase ids ({@code "steam"}, {@code "default"}). Third-party
+     * {@code LiftingGasType} implementations fall through to their class's
+     * simple name so the gas remains identifiable to scripts.
      *
-     * @return The gas type id ("steam", "default", or "unknown").
+     * @return The gas type id.
      */
     @LuaFunction
-    public final String getGasType(GasProviderData data) {
-        return data.getLiftingGasType().getClass().getSimpleName();
+    public final String getGasType() {
+        return gasTypeId(this.data().getLiftingGasType());
+    }
+
+    private static String gasTypeId(final LiftingGasType t) {
+        if (t instanceof SteamLiftingGas) return "steam";
+        if (t instanceof DefaultLiftingGas) return "default";
+        return t.getClass().getSimpleName();
     }
 
     /**
@@ -73,8 +104,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The target amount.
      */
     @LuaFunction
-    public final int getTargetAmount(GasProviderData data) {
-        return data.getTargetAmount();
+    public final int getTargetAmount() {
+        return this.data().getTargetAmount();
     }
 
     /**
@@ -83,8 +114,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @param amount The new target amount.
      */
     @LuaFunction(mainThread = true)
-    public final void setTargetAmount(GasProviderData data, final int amount) {
-        data.setTargetAmount(amount);
+    public final void setTargetAmount(final int amount) {
+        this.data().setTargetAmount(amount);
     }
 
     /**
@@ -93,8 +124,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The boiler efficiency in [0, 1].
      */
     @LuaFunction
-    public final double getBoilerEfficiency(GasProviderData data) {
-        return data.getBoilerEfficiency();
+    public final double getBoilerEfficiency() {
+        return this.data().getBoilerEfficiency();
     }
 
     /**
@@ -103,8 +134,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return True if a balloon is present.
      */
     @LuaFunction
-    public final boolean hasBalloon(GasProviderData data) {
-        return data.getBalloon() != null;
+    public final boolean hasBalloon() {
+        return this.data().getBalloon() != null;
     }
 
     /**
@@ -113,8 +144,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The balloon's capacity, or 0 if none.
      */
     @LuaFunction
-    public final int getBalloonCapacity(GasProviderData data) {
-        final Balloon b = data.getBalloon();
+    public final int getBalloonCapacity() {
+        final Balloon b = this.data().getBalloon();
         return b != null ? b.getCapacity() : 0;
     }
 
@@ -124,8 +155,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The filled volume, or 0 if no server-side balloon.
      */
     @LuaFunction
-    public final double getBalloonFilledVolume(GasProviderData data) {
-        final Balloon b = data.getBalloon();
+    public final double getBalloonFilledVolume() {
+        final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalFilledVolume() : 0.0;
     }
 
@@ -135,8 +166,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The target volume, or 0 if no server-side balloon.
      */
     @LuaFunction
-    public final double getBalloonTargetVolume(GasProviderData data) {
-        final Balloon b = data.getBalloon();
+    public final double getBalloonTargetVolume() {
+        final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalTargetVolume() : 0.0;
     }
 
@@ -146,8 +177,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The signed volume change, or 0 if no server-side balloon.
      */
     @LuaFunction
-    public final double getBalloonVolumeChange(GasProviderData data) {
-        final Balloon b = data.getBalloon();
+    public final double getBalloonVolumeChange() {
+        final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalVolumeChange() : 0.0;
     }
 
@@ -157,8 +188,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The lift, or 0 if no server-side balloon.
      */
     @LuaFunction
-    public final double getBalloonLift(GasProviderData data) {
-        final Balloon b = data.getBalloon();
+    public final double getBalloonLift() {
+        final Balloon b = this.data().getBalloon();
         return (b instanceof final ServerBalloon sb) ? sb.getTotalLift() : 0.0;
     }
 
@@ -168,8 +199,8 @@ public class GasProviderGenericSource implements GenericSource {
      * @return The height, or 0 if no balloon.
      */
     @LuaFunction
-    public final double getBalloonHeight(GasProviderData data) {
-        final Balloon b = data.getBalloon();
+    public final double getBalloonHeight() {
+        final Balloon b = this.data().getBalloon();
         return b != null ? b.getHeight() : 0.0;
     }
 
@@ -179,12 +210,12 @@ public class GasProviderGenericSource implements GenericSource {
      * @return A list of gas mix entries.
      */
     @LuaFunction
-    public final List<Map<String, Object>> getBalloonGasMix(GasProviderData data) {
-        final Balloon b = data.getBalloon();
+    public final List<Map<String, Object>> getBalloonGasMix() {
+        final Balloon b = this.data().getBalloon();
         if (!(b instanceof final ServerBalloon sb)) return List.of();
         final List<Map<String, Object>> out = new ArrayList<>();
         for (final LiftingGasHolder h : sb.getLiftingGasHolders()) {
-            out.add(Map.of("type", h.type().getClass().getSimpleName(), "amount", h.data().amount));
+            out.add(Map.of("type", gasTypeId(h.type()), "amount", h.data().amount));
         }
         return out;
     }
