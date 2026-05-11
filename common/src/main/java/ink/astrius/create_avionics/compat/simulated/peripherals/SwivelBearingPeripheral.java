@@ -1,10 +1,14 @@
 package ink.astrius.create_avionics.compat.simulated.peripherals;
 
+import com.simibubi.create.content.contraptions.AssemblyException;
+import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlockEntity;
+import ink.astrius.create_avionics.api.simulated.SwivelBearingExt;
 import ink.astrius.create_avionics.compat.create.peripherals.KineticReadback;
 import net.minecraft.core.BlockPos;
 
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -111,5 +115,75 @@ public class SwivelBearingPeripheral extends SimKineticPeripheral<SwivelBearingB
     public final String getSubLevelId() {
         final UUID id = this.blockEntity.getSubLevelID();
         return id == null ? null : id.toString();
+    }
+
+    // --- Locking ---
+
+    private SwivelBearingExt ext() {
+        return (SwivelBearingExt) this.blockEntity;
+    }
+
+    /**
+     * Check whether the bearing is currently asserting its rotational lock.
+     * True when the block state is powered (the bearing is actively holding
+     * its attached sub-level fixed against the parent).
+     *
+     * @return True if locked.
+     */
+    @LuaFunction
+    public final boolean isLocked() {
+        return this.ext().createAvionics$isLocking();
+    }
+
+    /**
+     * Get the bearing's locking mode — how it reacts to redstone signal.
+     * One of:
+     * <ul>
+     *   <li>{@code "locked_always"} — locked regardless of signal</li>
+     *   <li>{@code "locked_default"} — locked at rest; signal unlocks</li>
+     *   <li>{@code "unlocked_default"} — unlocked at rest; signal locks</li>
+     *   <li>{@code "unlocked_always"} — unlocked regardless of signal</li>
+     * </ul>
+     * Mirrors the in-game scroll option.
+     *
+     * @return The current locking mode.
+     */
+    @LuaFunction
+    public final String getLockingMode() {
+        return this.ext().createAvionics$getLockingMode();
+    }
+
+    /**
+     * Set the bearing's locking mode. See {@link #getLockingMode} for the
+     * accepted values.
+     *
+     * @param mode The new locking mode.
+     */
+    @LuaFunction(mainThread = true)
+    public final void setLockingMode(final String mode) throws LuaException {
+        final int ordinal = switch (mode.toLowerCase(Locale.ROOT)) {
+            case "locked_always" -> 0;
+            case "locked_default" -> 1;
+            case "unlocked_default" -> 2;
+            case "unlocked_always" -> 3;
+            default -> throw new LuaException(
+                "expected 'locked_always', 'locked_default', 'unlocked_default', or 'unlocked_always'");
+        };
+        this.ext().createAvionics$setLockingModeOrdinal(ordinal);
+    }
+
+    // --- Assembly diagnostics ---
+
+    /**
+     * Get the message from the bearing's most recent failed assembly attempt,
+     * or nil if the last {@link #assemble} call succeeded (or none has been
+     * made yet).
+     *
+     * @return The failure message, or nil.
+     */
+    @LuaFunction
+    public final String getLastAssemblyException() {
+        final AssemblyException e = this.blockEntity.getLastAssemblyException();
+        return e == null ? null : e.getMessage();
     }
 }
