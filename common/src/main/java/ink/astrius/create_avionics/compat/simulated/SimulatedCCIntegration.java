@@ -2,10 +2,7 @@ package ink.astrius.create_avionics.compat.simulated;
 
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.peripheral.IPeripheral;
-import dev.simulated_team.simulated.compat.computercraft.peripherals.DirectionalLinkPeripheral;
-import dev.simulated_team.simulated.compat.computercraft.peripherals.DockingConnectorPeripheral;
-import dev.simulated_team.simulated.compat.computercraft.peripherals.ModulatingLinkPeripheral;
-import dev.simulated_team.simulated.compat.computercraft.peripherals.NamePlatePeripheral;
+import dev.simulated_team.simulated.compat.computercraft.peripherals.*;
 import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlock;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.service.ServiceUtil;
@@ -13,6 +10,13 @@ import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import ink.astrius.create_avionics.CreateAvionics;
 import ink.astrius.create_avionics.compat.simulated.peripherals.*;
+import ink.astrius.create_avionics.compat.simulated.peripherals.AltitudeSensorPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.GimbalSensorPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.LinkedTypewriterPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.NavTablePeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.SwivelBearingPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.TorsionSpringPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
