@@ -116,18 +116,15 @@ public class KineticSource implements GenericSource {
     }
 
     /**
-     * Get the stress capacity this block adds to its network. Non-zero for
-     * sources only.
-     * <p>
-     * <b>Caveat:</b> on the {@code Create_Stressometer} peripheral the
-     * same-named method returns the <em>network total</em> capacity instead
-     * (preserving Create's gauge semantics). Stressometer is the only place
-     * this method's meaning differs.
+     * Get this block's contribution to its network's stress capacity. Non-zero
+     * for sources only. Parallel to {@code getStressImpact} (per-block draw)
+     * and distinct from {@code Create_Stressometer#getStressCapacity}, which
+     * reports the network total.
      *
-     * @return The added stress capacity (per-block contribution).
+     * @return The per-block stress contribution.
      */
     @LuaFunction
-    public final double getStressCapacity(KineticBlockEntity be) {
+    public final double getStressContribution(KineticBlockEntity be) {
         return be.calculateAddedStressCapacity();
     }
 }
