@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-11
+
+### Added
+
+- Optional integration with [Create: Offroad](https://maven.ryanhcode.dev/).
+  Adds the `wheel_mount` peripheral.
+- `wheel_mount`: kinetic SCADA surface plus two independent script overrides.
+  `setSteering(-1..1)` / `clearSteering` bypasses the side-redstone read,
+  `setBrake(0..1)` / `clearBrake` bypasses the top-of-block redstone read.
+  Both are persisted across save/load and synced to the client so the
+  wheel visuals match server-side physics. Reads expose tire presence and
+  radius, suspension extension, angular velocity, contact-block friction,
+  and a `isLiftedUp` flag.
+- Public API `ink.astrius.create_avionics.api.offroad.WheelMountExt` —
+  mixin-supplied interface for downstream addons driving the overrides
+  from Java.
+
 ## [0.3.1] - 2026-05-11
 
 ### Added
