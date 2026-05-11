@@ -1,7 +1,7 @@
 package ink.astrius.create_avionics.mixin.create;
 
 import com.simibubi.create.compat.computercraft.implementation.ComputerBehaviour;
-import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
+import com.simibubi.create.compat.computercraft.implementation.peripherals.*;
 import com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity;
 import com.simibubi.create.content.contraptions.piston.MechanicalPistonBlockEntity;
 import com.simibubi.create.content.contraptions.elevator.ElevatorContactBlockEntity;
@@ -14,7 +14,6 @@ import com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.simibubi.create.content.kinetics.speedController.SpeedControllerBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import ink.astrius.create_avionics.compat.create.peripherals.CreativeMotorPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.ElevatorContactPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.ElevatorPulleyPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.MechanicalBearingPeripheral;
@@ -22,9 +21,6 @@ import ink.astrius.create_avionics.compat.create.peripherals.GantryShaftPeripher
 import ink.astrius.create_avionics.compat.create.peripherals.MechanicalPistonPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.RopePulleyPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.SequencedGearshiftPeripheral;
-import ink.astrius.create_avionics.compat.create.peripherals.SpeedControllerPeripheral;
-import ink.astrius.create_avionics.compat.create.peripherals.SpeedGaugePeripheral;
-import ink.astrius.create_avionics.compat.create.peripherals.StressGaugePeripheral;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -46,14 +42,6 @@ public abstract class ComputerBehaviourMixin {
             final CallbackInfoReturnable<Supplier<SyncedPeripheral<?>>> cir) {
         if (be instanceof final SequencedGearshiftBlockEntity sgbe) {
             cir.setReturnValue(() -> new SequencedGearshiftPeripheral(sgbe));
-        } else if (be instanceof final SpeedGaugeBlockEntity spgbe) {
-            cir.setReturnValue(() -> new SpeedGaugePeripheral(spgbe));
-        } else if (be instanceof final StressGaugeBlockEntity stgbe) {
-            cir.setReturnValue(() -> new StressGaugePeripheral(stgbe));
-        } else if (be instanceof final SpeedControllerBlockEntity scbe) {
-            cir.setReturnValue(() -> new SpeedControllerPeripheral(scbe, scbe.targetSpeed));
-        } else if (be instanceof final CreativeMotorBlockEntity cmbe) {
-            cir.setReturnValue(() -> new CreativeMotorPeripheral(cmbe, cmbe.generatedSpeed));
         } else if (be instanceof final MechanicalBearingBlockEntity mbbe) {
             cir.setReturnValue(() -> new MechanicalBearingPeripheral(mbbe));
         } else if (be instanceof final MechanicalPistonBlockEntity mpbe) {
