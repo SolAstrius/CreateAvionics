@@ -1,10 +1,10 @@
 package ink.astrius.create_avionics.mixin.simulated;
 
+import dan200.computercraft.api.peripheral.AttachedComputerSet;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.LinkedTypewriterBlockEntity;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.LinkedTypewriterEntries;
 import dev.simulated_team.simulated.service.SimPlatformService;
 import ink.astrius.create_avionics.api.simulated.LinkedTypewriterExt;
-import ink.astrius.create_avionics.compat.AttachedComputerHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -18,10 +18,10 @@ public abstract class LinkedTypewriterBlockEntityMixin implements LinkedTypewrit
     @Shadow private LinkedTypewriterEntries entryMap;
 
     @Unique
-    private final AttachedComputerHandler computerHandler = new AttachedComputerHandler();
+    private final AttachedComputerSet computerHandler = new AttachedComputerSet();
 
     @Override
-    public AttachedComputerHandler getComputerHandler() {
+    public AttachedComputerSet getComputerHandler() {
         return this.computerHandler;
     }
 

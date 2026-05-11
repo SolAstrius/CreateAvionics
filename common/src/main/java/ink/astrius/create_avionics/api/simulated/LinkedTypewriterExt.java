@@ -1,7 +1,7 @@
 package ink.astrius.create_avionics.api.simulated;
 
-import ink.astrius.create_avionics.compat.AttachedComputerHandler;
+import dan200.computercraft.api.peripheral.AttachedComputerSet;
 
 public interface LinkedTypewriterExt {
-    AttachedComputerHandler getComputerHandler();
+    AttachedComputerSet getComputerHandler();
 }
