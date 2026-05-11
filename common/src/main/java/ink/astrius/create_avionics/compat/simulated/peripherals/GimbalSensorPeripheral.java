@@ -25,15 +25,10 @@ import java.util.List;
  *
  * @cc.module gimbal_sensor
  */
-public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntity> {
+public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.computercraft.peripherals.GimbalSensorPeripheral {
 
     public GimbalSensorPeripheral(final GimbalSensorBlockEntity blockEntity) {
         super(blockEntity);
-    }
-
-    @Override
-    public String getType() {
-        return "gimbal_sensor";
     }
 
     /**
@@ -48,9 +43,10 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
      *
      * @return A two-element list {pitch, roll} in degrees.
      */
+    @Override
     @LuaFunction
     public List<Double> getAngles() {
-        return List.of(Math.toDegrees(this.blockEntity.getXAngle()), Math.toDegrees(this.blockEntity.getZAngle()));
+        return super.getAngles();
     }
 
     /**
@@ -59,9 +55,10 @@ public class GimbalSensorPeripheral extends SimPeripheral<GimbalSensorBlockEntit
      *
      * @return A two-element list {pitch, roll} in radians.
      */
+    @Override
     @LuaFunction
     public List<Double> getAnglesRad() {
-        return List.of(this.blockEntity.getXAngle(), this.blockEntity.getZAngle());
+        return super.getAnglesRad();
     }
 
     /**
