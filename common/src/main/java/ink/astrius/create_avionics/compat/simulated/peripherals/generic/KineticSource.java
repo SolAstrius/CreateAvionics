@@ -5,6 +5,17 @@ import dan200.computercraft.api.lua.GenericSource;
 import dan200.computercraft.api.lua.LuaFunction;
 import ink.astrius.create_avionics.compat.create.peripherals.KineticReadback;
 
+/**
+ * Shared peripheral for kinetic blocks meant to mimic the base class for Avionics peripherals.
+ * Provides the kinetic SCADA pack — block id, parent id, speed-zone
+ * anchor id, network id, role, local speed, stress, health — so concrete
+ * peripherals only add their block-specific surface.
+ *
+ * <p>Ids are opaque tokens for equality comparison across peripherals.
+ * Network totals are not exposed; that's the Stressometer's role.</p>
+ *
+ * @cc.module kinetic_provider
+ */
 public class KineticSource implements GenericSource {
     @Override
     public String id() {
