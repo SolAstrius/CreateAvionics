@@ -15,12 +15,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * Composes generic-source methods onto a registered BE's capability-supplied
- * peripheral. Without this, CC's
- * {@code PlatformHelperImpl$PeripheralAccess#get(Direction)} short-circuits to
- * the capability peripheral and never runs the generic-source pass, so e.g.
- * the kinetic SCADA methods from {@code KineticSource} never reach Create's
- * pre-peripheraled BEs (motor, speed controller, gauges, sequenced gearshift).
+ * Composes generic-source methods (including {@code ComponentLookup}-sourced
+ * methods like CC's {@code InventoryMethods}) onto a registered BE's
+ * capability-supplied peripheral.
+ *
+ * <p>Without this, {@code PlatformHelperImpl$PeripheralAccess#get(Direction)}
+ * short-circuits to the capability peripheral and never runs the generic-source
+ * pass — so e.g. the inventory pack ({@code pushItems}, {@code list}, …) never
+ * reaches BEs whose peripheral we supplied via capability (Sim's portable
+ * engine), and SCADA methods from {@code KineticSource} never reach Create's
+ * pre-peripheraled kinetic BEs.</p>
  *
  * <p>Opt-in: a BE type is composed only when registered via
  * {@link PeripheralComposition#register}.</p>
@@ -51,8 +55,18 @@ public abstract class PeripheralAccessMixin {
         final MinecraftServer server = serverLevel.getServer();
         if (server == null) return original;
 
+        // The "side" passed to ComponentLookups is the face on the neighbour
+        // pointing back at the requestor — i.e. the opposite of the direction
+        // we travelled to reach it. Matches CC's own fallback path.
         final ComposingPeripheral composed = ComposingPeripheral.build(
-            primary, neighbor, ServerContext.get(server).peripheralMethods());
+            primary,
+            neighbor,
+            serverLevel,
+            neighborPos,
+            direction.getOpposite(),
+            ServerContext.get(server).peripheralMethods(),
+            PeripheralsGenericProviderAccessor.createAvionics$getGenericProvider()
+        );
         return composed != null ? composed : original;
     }
 }

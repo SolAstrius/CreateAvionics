@@ -10,6 +10,7 @@ import dev.simulated_team.simulated.service.ServiceUtil;
 import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import ink.astrius.create_avionics.CreateAvionics;
+import ink.astrius.create_avionics.compat.cc.PeripheralComposition;
 import ink.astrius.create_avionics.compat.simulated.peripherals.*;
 import ink.astrius.create_avionics.compat.simulated.peripherals.AltitudeSensorPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.GimbalSensorPeripheral;
@@ -57,6 +58,9 @@ public class SimulatedCCIntegration implements SimModCompatibilityService {
         add(service, SimBlockEntityTypes.SIMPLE_BE, AnalogTransmissionPeripheral::new);
         add(service, SimBlockEntityTypes.PHYSICS_ASSEMBLER, PhysicsAssemblerPeripheral::new);
         add(service, SimBlockEntityTypes.PORTABLE_ENGINE, PortableEnginePeripheral::new);
+        // Restore CC's generic inventory pack (pushItems/pullItems/list/...) on
+        // top of the capability-supplied portable-engine peripheral. See #15.
+        PeripheralComposition.register(SimBlockEntityTypes.PORTABLE_ENGINE);
         add(service, SimBlockEntityTypes.STEERING_WHEEL, SteeringWheelPeripheral::new);
         add(service, SimBlockEntityTypes.THROTTLE_LEVER, ThrottleLeverPeripheral::new);
 

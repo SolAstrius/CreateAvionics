@@ -21,6 +21,7 @@
     "offroad.WheelMountBlockEntityMixin",
     "cc.ComponentAccessOwnerAccessor",
     "cc.PeripheralAccessMixin",
+    "cc.PeripheralsGenericProviderAccessor",
     "create.ComputerBehaviourMixin",
     "create.ElevatorContactBlockEntityMixin",
     "create.ElevatorPulleyBlockEntityMixin",

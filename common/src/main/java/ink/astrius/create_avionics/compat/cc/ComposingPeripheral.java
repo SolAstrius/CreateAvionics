@@ -9,6 +9,11 @@ import dan200.computercraft.api.peripheral.IDynamicPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.core.methods.MethodSupplier;
 import dan200.computercraft.core.methods.PeripheralMethod;
+import dan200.computercraft.shared.peripheral.generic.GenericPeripheralProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,16 +24,20 @@ import java.util.Set;
 
 /**
  * A peripheral that composes a primary {@link IPeripheral} with extra methods
- * harvested from CC's registered generic methods for the target block entity
- * (i.e. methods contributed by {@code GenericSource} implementations whose
- * first-parameter type matches the BE). Primary methods win on name collision;
- * {@link #getType()} and {@link #getTarget()} delegate to the primary;
- * {@link #getAdditionalTypes()} is the union.
+ * harvested from CC's {@link GenericPeripheralProvider}. The generic pass
+ * covers both {@code GenericSource} implementations whose first-parameter type
+ * matches the BE (e.g. {@code KineticSource}) and methods reached via
+ * registered {@code ComponentLookup}s (e.g. {@code InventoryMethods} on the
+ * BE's {@code IItemHandler} capability).
+ *
+ * <p>Primary methods win on name collision; {@link #getType()} and
+ * {@link #getTarget()} delegate to the primary; {@link #getAdditionalTypes()}
+ * is the union.</p>
  *
  * <p>Created on-demand by {@code PeripheralAccessMixin} when the BE is
  * registered via {@link PeripheralComposition}. Returns {@code null} from
- * {@link #build} when the generic-source pass contributes no new methods, so
- * callers can fall back to the primary unchanged.</p>
+ * {@link #build} when the generic pass contributes no new methods, so callers
+ * can fall back to the primary unchanged.</p>
  */
 public final class ComposingPeripheral implements IDynamicPeripheral {
 
@@ -46,7 +55,15 @@ public final class ComposingPeripheral implements IDynamicPeripheral {
         this.target = target;
     }
 
-    public static @Nullable ComposingPeripheral build(final IPeripheral primary, final Object target, final MethodSupplier<PeripheralMethod> supplier) {
+    public static @Nullable ComposingPeripheral build(
+        final IPeripheral primary,
+        final BlockEntity blockEntity,
+        final ServerLevel level,
+        final BlockPos pos,
+        final Direction side,
+        final MethodSupplier<PeripheralMethod> supplier,
+        final GenericPeripheralProvider provider
+    ) {
         final List<Entry> entries = new ArrayList<>();
         final Set<String> seen = new HashSet<>();
         final Set<String> additionalTypes = new HashSet<>(primary.getAdditionalTypes());
@@ -57,14 +74,15 @@ public final class ComposingPeripheral implements IDynamicPeripheral {
         });
         final int primaryCount = entries.size();
 
-        // Generic methods for the BE — GenericSources whose target type matches.
-        supplier.forEachMethod(target, (obj, name, method, info) -> {
+        // Generic pass: GenericSources matching the BE plus all registered
+        // ComponentLookups (capability-backed targets like IItemHandler).
+        provider.forEachMethod(supplier, level, pos, side, blockEntity, (obj, name, method, info) -> {
             if (seen.add(name)) entries.add(new Entry(obj, name, method));
         });
 
         if (entries.size() == primaryCount) return null;
 
-        return new ComposingPeripheral(primary, entries, additionalTypes, target);
+        return new ComposingPeripheral(primary, entries, additionalTypes, blockEntity);
     }
 
     @Override
