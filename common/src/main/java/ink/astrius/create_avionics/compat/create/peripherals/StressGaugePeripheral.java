@@ -41,7 +41,7 @@ import org.jetbrains.annotations.NotNull;
  * events. Existing scripts that rely on these names and semantics keep working.
  * <p>
  * <b>Added (Avionics):</b> the full kinetic SCADA pack, inherited from
- * {@link KineticScadaSurface} via {@link KineticPeripheral} — {@code getSelfId},
+ * {@code KineticScadaSurface} via {@code KineticPeripheral} — {@code getSelfId},
  * {@code getSourceId}, {@code getSubnetworkAnchorId}, {@code getNetworkId},
  * {@code getKind} (returns {@code "passthrough"} on a Stressometer),
  * {@code getSpeed}, {@code hasSource}, {@code isOverstressed},
