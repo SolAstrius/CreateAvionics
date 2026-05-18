@@ -9,6 +9,7 @@ import ink.astrius.create_avionics.api.create.ElevatorPulleyExt;
 import ink.astrius.create_avionics.api.create.GantryShaftExt;
 import ink.astrius.create_avionics.api.create.LinearActuatorExt;
 import ink.astrius.create_avionics.api.create.MechanicalBearingExt;
+import ink.astrius.create_avionics.compat.cc.PeripheralComposition;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -23,6 +24,11 @@ public class CreateAvionicsNeoForge {
 
     private static void registerCapabilities(final RegisterCapabilitiesEvent event) {
         if (!Mods.COMPUTERCRAFT.isLoaded()) return;
+
+        // Smoke test: compose KineticSource SCADA onto Create's pre-peripheraled
+        // sequenced gearshift, which today exposes our subclass's queue surface
+        // but no SCADA pack.
+        PeripheralComposition.register(AllBlockEntityTypes.SEQUENCED_GEARSHIFT);
 
         event.registerBlockEntity(
                 PeripheralCapability.get(),

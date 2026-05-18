@@ -19,6 +19,8 @@
     "aeronautics.HotAirBurnerBlockEntityMixin",
     "aeronautics.SteamVentBlockEntityMixin",
     "offroad.WheelMountBlockEntityMixin",
+    "cc.ComponentAccessOwnerAccessor",
+    "cc.PeripheralAccessMixin",
     "create.ComputerBehaviourMixin",
     "create.ElevatorContactBlockEntityMixin",
     "create.ElevatorPulleyBlockEntityMixin",

@@ -37,6 +37,10 @@ dependencies {
 
     compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core-api:${computercraft_tweaked_version}")
     compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-forge-api:${computercraft_tweaked_version}")
+    // CC's internal classes (MethodSupplier, ServerContext, PlatformHelperImpl) for mixin targets.
+    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core:${computercraft_tweaked_version}")
+    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-common:${computercraft_tweaked_version}")
+    compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${computercraft_tweaked_version}")
     runtimeOnly("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${computercraft_tweaked_version}")
 }
 
