@@ -1,0 +1,43 @@
+name: Modrinth Changelog Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.5.1) whose GitHub release notes to copy onto the matching Modrinth version'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Patch Modrinth version changelog from release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          vid=$(curl -sf "https://api.modrinth.com/v2/project/create-avionics/version" \
+            | jq -r --arg v "$version" '.[] | select(.version_number == $v) | .id')
+          if [ -z "$vid" ]; then
+            echo "::error::No Modrinth version ${version} found"
+            exit 1
+          fi
+          # GitHub alert syntax does not render on Modrinth; downgrade to emoji blockquotes.
+          gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq .body \
+            | tr -d '\r' \
+            | sed -e 's/^> \[!WARNING\]/> ⚠️/' \
+                  -e 's/^> \[!IMPORTANT\]/> 🛑/' \
+                  -e 's/^> \[!NOTE\]/> ℹ️/' \
+            | jq -Rs '{changelog: .}' \
+            | curl -sf -X PATCH "https://api.modrinth.com/v2/version/${vid}" \
+                -H "Authorization: ${MODRINTH_TOKEN}" \
+                -H "Content-Type: application/json" \
+                --data @-
+          echo "Patched Modrinth version ${vid} (${version}) from ${TAG} release notes."
