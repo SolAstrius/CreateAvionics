@@ -73,6 +73,31 @@ jobs:
           prerelease: "${{ contains(steps.vars.outputs.version, '-') }}"
           files: release-artifacts/*.jar
 
+      - name: Extract changelog section
+        run: |
+          awk -v ver="${{ steps.vars.outputs.version }}" '
+            $0 ~ "^## \\[" ver "\\]" { flag = 1; next }
+            /^## \[/ && flag { exit }
+            flag' CHANGELOG.md > modrinth-changelog.md
+          if [ ! -s modrinth-changelog.md ]; then
+            echo "::warning::No CHANGELOG.md section found for ${{ steps.vars.outputs.version }}, falling back to tag subject"
+            git tag -l --format='%(contents:subject)' "${{ steps.vars.outputs.tag }}" > modrinth-changelog.md
+          fi
+          cat modrinth-changelog.md
+
+      - name: Publish to Modrinth
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: h4nsLvjf
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: release-artifacts/*.jar
+          name: "Create: Avionics ${{ steps.vars.outputs.version }}"
+          version: ${{ steps.vars.outputs.version }}
+          version-type: alpha
+          loaders: neoforge
+          game-versions: '1.21.1'
+          changelog-file: modrinth-changelog.md
+
       - name: Regenerate updates.json on main
         if: "${{ !contains(steps.vars.outputs.version, '-') }}"
         env:
