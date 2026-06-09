@@ -7,6 +7,7 @@ import dan200.computercraft.api.lua.MethodResult;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IDynamicPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.api.peripheral.PeripheralType;
 import dan200.computercraft.core.methods.MethodSupplier;
 import dan200.computercraft.core.methods.PeripheralMethod;
 import dan200.computercraft.shared.peripheral.generic.GenericPeripheralProvider;
@@ -76,8 +77,15 @@ public final class ComposingPeripheral implements IDynamicPeripheral {
 
         // Generic pass: GenericSources matching the BE plus all registered
         // ComponentLookups (capability-backed targets like IItemHandler).
+        // Each method's NamedMethod carries the contributing source's
+        // PeripheralType (e.g. "inventory"); union it so hasType/find work.
         provider.forEachMethod(supplier, level, pos, side, blockEntity, (obj, name, method, info) -> {
             if (seen.add(name)) entries.add(new Entry(obj, name, method));
+            if (info == null) return;
+            final PeripheralType generic = info.genericType();
+            if (generic == null) return;
+            if (generic.getPrimaryType() != null) additionalTypes.add(generic.getPrimaryType());
+            additionalTypes.addAll(generic.getAdditionalTypes());
         });
 
         if (entries.size() == primaryCount) return null;
