@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 public final class PeripheralComposition {
 
     private static final Set<BlockEntityType<?>> TYPES = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<Supplier<? extends BlockEntityType<?>>> PENDING = Collections.synchronizedSet(new HashSet<>());
 
     private PeripheralComposition() {
     }
@@ -30,11 +31,23 @@ public final class PeripheralComposition {
         TYPES.add(type);
     }
 
+    /**
+     * Registration runs from mod constructors (Simulated's SPI init), before
+     * block-entity registries are bound — resolving the supplier here would
+     * throw "Trying to access unbound value". Park it and resolve on first
+     * lookup, which can only happen once a level exists.
+     */
     public static void register(final Supplier<? extends BlockEntityType<?>> type) {
-        TYPES.add(type.get());
+        PENDING.add(type);
     }
 
     public static boolean isRegistered(final BlockEntityType<?> type) {
+        if (!PENDING.isEmpty()) {
+            synchronized (PENDING) {
+                PENDING.forEach(s -> TYPES.add(s.get()));
+                PENDING.clear();
+            }
+        }
         return TYPES.contains(type);
     }
 }
