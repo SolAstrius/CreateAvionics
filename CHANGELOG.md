@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.5.0] - 2026-06-09
+## [0.5.1] - 2026-06-09
+
+### Fixed
+
+- **0.5.0 crashed on launch** for everyone: `PeripheralComposition`
+  resolved Simulated's portable-engine block-entity holder during mod
+  construction, before block-entity registries are bound, throwing
+  "Trying to access unbound value". Suppliers are now parked and resolved
+  on first lookup. 0.5.0 has been withdrawn from Modrinth and GitHub
+  releases — upgrade directly from 0.4.0 to 0.5.1.
+- Composed peripherals now report their generic type names: portable
+  engines answer `peripheral.hasType(name, "inventory")` and are returned
+  by `peripheral.find("inventory")`. 0.5.0 composed only the methods, not
+  the types, so scripts that locate inventories by type still missed them
+  (follow-up to [#15]).
+
+## [0.5.0] - 2026-06-09 [YANKED]
 
 ### Added
 
@@ -210,7 +226,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#6]: https://github.com/SolAstrius/CreateAvionics/pull/6
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
 
-[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.0...v0.3.1
