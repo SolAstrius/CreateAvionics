@@ -13,6 +13,11 @@ on:
 permissions:
   contents: write
 
+env:
+  # Runners force Node 24 on 2026-06-16; mc-publish@v3.3 still targets Node 20.
+  # Opt in early so a breakage shows up in a test run, not a real release.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -44,8 +49,11 @@ jobs:
             echo "::error::Tag version ($version) does not match gradle.properties mod_version ($gradle_version)"
             exit 1
           fi
-          echo "tag=$tag" >>"$GITHUB_OUTPUT"
-          echo "version=$version" >>"$GITHUB_OUTPUT"
+          {
+            echo "tag=$tag"
+            echo "version=$version"
+            echo "mc=$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2)"
+          } >>"$GITHUB_OUTPUT"
 
       - name: Build
         run: ./gradlew build --stacktrace
@@ -97,7 +105,7 @@ jobs:
           version: ${{ steps.vars.outputs.version }}
           version-type: alpha
           loaders: neoforge
-          game-versions: '1.21.1'
+          game-versions: ${{ steps.vars.outputs.mc }}
           changelog-file: modrinth-changelog.md
           # Explicit list — auto-detection from mods.toml maps modId
           # "computercraft" to the archived original ComputerCraft project and
@@ -111,7 +119,7 @@ jobs:
       - name: Regenerate updates.json on main
         if: "${{ !contains(steps.vars.outputs.version, '-') }}"
         env:
-          MC_VERSION: '1.21.1'
+          MC_VERSION: ${{ steps.vars.outputs.mc }}
         run: |
           set -euo pipefail
           git fetch origin main
