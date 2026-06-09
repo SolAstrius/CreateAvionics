@@ -90,7 +90,9 @@ jobs:
         with:
           modrinth-id: h4nsLvjf
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          files: release-artifacts/*.jar
+          # Mod jar only — the javadoc jar must not be uploaded (alphabetical
+          # glob order would make it the primary file on Modrinth).
+          files: release-artifacts/create_avionics-neoforge-*-${{ steps.vars.outputs.version }}.jar
           name: "Create: Avionics ${{ steps.vars.outputs.version }}"
           version: ${{ steps.vars.outputs.version }}
           version-type: alpha
