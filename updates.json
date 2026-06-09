@@ -6,10 +6,11 @@
     "0.3.0": "Proper Create SCADA; breaking: kinetic getter renames (getKineticSpeed/getInputSpeed \u2192 getSpeed; getStressApplied \u2192 getStressImpact; getOutputStressApplied \u2192 getOutputStressImpact) + gimbal_sensor.getLinearAcceleration now subtracts gravity \u2014 see CHANGELOG",
     "0.3.1": "gyroscopic_propeller_bearing: add persistent manual-target override (setManualTarget/clearManualTarget/getManualTarget) plus diagnostic reads (getBlockNormal/getTiltAngle/getStabilizationStrength); remove non-functional setTilt/setStrictTilt \u2014 see CHANGELOG",
     "0.4.0": "wheel_mount peripheral: setSteering/setBrake script overrides plus tire/suspension reads \u2014 Create: Offroad now supported",
-    "0.5.0": "swivel_bearing locking modes + assembly diagnostics; kinetic SCADA pack on bare kinetic blocks (thanks TechTastic); portable engines are inventory peripherals again; breaking: per-block getStressCapacity \u2192 getStressContribution \u2014 see CHANGELOG"
+    "0.5.0": "swivel_bearing locking modes + assembly diagnostics; kinetic SCADA pack on bare kinetic blocks (thanks TechTastic); portable engines are inventory peripherals again; breaking: per-block getStressCapacity \u2192 getStressContribution \u2014 see CHANGELOG",
+    "0.5.1": "fix 0.5.0 launch crash (registry access at mod construction) and make composed peripherals report generic types (portable engines findable as inventory) \u2014 0.5.0 withdrawn, upgrade from 0.4.0 directly to 0.5.1"
   },
   "promos": {
-    "1.21.1-recommended": "0.5.0",
-    "1.21.1-latest": "0.5.0"
+    "1.21.1-recommended": "0.5.1",
+    "1.21.1-latest": "0.5.1"
   }
 }
