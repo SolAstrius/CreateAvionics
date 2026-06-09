@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `swivel_bearing`: locking-mode control and assembly diagnostics —
+  `isLocked`, `getLockingMode`, `setLockingMode` (one of `locked_always`,
+  `locked_default`, `unlocked_default`, `unlocked_always`), and
+  `getLastAssemblyException` (the message from the most recent failed
+  assembly attempt, or nil). Public API
+  `ink.astrius.create_avionics.api.simulated.SwivelBearingExt` —
+  mixin-supplied interface for downstream addons.
+- Kinetic SCADA pack on bare kinetic blocks: a new `KineticSource` generic
+  source applies the full pack to every `KineticBlockEntity` that has no
+  explicit peripheral (encased shafts, gearboxes, mixers, …). Thanks
+  @TechTastic ([#6]).
+- Generic-source methods now compose onto capability-supplied peripherals:
+  blocks whose peripheral Avionics supplies via the NeoForge capability
+  (e.g. `portable_engine`) also expose matching generic packs instead of
+  shadowing them.
+
+### Changed
+
+- **Breaking**: the per-block `getStressCapacity` of the kinetic SCADA pack
+  is renamed to `getStressContribution` (on `KineticPeripheral`,
+  `SimKineticPeripheral`, and `KineticSource`). The old name collided with
+  `Create_Stressometer.getStressCapacity`, which reports the network-wide
+  total and keeps its name.
+- `gas_provider.getGasType()`: third-party `LiftingGasType` implementations
+  now return their class's simple name instead of `"unknown"`. Stock types
+  still return `"steam"` / `"default"`.
+- Simulated-side peripherals deduplicated against the originals Simulated
+  ships: `altitude_sensor`, `gimbal_sensor`, and `linked_typewriter` now
+  extend their upstream counterparts; standalone duplicates of the
+  nameplate, modulating-link, directional-link, docking-connector,
+  nav-table, optical-sensor, and velocity-sensor peripherals were removed
+  in favor of upstream's, with method parity preserved. Thanks @TechTastic
+  ([#6]).
+
+### Fixed
+
+- Portable engines are inventory peripherals again: the capability-supplied
+  peripheral no longer drops CC: Tweaked's generic inventory methods
+  ([#15]).
+
+### Docs
+
+- The kinetic SCADA pack is declared once on the `KineticScadaSurface`
+  interface; the cct-javadoc fork gained interface scanning
+  (1.10.0-mainthread.4) so `@LuaFunction` default methods on interfaces
+  document correctly.
+- `StressGauge`: use `@code` instead of `@link` for non-peripheral types so
+  references render instead of breaking.
+
 ## [0.4.0] - 2026-05-11
 
 ### Added
@@ -154,7 +205,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `laser_pointer` published method name (`getLaserRange`).
 - NeoForge version range and CI YAML quoting issues.
 
-[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.0...HEAD
+[#6]: https://github.com/SolAstrius/CreateAvionics/pull/6
+[#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
+
+[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/SolAstrius/CreateAvionics/releases/tag/v0.2.0
