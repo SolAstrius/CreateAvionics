@@ -99,6 +99,14 @@ jobs:
           loaders: neoforge
           game-versions: '1.21.1'
           changelog-file: modrinth-changelog.md
+          # Explicit list — auto-detection from mods.toml maps modId
+          # "computercraft" to the archived original ComputerCraft project and
+          # invents ids for mods without Modrinth pages (Simulated, Offroad).
+          dependencies: |
+            cc-tweaked(required)
+            create(required)
+            sable(required)
+            create-aeronautics(optional)
 
       - name: Regenerate updates.json on main
         if: "${{ !contains(steps.vars.outputs.version, '-') }}"

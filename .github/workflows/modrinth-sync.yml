@@ -15,6 +15,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      # Also re-asserts the canonical dependency list (CC: Tweaked, Create,
+      # Sable required; Create Aeronautics optional) on the patched version.
       - name: Patch Modrinth version changelog from release notes
         env:
           GH_TOKEN: ${{ github.token }}
@@ -35,7 +37,12 @@ jobs:
             | sed -e 's/^> \[!WARNING\]/> ⚠️/' \
                   -e 's/^> \[!IMPORTANT\]/> 🛑/' \
                   -e 's/^> \[!NOTE\]/> ℹ️/' \
-            | jq -Rs '{changelog: .}' \
+            | jq -Rs '{changelog: ., dependencies: [
+                {project_id: "gu7yAYhd", dependency_type: "required"},
+                {project_id: "LNytGWDc", dependency_type: "required"},
+                {project_id: "T9PomCSv", dependency_type: "required"},
+                {project_id: "oWaK0Q19", dependency_type: "optional"}
+              ]}' \
             | curl -sf -X PATCH "https://api.modrinth.com/v2/version/${vid}" \
                 -H "Authorization: ${MODRINTH_TOKEN}" \
                 -H "Content-Type: application/json" \
