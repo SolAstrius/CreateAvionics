@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-09
+
 ### Added
 
 - `swivel_bearing`: locking-mode control and assembly diagnostics —
@@ -208,7 +210,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#6]: https://github.com/SolAstrius/CreateAvionics/pull/6
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
 
-[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.2.1...v0.3.0
