@@ -12,11 +12,15 @@ on:
 
 permissions:
   contents: write
+  # Needed to dispatch the Docs workflow after publishing.
+  actions: write
 
 env:
   # Runners force Node 24 on 2026-06-16; mc-publish@v3.3 still targets Node 20.
   # Opt in early so a breakage shows up in a test run, not a real release.
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  # Keep in sync with docs.yml.
+  ILLUAMINATE_VERSION: 0.1.0-83-g1131f68
 
 jobs:
   release:
@@ -71,6 +75,26 @@ jobs:
           done
           ls -la release-artifacts/
 
+      - name: Build docs snapshot
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :common:luaJavadoc --stacktrace
+
+      - name: Download illuaminate
+        run: |
+          set -euo pipefail
+          mkdir -p .bin
+          curl -sSLo .bin/illuaminate \
+            "https://squiddev.cc/illuaminate/bin/${ILLUAMINATE_VERSION}/illuaminate-linux-x86_64"
+          chmod +x .bin/illuaminate
+          .bin/illuaminate --version
+
+      - name: Package docs snapshot
+        run: |
+          .bin/illuaminate doc-gen
+          tar -czf "release-artifacts/docs-${{ steps.vars.outputs.tag }}.tar.gz" -C build/illuaminate .
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
         with:
@@ -79,7 +103,9 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: "${{ contains(steps.vars.outputs.version, '-') }}"
-          files: release-artifacts/*.jar
+          files: |
+            release-artifacts/*.jar
+            release-artifacts/docs-*.tar.gz
 
       - name: Extract changelog section
         run: |
@@ -162,3 +188,11 @@ jobs:
           git add updates.json
           git commit -m "chore: update updates.json for ${{ steps.vars.outputs.tag }}"
           git push origin main
+
+      # Events caused by GITHUB_TOKEN (the release above, the push to main)
+      # do not trigger other workflows, so recompose the docs site explicitly
+      # to pick up this release's docs-*.tar.gz archive.
+      - name: Recompose docs site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run docs.yml --ref main

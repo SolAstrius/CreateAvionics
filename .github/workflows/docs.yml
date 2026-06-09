@@ -53,10 +53,23 @@ jobs:
       - name: Build docs site
         run: .bin/illuaminate doc-gen
 
+      - name: Download per-version doc archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p doc-archives
+          for tag in $(gh release list --json tagName --jq '.[].tagName'); do
+            gh release download "$tag" --pattern 'docs-*.tar.gz' --dir doc-archives || true
+          done
+          ls -la doc-archives/
+
+      - name: Compose versioned site
+        run: .github/scripts/compose-docs-site.sh site build/illuaminate doc-archives
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: build/illuaminate
+          path: site
 
   deploy:
     needs: build
