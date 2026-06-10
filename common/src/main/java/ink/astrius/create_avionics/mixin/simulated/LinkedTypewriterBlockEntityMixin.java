@@ -25,10 +25,10 @@ public abstract class LinkedTypewriterBlockEntityMixin implements LinkedTypewrit
         return this.computerHandler;
     }
 
-    @Inject(method = "pressKey", at = @At("HEAD"))
+    @Inject(method = "pressKey", at = @At("TAIL"))
     private void createAvionics$queueKeyEvent(final int key, final CallbackInfo ci) {
         if (SimPlatformService.INSTANCE.isLoaded("computercraft")) {
-            this.computerHandler.queueEvent("key", key, this.entryMap.getEntry(key).isAlive());
+            this.computerHandler.queueEvent("key", key, true);
         }
     }
 
