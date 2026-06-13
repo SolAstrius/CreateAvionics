@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `mounted_potato_cannon`: `getAimingVector` and `getBarrelPos` returned
+  body/local-frame values instead of the world-frame values their docs
+  promise — the aim came back as a fixed body axis (e.g. `{1, 0, 0}`) and
+  the muzzle position carried raw sub-level local coordinates. Both now
+  project out of the host sub-level (aim rotated into world frame, muzzle
+  position projected to world frame), and pass through unchanged when the
+  cannon isn't on a sub-level ([#18]).
+
 ## [0.5.1] - 2026-06-09
 
 ### Fixed
@@ -225,6 +235,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [#6]: https://github.com/SolAstrius/CreateAvionics/pull/6
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
+[#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
 
 [Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.1...HEAD
 [0.5.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.0...v0.5.1

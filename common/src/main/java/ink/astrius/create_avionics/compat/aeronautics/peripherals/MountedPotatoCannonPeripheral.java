@@ -3,11 +3,14 @@ package ink.astrius.create_avionics.compat.aeronautics.peripherals;
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.eriksonn.aeronautics.content.blocks.mounted_potato_cannon.MountedPotatoCannonBlockEntity;
 import dev.eriksonn.aeronautics.content.blocks.mounted_potato_cannon.MountedPotatoCannonInventory;
+import dev.ryanhcode.sable.Sable;
+import dev.ryanhcode.sable.sublevel.SubLevel;
 import ink.astrius.create_avionics.compat.simulated.peripherals.SimKineticPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.SimPeripheral;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -32,22 +35,36 @@ public class MountedPotatoCannonPeripheral extends SimKineticPeripheral<MountedP
 
     /**
      * Get the cannon's aim direction.
+     * The block entity reports the aim in the host sub-level's body frame; this
+     * rotates it into world frame so it stays usable as the contraption turns.
+     * When the cannon isn't on a sub-level (placed on stationary ground), body
+     * frame already equals world frame and the value is returned unchanged.
      *
      * @return Unit vector along the barrel in world frame, as a 3-element list.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final List<Double> getAimingVector() {
-        return SimPeripheral.vecList(this.blockEntity.getAimingVector());
+        final Vec3 local = this.blockEntity.getAimingVector();
+        final SubLevel subLevel = Sable.HELPER.getContaining(this.blockEntity);
+        // transformNormal: rotation only (no translation), so a unit aim stays a unit.
+        return SimPeripheral.vecList(subLevel == null ? local : subLevel.logicalPose().transformNormal(local));
     }
 
     /**
      * Get the cannon's muzzle position.
+     * The block entity reports the muzzle in the host sub-level's local frame
+     * (large sub-level coordinates); this projects it out into world frame.
+     * When the cannon isn't on a sub-level (placed on stationary ground), local
+     * frame already equals world frame and the value is returned unchanged.
      *
      * @return World-frame position of the muzzle, as a 3-element list.
      */
-    @LuaFunction
+    @LuaFunction(mainThread = true)
     public final List<Double> getBarrelPos() {
-        return SimPeripheral.vecList(this.blockEntity.getBarrelPos());
+        final Vec3 local = this.blockEntity.getBarrelPos();
+        final SubLevel subLevel = Sable.HELPER.getContaining(this.blockEntity);
+        // transformPosition: full pose (rotation + translation) for a point.
+        return SimPeripheral.vecList(subLevel == null ? local : subLevel.logicalPose().transformPosition(local));
     }
 
     // --- Drive ---
