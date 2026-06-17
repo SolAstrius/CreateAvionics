@@ -46,7 +46,7 @@ public interface KineticScadaSurface {
     /**
      * Get the id of this block's speed-zone anchor — the gearshift / clutch /
      * speed controller / generator that defines the start of this speed zone.
-     * Two blocks share an anchor iff they're in the same speed zone. A
+     * Two blocks share an anchor if they're in the same speed zone. A
      * generator or split-shaft returns its own {@link #getSelfId}.
      *
      * @return The anchor block's id, or nil.
