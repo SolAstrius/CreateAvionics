@@ -2,30 +2,49 @@ package ink.astrius.create_avionics.compat.simulated;
 
 import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.network.wired.WiredElement;
-import dan200.computercraft.api.peripheral.IPeripheral;
-import dev.simulated_team.simulated.compat.computercraft.peripherals.*;
 import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlock;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.service.ServiceUtil;
-import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import ink.astrius.create_avionics.CreateAvionics;
+import ink.astrius.create_avionics.compat.CCIntegration;
 import ink.astrius.create_avionics.compat.cc.PeripheralComposition;
-import ink.astrius.create_avionics.compat.simulated.peripherals.*;
+
+// Upstream Simulated peripherals, used as-is. Deliberately NOT a wildcard
+// import: this package and ours below share eight-plus simple names
+// (AltitudeSensor, GimbalSensor, LinkedTypewriter, NavTable, SwivelBearing,
+// TorsionSpring, VelocitySensor, SimPeripheral). Two wildcards would make
+// every one of those ambiguous, and the compiler would only complain about
+// the ones actually referenced — so which class a registration resolves to
+// must stay visible here, in writing.
+import dev.simulated_team.simulated.compat.computercraft.peripherals.DirectionalLinkPeripheral;
+import dev.simulated_team.simulated.compat.computercraft.peripherals.DockingConnectorPeripheral;
+import dev.simulated_team.simulated.compat.computercraft.peripherals.ModulatingLinkPeripheral;
+import dev.simulated_team.simulated.compat.computercraft.peripherals.NamePlatePeripheral;
+import dev.simulated_team.simulated.compat.computercraft.peripherals.OpticalSensorPeripheral;
+
+// Avionics peripherals. AltitudeSensor, GimbalSensor, LinkedTypewriter,
+// NavTable and VelocitySensor subclass their upstream namesakes; the rest are
+// ours outright.
 import ink.astrius.create_avionics.compat.simulated.peripherals.AltitudeSensorPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.AnalogTransmissionPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.DirectionalGearshiftPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.GimbalSensorPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.LaserPointerPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.LaserSensorPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.LinkedTypewriterPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.NavTablePeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.PhysicsAssemblerPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.PortableEnginePeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.RopeWinchPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.SteeringWheelPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.SwivelBearingPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.ThrottleLeverPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.TorsionSpringPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
 import ink.astrius.create_avionics.compat.simulated.peripherals.generic.KineticSource;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 
-import java.util.function.Supplier;
-
-public class SimulatedCCIntegration implements SimModCompatibilityService {
+public class SimulatedCCIntegration implements CCIntegration {
 
     @Override
     public String getModId() {
@@ -75,9 +94,5 @@ public class SimulatedCCIntegration implements SimModCompatibilityService {
             }
             return (WiredElement) blockEntity.ccWiredElement;
         });
-    }
-
-    private static <T extends BlockEntity> void add(final SimPeripheralService service, final Supplier<BlockEntityType<T>> supplier, final SimPeripheralService.SimpleCapabilityGetter<T, IPeripheral> getter) {
-        service.addPeripheral(supplier, getter);
     }
 }

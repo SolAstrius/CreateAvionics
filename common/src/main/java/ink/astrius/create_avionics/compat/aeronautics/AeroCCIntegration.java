@@ -1,23 +1,18 @@
 package ink.astrius.create_avionics.compat.aeronautics;
 
-import dan200.computercraft.api.peripheral.IPeripheral;
 import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
 import dev.simulated_team.simulated.service.ServiceUtil;
-import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.service.SimPlatformService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 import ink.astrius.create_avionics.CreateAvionics;
+import ink.astrius.create_avionics.compat.CCIntegration;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.GasProviderPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.GyroscopicPropellerBearingPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.MountedPotatoCannonPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.PropellerBearingPeripheral;
 import ink.astrius.create_avionics.compat.aeronautics.peripherals.PropellerPeripheral;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 
-import java.util.function.Supplier;
-
-public class AeroCCIntegration implements SimModCompatibilityService {
+public class AeroCCIntegration implements CCIntegration {
 
     @Override
     public String getModId() {
@@ -44,9 +39,5 @@ public class AeroCCIntegration implements SimModCompatibilityService {
         add(service, AeroBlockEntityTypes.PROPELLER_BEARING, PropellerBearingPeripheral::new);
         add(service, AeroBlockEntityTypes.GYROSCOPIC_PROPELLER_BEARING, GyroscopicPropellerBearingPeripheral::new);
         add(service, AeroBlockEntityTypes.MOUNTED_POTATO_CANNON, MountedPotatoCannonPeripheral::new);
-    }
-
-    private static <T extends BlockEntity> void add(final SimPeripheralService service, final Supplier<BlockEntityType<T>> supplier, final SimPeripheralService.SimpleCapabilityGetter<T, IPeripheral> getter) {
-        service.addPeripheral(supplier, getter);
     }
 }
