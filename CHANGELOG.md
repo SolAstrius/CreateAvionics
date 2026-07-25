@@ -7,15 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-07-25
+
+### Added
+
+- **Releases now publish to CurseForge.** The CurseForge listing had been
+  stuck on 0.4.0 since 2026-05-11 while Modrinth carried through 0.5.1, so
+  anyone browsing from a launcher's CurseForge index saw a build three
+  releases old. Note that Create Aeronautics — which supplies the required
+  `simulated` dependency — is published only on Modrinth, and still has to
+  be installed from there.
+
 ### Fixed
 
+- **Runs on Create: Simulated 1.3.0.** `mods.toml` has always declared
+  `simulated [1.2.1,)`, but 1.3.0 renamed `getLaserRange` to
+  `getRaycastLength` and retyped the recovery-compass placer component from
+  `String` to `UUID`, so the jar would not in fact have run against it. Both
+  are bridged: one jar now covers Simulated 1.2.1 through 1.3.0, and Sable
+  1.1.x through 2.0.x, with no change to any Lua-visible value.
 - `mounted_potato_cannon`: `getAimingVector` and `getBarrelPos` returned
   body/local-frame values instead of the world-frame values their docs
   promise — the aim came back as a fixed body axis (e.g. `{1, 0, 0}`) and
   the muzzle position carried raw sub-level local coordinates. Both now
   project out of the host sub-level (aim rotated into world frame, muzzle
   position projected to world frame), and pass through unchanged when the
-  cannon isn't on a sub-level ([#18]).
+  cannon isn't on a sub-level ([#18], [#22]).
+- `linked_typewriter`: the `key` event fired before the keypress had been
+  applied and carried an "alive" flag read from the pre-update state. It now
+  fires once the key has registered, with `true` as the third argument.
+
+### Changed
+
+- Startup logs when Create: Simulated's own ComputerCraft registration is
+  suppressed, alongside Avionics' own registration lines. Avionics replaces
+  that registration wholesale, and previously nothing in the log said so —
+  which made reports about missing or misbehaving Simulated peripherals hard
+  to read.
+- Internal: the Create-side peripheral table moved out of
+  `ComputerBehaviourMixin` into `CreatePeripheralRegistry`; the kinetic SCADA
+  pack now routes entirely through `KineticReadback` so its two declarations
+  cannot drift; the three CC integration classes share one `add()` helper.
+  No behavioural change.
+- CI compiles and tests against the ends of the declared upstream ranges
+  (Simulated 1.2.1/1.3.0 × Sable 1.1.1/2.0.3), so an upstream rename fails a
+  build instead of a user's launch. Adds the first tests in the repo.
 
 ## [0.5.1] - 2026-06-09
 
@@ -236,8 +272,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#6]: https://github.com/SolAstrius/CreateAvionics/pull/6
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
 [#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
+[#22]: https://github.com/SolAstrius/CreateAvionics/issues/22
 
-[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.3.1...v0.4.0
