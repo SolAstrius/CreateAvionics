@@ -65,6 +65,14 @@ jobs:
         # its version, so they track it rather than varying independently.
         simulated: ['1.2.1', '1.3.0']
         sable: ['1.1.1', '2.0.3']
+        # sable-companion is jar-in-jar'd inside Sable, so a user never picks
+        # it independently -- they get whatever their Sable bundles. Pair them
+        # rather than taking the cross product of versions that cannot co-occur.
+        include:
+          - sable: '1.1.1'
+            companion: '1.5.0'
+          - sable: '2.0.3'
+            companion: '1.6.0'
     steps:
       - uses: actions/checkout@v6
 
@@ -85,4 +93,5 @@ jobs:
             -Psimulated_version=${{ matrix.simulated }} \
             -Paeronautics_version=${{ matrix.simulated }} \
             -Poffroad_version=${{ matrix.simulated }} \
-            -Psable_version=${{ matrix.sable }}
+            -Psable_version=${{ matrix.sable }} \
+            -Psable_companion_version=${{ matrix.companion }}
