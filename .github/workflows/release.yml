@@ -142,6 +142,28 @@ jobs:
             sable(required)
             create-aeronautics(optional)
 
+      - name: Publish to CurseForge
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          curseforge-id: 1539942
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          # Same jar-only glob as Modrinth — the javadoc jar must not become
+          # the primary file.
+          files: release-artifacts/create_avionics-neoforge-*-${{ steps.vars.outputs.version }}.jar
+          name: "Create: Avionics ${{ steps.vars.outputs.version }}"
+          version: ${{ steps.vars.outputs.version }}
+          version-type: alpha
+          loaders: neoforge
+          game-versions: ${{ steps.vars.outputs.mc }}
+          changelog-file: modrinth-changelog.md
+          # CurseForge slugs, not Modrinth ones, and only those that actually
+          # resolve on CurseForge: Simulated and Aeronautics are Modrinth-only,
+          # so an "optional" entry for them would fail the upload.
+          dependencies: |
+            cc-tweaked(required)
+            create(required)
+            sable(required)
+
       - name: Regenerate updates.json on main
         if: "${{ !contains(steps.vars.outputs.version, '-') }}"
         env:
