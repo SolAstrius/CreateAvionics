@@ -2,6 +2,7 @@ package ink.astrius.create_avionics.compat.simulated.peripherals;
 
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.simulated_team.simulated.content.blocks.lasers.laser_pointer.LaserPointerBlockEntity;
+import ink.astrius.create_avionics.compat.simulated.SimulatedCompat;
 
 /**
  * A pointable laser. Reports its facing, firing state, redstone output,
@@ -57,7 +58,8 @@ public class LaserPointerPeripheral extends SimPeripheral<LaserPointerBlockEntit
      */
     @LuaFunction
     public final double getRange() {
-        return this.blockEntity.getLaserRange();
+        // Renamed getLaserRange -> getRaycastLength in Simulated 1.3.0; see SimulatedCompat.
+        return SimulatedCompat.laserRange(this.blockEntity);
     }
 
     /**

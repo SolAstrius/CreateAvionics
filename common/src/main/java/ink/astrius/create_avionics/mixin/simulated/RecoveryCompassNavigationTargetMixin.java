@@ -16,9 +16,16 @@ public abstract class RecoveryCompassNavigationTargetMixin implements Navigation
     @Override
     public Map<String, Object> getPeripheralMetadata(final NavTableBlockEntity be, final ItemStack self) {
         final Map<String, Object> out = new HashMap<>();
-        final String placer = self.getComponents().get(SimDataComponents.COMPASS_PLACER_UUID);
+        // Received as Object on purpose: COMPASS_PLACER_UUID is a
+        // DataComponentType<String> up to Simulated 1.2.1 and a
+        // DataComponentType<UUID> from 1.3.0. Generics are erased, so the only
+        // thing that breaks across versions is inference at this call site --
+        // widening the local defeats it and both builds compile. toString()
+        // yields the same canonical UUID text either way, so the Lua value is
+        // unchanged.
+        final Object placer = self.getComponents().get(SimDataComponents.COMPASS_PLACER_UUID);
         if (placer != null) {
-            out.put("placer_uuid", placer);
+            out.put("placer_uuid", placer.toString());
         }
         return out;
     }
