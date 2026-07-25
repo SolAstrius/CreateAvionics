@@ -22,5 +22,5 @@ print(engine.getRpm())
 Source: <https://github.com/SolAstrius/CreateAvionics> · License: MIT.
 
 [cc-tweaked]: https://tweaked.cc/
-[simulated]: https://modrinth.com/mod/create-simulated
+[simulated]: https://modrinth.com/mod/create-aeronautics
 [aeronautics]: https://modrinth.com/mod/create-aeronautics
