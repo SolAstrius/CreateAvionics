@@ -80,7 +80,7 @@ public class KineticSource implements GenericSource {
      */
     @LuaFunction
     public final double getSpeed(KineticBlockEntity be) {
-        return be.getSpeed();
+        return KineticReadback.speed(be);
     }
 
     /**
@@ -90,7 +90,7 @@ public class KineticSource implements GenericSource {
      */
     @LuaFunction
     public final boolean hasSource(KineticBlockEntity be) {
-        return be.hasSource();
+        return KineticReadback.hasSource(be);
     }
 
     /**
@@ -100,7 +100,7 @@ public class KineticSource implements GenericSource {
      */
     @LuaFunction
     public final boolean isOverstressed(KineticBlockEntity be) {
-        return be.isOverStressed();
+        return KineticReadback.isOverstressed(be);
     }
 
     /**
@@ -112,7 +112,7 @@ public class KineticSource implements GenericSource {
      */
     @LuaFunction
     public final double getStressImpact(KineticBlockEntity be) {
-        return be.calculateStressApplied();
+        return KineticReadback.stressImpact(be);
     }
 
     /**
@@ -125,6 +125,6 @@ public class KineticSource implements GenericSource {
      */
     @LuaFunction
     public final double getStressContribution(KineticBlockEntity be) {
-        return be.calculateAddedStressCapacity();
+        return KineticReadback.stressContribution(be);
     }
 }

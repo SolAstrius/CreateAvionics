@@ -29,11 +29,32 @@ configurations {
     cctJavadoc
 }
 
+// Upstream mods are compileOnly, so the test source set has to borrow main's
+// compile classpath to load our own classes at all — reflecting over a
+// peripheral resolves its Create and CC: Tweaked supertypes.
+sourceSets {
+    test {
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.compileClasspath
+    }
+}
+
 dependencies {
     // Patched fork (https://github.com/SolAstrius/cct-javadoc) — adds a
     // "Yields" aside for @LuaFunction(mainThread = true). Pinned until upstream
     // accepts the change.
     cctJavadoc "cc.tweaked:cct-javadoc:1.10.0-mainthread.4"
+
+    testImplementation platform("org.junit:junit-bom:$junit_version")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+    }
 }
 
 // The default javadoc task (built into the standard tooling) doesn't know about

@@ -87,7 +87,7 @@ public interface KineticScadaSurface {
      */
     @LuaFunction
     default double getSpeed() {
-        return scadaBlockEntity().getSpeed();
+        return KineticReadback.speed(scadaBlockEntity());
     }
 
     /**
@@ -97,7 +97,7 @@ public interface KineticScadaSurface {
      */
     @LuaFunction
     default boolean hasSource() {
-        return scadaBlockEntity().hasSource();
+        return KineticReadback.hasSource(scadaBlockEntity());
     }
 
     /**
@@ -107,7 +107,7 @@ public interface KineticScadaSurface {
      */
     @LuaFunction
     default boolean isOverstressed() {
-        return scadaBlockEntity().isOverStressed();
+        return KineticReadback.isOverstressed(scadaBlockEntity());
     }
 
     /**
@@ -119,7 +119,7 @@ public interface KineticScadaSurface {
      */
     @LuaFunction
     default double getStressImpact() {
-        return scadaBlockEntity().calculateStressApplied();
+        return KineticReadback.stressImpact(scadaBlockEntity());
     }
 
     /**
@@ -132,6 +132,6 @@ public interface KineticScadaSurface {
      */
     @LuaFunction
     default double getStressContribution() {
-        return scadaBlockEntity().calculateAddedStressCapacity();
+        return KineticReadback.stressContribution(scadaBlockEntity());
     }
 }

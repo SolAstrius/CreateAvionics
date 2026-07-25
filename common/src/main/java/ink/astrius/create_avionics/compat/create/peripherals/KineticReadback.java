@@ -79,6 +79,34 @@ public final class KineticReadback {
         return "passthrough";
     }
 
+    // The five below are one-line delegations to Create and look redundant.
+    // They are not: the SCADA pack is declared twice -- once as @LuaFunction
+    // defaults on KineticScadaSurface, once as GenericSource methods on
+    // KineticSource -- because CC requires two different shapes. Routing every
+    // reading through here means the two declarations stay pure delegation and
+    // a behaviour change lands in one file instead of silently in one of two.
+    // KineticScadaSurfaceTest asserts the two surfaces stay in step.
+
+    public static double speed(final KineticBlockEntity be) {
+        return be.getSpeed();
+    }
+
+    public static boolean hasSource(final KineticBlockEntity be) {
+        return be.hasSource();
+    }
+
+    public static boolean isOverstressed(final KineticBlockEntity be) {
+        return be.isOverStressed();
+    }
+
+    public static double stressImpact(final KineticBlockEntity be) {
+        return be.calculateStressApplied();
+    }
+
+    public static double stressContribution(final KineticBlockEntity be) {
+        return be.calculateAddedStressCapacity();
+    }
+
     private static String idOf(final long packed) {
         return String.format("%016x", packed);
     }

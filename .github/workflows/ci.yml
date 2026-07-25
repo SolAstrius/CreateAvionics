@@ -77,9 +77,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Compile against upstream combination
+      # :common:test pulls in compileJava, so this covers both symbol
+      # resolution and the reflection tests against each combination.
+      - name: Compile and test against upstream combination
         run: |
-          ./gradlew :common:compileJava --stacktrace \
+          ./gradlew :common:test --stacktrace \
             -Psimulated_version=${{ matrix.simulated }} \
             -Paeronautics_version=${{ matrix.simulated }} \
             -Poffroad_version=${{ matrix.simulated }} \
