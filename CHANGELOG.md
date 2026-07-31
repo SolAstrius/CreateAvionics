@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Create_GantryShaft` can now see a carriage while it is moving.** A gantry
+  carriage stops being a block the instant it assembles — Create anchors the
+  contraption at the carriage's own position and removes its blocks from the
+  world — so every position readback went nil for the entire duration of a
+  move, which is exactly when a control program needs one. The peripheral now
+  looks for the contraption entity first and falls back to a block scan, using
+  Create's own rail-membership test, so positions stay live end to end and are
+  fractional rather than whole while travelling.
+- `Create_GantryShaft`: `getCarriage`, returning position, state and the
+  applicable one of id/error/remaining in a single read. Preferred over the
+  individual getters in a control loop — every field comes from one
+  observation, so they cannot disagree the way separate polls straddling a
+  tick boundary can.
+- `Create_GantryShaft`: `getState`, distinguishing `empty`, `parked`,
+  `moving`, `stalled` and `failed`. Previously every one of those answered nil
+  and there was no way to tell "no carriage" from "blocked" from "assembly
+  failed".
+- `Create_GantryShaft`: `isAssembled`, `isStalled`, `getRemainingMovement`,
+  `getLastAssemblyError`, `getRailStart`, and `disassemble`. This brings the
+  gantry to parity with the other contraption controllers — piston, rope
+  pulley, bearing and elevator pulley all had assembly state and an error
+  readback already. `getRailStart` exposes the origin rail indices are
+  measured from, so waypoints can be anchored in world space instead of
+  silently shifting when a player extends the rail at the start end.
+- `Create_GantryShaft` now queues `gantry_departed`, `gantry_arrived`,
+  `gantry_stalled` and `gantry_assembly_failed`, so a controller can wait on
+  an event instead of polling. Nothing upstream fires on any of these; the
+  rail is polled for edges every five ticks, and only on shafts that actually
+  have a computer attached.
+
+### Fixed
+
+- **`Create_GantryShaft`: `hasCarriage` and `getCarriagePosition` were looking
+  for the wrong block.** The carriage-detection test was inverted — it
+  required `GantryCarriageBlock.FACING` to point back at the shaft, when in
+  Create it points *away* from it. The predicate therefore never matched a
+  carriage on the queried rail at all; what it did match was a carriage one
+  block away belonging to a *different* rail two blocks away. Since direction
+  iteration starts at `DOWN`, the practical effect was "reports the carriage
+  below the rail, never its own" — most visible on a stacked gantry, where
+  rail, carriage and second rail are exactly that geometry. Reported in #24.
+- **`Create_GantryShaft`: rail length and index ran past the end of the rail.**
+  The rail walk accepted any neighbouring shaft on the same *axis*; Create
+  joins shafts into one rail only on exact facing equality. Two abutting
+  shafts facing opposite ways are two rails, and sneak-placing against an
+  existing shaft deliberately gives you the opposite facing — so this was one
+  keystroke away, not a corner case. Affected `getRailLength`, `getRailIndex`
+  and the origin `getCarriagePosition` measures from.
+- **`Create_GantryShaft` could load, and generate, chunks from a Lua call.**
+  The rail walk called `getBlockState` up to 256 times per direction with no
+  load check, and `Level.getBlockState` resolves its chunk with
+  `requireChunk = true`. A rail pointing into ungenerated terrain would
+  therefore generate it, synchronously, on the server thread. The walk now
+  stops at unloaded chunks, as Create's own does.
+- **`Create_GantryShaft` documented a redstone behaviour that does not
+  exist.** `isPowered` claimed powering a shaft inverts the carriage's
+  direction of travel and `getMovementSpeed` claimed to factor that inversion
+  in. Create's `getPinionMovementSpeed` reads no redstone state whatsoever. A
+  powered gantry shaft stops translating its carriage and transmits rotation
+  into the carriage's output shaft instead — the docs had it backwards from a
+  real mechanic. Also now documented: the ±0.49 blocks/tick clamp, and that
+  `canAssembleOn` answers per-shaft, with `single` shafts never able to
+  assemble and the two ends requiring opposite signs.
+
 ## [0.5.2] - 2026-07-25
 
 ### Added
