@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "create_avionics:block/rail_modem_side",
+    "down":     "create_avionics:block/rail_modem_contact",
+    "up":       "create_avionics:block/rail_modem_top",
+    "north":    "create_avionics:block/rail_modem_face",
+    "south":    "create_avionics:block/rail_modem_side",
+    "east":     "create_avionics:block/rail_modem_side",
+    "west":     "create_avionics:block/rail_modem_side"
+  }
+}

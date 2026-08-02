@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "create_avionics:block/rail_modem" },
+    "lit=true":  { "model": "create_avionics:block/rail_modem_on" }
+  }
+}

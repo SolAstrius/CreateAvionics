@@ -104,12 +104,17 @@ public final class RailMedium implements Medium {
         return (TX_POWER_DB - qualityDb) / ATTENUATION_DB_PER_BLOCK;
     }
 
-    /** Attach an endpoint to this medium. */
+    /**
+     * Attach an endpoint that is not one of the graph's own registered
+     * modems. Production endpoints do not need this — a {@link
+     * RailModemPoint} is found through the graph itself — but it lets a
+     * test drive the medium without standing up edge points.
+     */
     public void attach(final RailEndpoint endpoint) {
         this.attached.add(endpoint);
     }
 
-    /** Detach an endpoint, e.g. when its block is broken or unloaded. */
+    /** Undo {@link #attach}. */
     public void detach(final RailEndpoint endpoint) {
         this.attached.remove(endpoint);
     }
@@ -121,7 +126,25 @@ public final class RailMedium implements Medium {
 
     @Override
     public Set<Endpoint> endpoints() {
-        return Collections.unmodifiableSet(new LinkedHashSet<>(this.attached));
+        return Collections.unmodifiableSet(new LinkedHashSet<>(this.stations()));
+    }
+
+    /**
+     * Every station currently on this medium.
+     *
+     * <p>Read from the graph on each call rather than cached, because the
+     * graph is the authority: Create splits and merges track networks as
+     * players lay and break rail, and a cached membership list would
+     * quietly diverge the first time someone connected two sidings.
+     * Modems whose chunk is unloaded are skipped — they are still on the
+     * graph, but nothing is there to receive.</p>
+     */
+    private Set<RailEndpoint> stations() {
+        final Set<RailEndpoint> out = new LinkedHashSet<>(this.attached);
+        for (final RailModemPoint point : this.graph.getPoints(RailModemPoint.TYPE)) {
+            if (point.isLoaded()) out.add(point);
+        }
+        return out;
     }
 
     @Override
@@ -159,7 +182,7 @@ public final class RailMedium implements Medium {
 
     @Override
     public void transmit(final Endpoint from, final byte[] frame) {
-        for (final RailEndpoint peer : List.copyOf(this.attached)) {
+        for (final RailEndpoint peer : List.copyOf(this.stations())) {
             if (peer == from) continue;
             final double q = this.linkQualityDb(from, peer);
             if (q < FLOOR_DB) continue;

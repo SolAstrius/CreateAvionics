@@ -10,16 +10,35 @@ import ink.astrius.create_avionics.api.create.GantryShaftExt;
 import ink.astrius.create_avionics.api.create.LinearActuatorExt;
 import ink.astrius.create_avionics.api.create.MechanicalBearingExt;
 import ink.astrius.create_avionics.compat.cc.PeripheralComposition;
+import ink.astrius.create_avionics.registry.AvionicsBlockEntities;
+import ink.astrius.create_avionics.registry.AvionicsBlocks;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 @Mod(CreateAvionics.MOD_ID)
 public class CreateAvionicsNeoForge {
 
     public CreateAvionicsNeoForge(final IEventBus bus) {
         CreateAvionics.LOGGER.info("Loaded {}", CreateAvionics.MOD_NAME);
+
+        // Blocks before block entities: the type's builder dereferences the
+        // block it is valid for.
+        AvionicsBlocks.BLOCKS.register(bus);
+        AvionicsBlocks.ITEMS.register(bus);
+        AvionicsBlockEntities.BLOCK_ENTITIES.register(bus);
+
         bus.addListener(CreateAvionicsNeoForge::registerCapabilities);
+        bus.addListener(CreateAvionicsNeoForge::addToCreativeTabs);
+    }
+
+    /** Put the rail modem somewhere a player can actually find it. */
+    private static void addToCreativeTabs(final BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
+            event.accept(AvionicsBlocks.RAIL_MODEM_ITEM.get());
+        }
     }
 
     private static void registerCapabilities(final RegisterCapabilitiesEvent event) {
