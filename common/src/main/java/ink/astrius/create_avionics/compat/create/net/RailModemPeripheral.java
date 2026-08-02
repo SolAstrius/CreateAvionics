@@ -1,6 +1,11 @@
 package ink.astrius.create_avionics.compat.create.net;
 
 import com.simibubi.create.compat.computercraft.implementation.peripherals.SyncedPeripheral;
+import com.simibubi.create.content.trains.entity.Train;
+import com.simibubi.create.content.trains.graph.EdgePointType;
+import com.simibubi.create.content.trains.graph.TrackGraph;
+import com.simibubi.create.content.trains.signal.SignalBlockEntity;
+import com.simibubi.create.content.trains.signal.TrackEdgePoint;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import ink.astrius.create_avionics.net.Frame;
@@ -11,7 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * A rail modem's Lua surface.
@@ -164,6 +171,108 @@ public class RailModemPeripheral extends SyncedPeripheral<RailModemBlockEntity> 
     @LuaFunction
     public final double distanceForQuality(final double quality) {
         return RailMedium.distanceForQuality(quality);
+    }
+
+    // --- Everything else on this rail network ---
+
+    /**
+     * List every train signal within range on this rail network.
+     *
+     * <p>Each entry has {@code id}, {@code distance} and {@code quality}
+     * as {@link #getPeers}, plus the signal's aspect on each side of the
+     * boundary — {@code forward} and {@code reverse}, one of
+     * {@code red}, {@code yellow}, {@code green} or {@code invalid} — and
+     * {@code forcedRedForward} / {@code forcedRedReverse} for whether
+     * redstone is holding that side at danger.</p>
+     *
+     * <p>A signal is a boundary between two block sections rather than a
+     * single lamp, which is why there are two aspects: a train approaching
+     * from one direction and one approaching from the other are being told
+     * different things.</p>
+     *
+     * @return A list of signal tables.
+     */
+    @LuaFunction(mainThread = true)
+    public final List<Map<String, Object>> getSignals() throws LuaException {
+        return this.survey(EdgePointType.SIGNAL, (signal, entry) -> {
+            entry.put("forward", aspect(signal.cachedStates.getFirst()));
+            entry.put("reverse", aspect(signal.cachedStates.getSecond()));
+            entry.put("forcedRedForward", signal.isForcedRed(true));
+            entry.put("forcedRedReverse", signal.isForcedRed(false));
+        });
+    }
+
+    /**
+     * List every train station within range on this rail network.
+     *
+     * <p>Each entry adds {@code name}, {@code assembling} (whether the
+     * station is in assembly mode), and {@code train} — the name of the
+     * train currently present, or nil if the platform is empty.</p>
+     *
+     * @return A list of station tables.
+     */
+    @LuaFunction(mainThread = true)
+    public final List<Map<String, Object>> getStations() throws LuaException {
+        return this.survey(EdgePointType.STATION, (station, entry) -> {
+            entry.put("name", station.name);
+            entry.put("assembling", station.assembling);
+            final Train present = station.getPresentTrain();
+            if (present != null) entry.put("train", present.name.getString());
+        });
+    }
+
+    /**
+     * List every track observer within range on this rail network.
+     *
+     * <p>Each entry adds {@code activated} — whether a train is passing
+     * it right now. The observer's own cargo filter decides which trains
+     * count.</p>
+     *
+     * @return A list of observer tables.
+     */
+    @LuaFunction(mainThread = true)
+    public final List<Map<String, Object>> getObservers() throws LuaException {
+        return this.survey(EdgePointType.OBSERVER,
+                (observer, entry) -> entry.put("activated", observer.isActivated()));
+    }
+
+    /**
+     * Walk one kind of edge point, keeping those within earshot and
+     * measuring each along the rail.
+     *
+     * <p>Range is judged exactly as it is for a modem: same attenuation,
+     * same shortest-path-along-track distance. A signal on the far side of
+     * a diamond crossing is unreachable for the same reason another modem
+     * there would be — the rails never join.</p>
+     */
+    private <T extends TrackEdgePoint> List<Map<String, Object>> survey(
+            final EdgePointType<T> type, final BiConsumer<T, Map<String, Object>> describe) throws LuaException {
+
+        final RailMedium medium = this.blockEntity.medium();
+        final RailModemPoint self = this.blockEntity.point();
+        final TrackGraph graph = this.blockEntity.graph();
+        if (medium == null || self == null || graph == null) {
+            throw new LuaException("not attached to a track network");
+        }
+
+        final List<Map<String, Object>> out = new ArrayList<>();
+        for (final T point : graph.getPoints(type)) {
+            final TrackFixture fixture = new TrackFixture(point);
+            final double quality = medium.linkQualityDb(self, fixture);
+            if (!Double.isFinite(quality) || quality < RailMedium.FLOOR_DB) continue;
+
+            final Map<String, Object> entry = new HashMap<>();
+            entry.put("id", point.getId().toString());
+            entry.put("distance", medium.distance(self, fixture));
+            entry.put("quality", quality);
+            describe.accept(point, entry);
+            out.add(entry);
+        }
+        return out;
+    }
+
+    private static String aspect(final SignalBlockEntity.SignalState state) {
+        return state == null ? "invalid" : state.name().toLowerCase(Locale.ROOT);
     }
 
     /**
