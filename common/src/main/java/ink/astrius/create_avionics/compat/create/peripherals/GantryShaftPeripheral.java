@@ -41,7 +41,7 @@ import java.util.Map;
  *
  * @cc.module Create_GantryShaft
  */
-public class GantryShaftPeripheral extends KineticPeripheral<GantryShaftBlockEntity> {
+public class GantryShaftPeripheral extends KineticPeripheral<GantryShaftBlockEntity> implements ContraptionSurface {
 
     /** Rail state is polled for edges this often; a full rail scan is not free. */
     private static final int EVENT_POLL_TICKS = 5;
@@ -74,6 +74,17 @@ public class GantryShaftPeripheral extends KineticPeripheral<GantryShaftBlockEnt
 
     /**
      * Get the rail's axis.
+     *
+     * <p>Gantry contraptions never rotate — {@code applyRotation} is a hard
+     * no-op — so this is also the coordinate axis {@link #getContraption}'s
+     * {@code blocks}/{@code actors} positions live in, with no transform
+     * needed to compare them. A block or actor whose position has this axis
+     * nonzero and both other axes at 0 sits directly in line with the rail:
+     * since a rail is a contiguous run of shaft blocks immediately beside the
+     * carriage's whole path, anything protruding on this axis will collide
+     * with a shaft block every time the carriage advances — visible as a
+     * stall repeating roughly once per block, not a one-off jam. Off-axis
+     * placement (as the carriage's own attachment point already is) is safe.
      *
      * @return The axis as {@code "x"}, {@code "y"}, or {@code "z"}.
      */
@@ -288,6 +299,12 @@ public class GantryShaftPeripheral extends KineticPeripheral<GantryShaftBlockEnt
     public final boolean isStalled() {
         final GantryContraptionEntity entity = GantryRail.movingCarriage(this.level(), this.rail());
         return entity != null && entity.isStalled();
+    }
+
+    /** The assembled carriage, or nil while parked — see {@link ContraptionSurface}. */
+    @Override
+    public GantryContraptionEntity contraptionEntity() {
+        return GantryRail.movingCarriage(this.level(), this.rail());
     }
 
     /**

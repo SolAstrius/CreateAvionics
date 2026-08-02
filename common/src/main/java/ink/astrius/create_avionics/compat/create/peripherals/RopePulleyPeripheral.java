@@ -1,5 +1,6 @@
 package ink.astrius.create_avionics.compat.create.peripherals;
 
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.IControlContraption.MovementMode;
 import com.simibubi.create.content.contraptions.pulley.PulleyBlockEntity;
@@ -30,7 +31,7 @@ import java.util.Locale;
  *
  * @cc.module Create_RopePulley
  */
-public class RopePulleyPeripheral extends KineticPeripheral<PulleyBlockEntity> {
+public class RopePulleyPeripheral extends KineticPeripheral<PulleyBlockEntity> implements ContraptionSurface {
 
     public RopePulleyPeripheral(final PulleyBlockEntity blockEntity) {
         super(blockEntity);
@@ -219,6 +220,17 @@ public class RopePulleyPeripheral extends KineticPeripheral<PulleyBlockEntity> {
         final AssemblyException e = this.blockEntity.getLastAssemblyException();
         if (e == null || e.component == null) return null;
         return e.component.getString();
+    }
+
+    /**
+     * The assembled contraption, or nil while retracted/extended and idle —
+     * see {@link ContraptionSurface}. For a mirror child this is the same
+     * entity {@link #getMirrorParentId} points at, via
+     * {@code PulleyBlockEntity#getAttachedContraption}.
+     */
+    @Override
+    public AbstractContraptionEntity contraptionEntity() {
+        return this.blockEntity.getAttachedContraption();
     }
 
     private ScrollOptionBehaviour<MovementMode> movementMode() {

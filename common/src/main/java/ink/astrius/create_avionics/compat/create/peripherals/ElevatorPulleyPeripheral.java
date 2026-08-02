@@ -1,5 +1,6 @@
 package ink.astrius.create_avionics.compat.create.peripherals;
 
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.elevator.ElevatorColumn;
 import com.simibubi.create.content.contraptions.elevator.ElevatorColumn.ColumnCoords;
@@ -43,7 +44,7 @@ import java.util.Map;
  *
  * @cc.module Create_ElevatorPulley
  */
-public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBlockEntity> {
+public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBlockEntity> implements ContraptionSurface {
 
     public ElevatorPulleyPeripheral(final ElevatorPulleyBlockEntity blockEntity) {
         super(blockEntity);
@@ -362,6 +363,12 @@ public class ElevatorPulleyPeripheral extends KineticPeripheral<ElevatorPulleyBl
     }
 
     // --- Helpers ---
+
+    /** The assembled cabin, or nil while parked — see {@link ContraptionSurface}. */
+    @Override
+    public AbstractContraptionEntity contraptionEntity() {
+        return this.blockEntity.movedContraption;
+    }
 
     private ElevatorContraption contraption() {
         if (this.blockEntity.movedContraption == null) return null;

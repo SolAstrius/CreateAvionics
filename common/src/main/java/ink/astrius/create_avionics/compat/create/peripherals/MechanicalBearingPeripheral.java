@@ -1,5 +1,6 @@
 package ink.astrius.create_avionics.compat.create.peripherals;
 
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.IControlContraption.RotationMode;
 import com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity;
@@ -23,7 +24,7 @@ import java.util.Locale;
  *
  * @cc.module Create_MechanicalBearing
  */
-public class MechanicalBearingPeripheral extends KineticPeripheral<MechanicalBearingBlockEntity> {
+public class MechanicalBearingPeripheral extends KineticPeripheral<MechanicalBearingBlockEntity> implements ContraptionSurface {
 
     public MechanicalBearingPeripheral(final MechanicalBearingBlockEntity blockEntity) {
         super(blockEntity);
@@ -181,6 +182,12 @@ public class MechanicalBearingPeripheral extends KineticPeripheral<MechanicalBea
         final AssemblyException e = this.blockEntity.getLastAssemblyException();
         if (e == null || e.component == null) return null;
         return e.component.getString();
+    }
+
+    /** The assembled contraption, or nil while at rest — see {@link ContraptionSurface}. */
+    @Override
+    public AbstractContraptionEntity contraptionEntity() {
+        return ((MechanicalBearingExt) this.blockEntity).createAvionics$movedContraption();
     }
 
     private ScrollOptionBehaviour<RotationMode> movementMode() {

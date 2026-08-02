@@ -2,6 +2,8 @@ package ink.astrius.create_avionics.mixin.create;
 
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.compat.computercraft.ComputerCraftProxy;
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
+import com.simibubi.create.content.contraptions.ControlledContraptionEntity;
 import com.simibubi.create.content.contraptions.IControlContraption.RotationMode;
 import com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -39,6 +41,14 @@ public abstract class MechanicalBearingBlockEntityMixin implements MechanicalBea
     @Override
     public ScrollOptionBehaviour<RotationMode> createAvionics$movementMode() {
         return this.createAvionics$movementMode_accessor();
+    }
+
+    @Accessor("movedContraption")
+    public abstract ControlledContraptionEntity createAvionics$movedContraption_accessor();
+
+    @Override
+    public AbstractContraptionEntity createAvionics$movedContraption() {
+        return this.createAvionics$movedContraption_accessor();
     }
 
     @Override

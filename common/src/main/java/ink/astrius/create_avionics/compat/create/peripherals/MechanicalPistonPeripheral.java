@@ -1,6 +1,7 @@
 package ink.astrius.create_avionics.compat.create.peripherals;
 
 import com.simibubi.create.AllBlocks;
+import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.IControlContraption.MovementMode;
 import com.simibubi.create.content.contraptions.piston.MechanicalPistonBlock;
@@ -33,7 +34,7 @@ import java.util.Locale;
  *
  * @cc.module Create_MechanicalPiston
  */
-public class MechanicalPistonPeripheral extends KineticPeripheral<MechanicalPistonBlockEntity> {
+public class MechanicalPistonPeripheral extends KineticPeripheral<MechanicalPistonBlockEntity> implements ContraptionSurface {
 
     public MechanicalPistonPeripheral(final MechanicalPistonBlockEntity blockEntity) {
         super(blockEntity);
@@ -195,6 +196,12 @@ public class MechanicalPistonPeripheral extends KineticPeripheral<MechanicalPist
         final AssemblyException e = this.blockEntity.getLastAssemblyException();
         if (e == null || e.component == null) return null;
         return e.component.getString();
+    }
+
+    /** The assembled contraption, or nil while retracted/extended and idle — see {@link ContraptionSurface}. */
+    @Override
+    public AbstractContraptionEntity contraptionEntity() {
+        return this.blockEntity.movedContraption;
     }
 
     private ScrollOptionBehaviour<MovementMode> movementMode() {
