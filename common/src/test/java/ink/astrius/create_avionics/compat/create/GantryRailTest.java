@@ -24,6 +24,17 @@ class GantryRailTest {
         return new Rail(Direction.EAST, new BlockPos(0, 64, 0), 8, 2);
     }
 
+    /**
+     * The mirror image of {@link #eastward()} — same layout, but facing a
+     * negative axis direction. {@code contains} used to compute its bound
+     * check from a raw coordinate delta with no regard for which way the
+     * axis runs, so on a rail like this every real position except the start
+     * shaft itself produced a negative "offset" and was rejected outright.
+     */
+    private static Rail westward() {
+        return new Rail(Direction.WEST, new BlockPos(0, 64, 0), 8, 2);
+    }
+
     @Test
     void everyShaftOfTheRailIsContained() {
         final Rail rail = eastward();
@@ -71,5 +82,44 @@ class GantryRailTest {
         assertTrue(vertical.contains(new BlockPos(10, 3, 10)));
         assertFalse(vertical.contains(new BlockPos(10, 4, 10)), "one past the end");
         assertFalse(vertical.contains(new BlockPos(11, 2, 10)), "parallel column beside it");
+    }
+
+    @Test
+    void everyShaftOfAWestwardRailIsContained() {
+        final Rail rail = westward();
+        for (int i = 0; i < rail.length(); i++) {
+            final BlockPos shaft = new BlockPos(-i, 64, 0);
+            assertTrue(rail.contains(shaft), shaft + " is the rail's own shaft " + i);
+        }
+    }
+
+    @Test
+    void westwardPositionsPastEitherEndAreNotContained() {
+        final Rail rail = westward();
+        assertFalse(rail.contains(new BlockPos(1, 64, 0)), "one before the start");
+        assertFalse(rail.contains(new BlockPos(-8, 64, 0)), "one past the end");
+    }
+
+    @Test
+    void westwardEndIsTheLastShaftNotOnePast() {
+        final Rail rail = westward();
+        assertEquals(new BlockPos(-7, 64, 0), rail.end());
+        assertTrue(rail.contains(rail.end()));
+    }
+
+    @Test
+    void negativeAxisFacingOffsetsCountUpAwayFromStart() {
+        final Rail rail = westward();
+        assertEquals(0, rail.coord(new BlockPos(0, 64, 0)));
+        assertEquals(3, rail.coord(new BlockPos(-3, 64, 0)));
+        assertEquals(7, rail.coord(rail.end()));
+    }
+
+    @Test
+    void downwardRailIsAlsoSignCorrected() {
+        final Rail rail = new Rail(Direction.DOWN, new BlockPos(10, 64, 10), 4, 0);
+        assertTrue(rail.contains(new BlockPos(10, 62, 10)));
+        assertFalse(rail.contains(new BlockPos(10, 65, 10)), "one before the start");
+        assertFalse(rail.contains(new BlockPos(10, 60, 10)), "one past the end");
     }
 }

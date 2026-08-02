@@ -81,19 +81,31 @@ public final class GantryRail {
             return this.facing.getAxis();
         }
 
-        /** This position's coordinate along the rail axis. */
+        /**
+         * This position's offset from {@link #start} along the rail axis, signed
+         * so it counts up in the rail's own direction of travel ({@link #facing}).
+         *
+         * <p>A raw coordinate delta is not enough: on a rail whose facing points
+         * in a negative axis direction (west, north, down), travelling away from
+         * {@code start} <em>decreases</em> the raw coordinate, so the delta comes
+         * out negative for every real position except {@code start} itself.</p>
+         */
         public int coord(final BlockPos pos) {
-            return this.axis().choose(pos.getX(), pos.getY(), pos.getZ());
+            final int delta = this.axis().choose(pos.getX(), pos.getY(), pos.getZ())
+                    - this.axis().choose(this.start.getX(), this.start.getY(), this.start.getZ());
+            return delta * this.facing.getAxisDirection().getStep();
         }
 
-        /** This vector's coordinate along the rail axis. */
+        /** This vector's offset from {@link #start} along the rail axis; see {@link #coord(BlockPos)}. */
         public double coord(final Vec3 vec) {
-            return this.axis().choose(vec.x, vec.y, vec.z);
+            final double delta = this.axis().choose(vec.x, vec.y, vec.z)
+                    - this.axis().choose(this.start.getX(), this.start.getY(), this.start.getZ());
+            return delta * this.facing.getAxisDirection().getStep();
         }
 
         /** Whether a position is one of this rail's shaft positions. */
         public boolean contains(final BlockPos pos) {
-            final int offset = this.coord(pos) - this.coord(this.start);
+            final int offset = this.coord(pos);
             if (offset < 0 || offset >= this.length) return false;
             return this.start.relative(this.facing, offset).equals(pos);
         }
@@ -135,7 +147,7 @@ public final class GantryRail {
         final GantryContraptionEntity moving = movingCarriage(level, rail);
         if (moving != null) {
             return new Carriage(
-                    rail.coord(moving.getAnchorVec()) - rail.coord(rail.start()),
+                    rail.coord(moving.getAnchorVec()),
                     moving.isStalled() ? State.STALLED : State.MOVING,
                     null,
                     null,
