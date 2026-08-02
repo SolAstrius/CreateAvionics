@@ -3,7 +3,9 @@ package ink.astrius.create_avionics.compat.create.net;
 import com.simibubi.create.Create;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
 import com.simibubi.create.compat.computercraft.ComputerCraftProxy;
+import com.simibubi.create.content.trains.graph.EdgePointType;
 import com.simibubi.create.content.trains.graph.TrackGraph;
+import com.simibubi.create.content.trains.signal.TrackEdgePoint;
 import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -106,10 +109,35 @@ public class RailModemBlockEntity extends SmartBlockEntity {
     public RailMedium medium() {
         final TrackGraph graph = this.graph();
         if (graph == null) return null;
-        return new RailMedium(graph, () -> graph.getPoints(RailModemPoint.TYPE)
-                .stream()
-                .filter(RailModemPoint::isLoaded)
-                .toList());
+        return new RailMedium(graph, () -> stationsOn(graph));
+    }
+
+    /**
+     * Everything bolted to this track network, as stations on the medium.
+     *
+     * <p>Modems and Create's own fixtures alike: a signal or a station is
+     * attached to the same conductor and addressable in the same space,
+     * so the medium should see them all. Walking every registered edge
+     * point type rather than naming three means an edge point some other
+     * addon registers is picked up without this needing to know about
+     * it.</p>
+     *
+     * <p>Unloaded modems are skipped -- they are still on the graph, but
+     * there is no block entity there to hand a frame to. Fixtures have no
+     * such requirement: their state lives on the graph itself.</p>
+     */
+    private static List<RailEndpoint> stationsOn(final TrackGraph graph) {
+        final List<RailEndpoint> out = new ArrayList<>();
+        for (final EdgePointType<?> type : EdgePointType.TYPES.values()) {
+            for (final TrackEdgePoint point : graph.getPoints(type)) {
+                if (point instanceof final RailModemPoint modem) {
+                    if (modem.isLoaded()) out.add(modem);
+                } else {
+                    out.add(new TrackFixture(point));
+                }
+            }
+        }
+        return out;
     }
 
     /** @return This modem's link-layer address, or null before it resolves. */

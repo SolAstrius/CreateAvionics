@@ -98,11 +98,19 @@ public class RailModemPeripheral extends SyncedPeripheral<RailModemBlockEntity> 
      * List every other modem on this rail network, with how far away it
      * is along the track and how strong the link to it is.
      *
-     * <p>Each entry is a table of {@code address}, {@code distance} (in
-     * blocks of track, along the shortest rail path — not straight-line
-     * distance) and {@code quality} (signal margin in dB). Modems with no
-     * rail path at all are omitted, as are those past the attenuation
-     * floor.</p>
+     * <p>Each entry is a table of {@code address}, {@code kind},
+     * {@code distance} (in blocks of track, along the shortest rail path —
+     * not straight-line distance) and {@code quality} (signal margin in
+     * dB). Peers with no rail path at all are omitted, as are those past
+     * the attenuation floor.</p>
+     *
+     * <p>{@code kind} is {@code modem} for another rail modem, or
+     * {@code signal} / {@code station} / {@code observer} for one of
+     * Create's own fixtures. Those are peers in the same sense and share
+     * one address space: they are bolted to the same conductor at a known
+     * point along it, and are what a command frame will eventually be
+     * addressed to. {@link #getSignals}, {@link #getStations} and
+     * {@link #getObservers} are detail views of the same set.</p>
      *
      * @return A list of peer tables.
      */
@@ -118,8 +126,9 @@ public class RailModemPeripheral extends SyncedPeripheral<RailModemBlockEntity> 
             final double quality = medium.linkQualityDb(self, peer);
             if (!Double.isFinite(quality) || quality < RailMedium.FLOOR_DB) continue;
 
-            final Map<String, Object> entry = new HashMap<>(3);
+            final Map<String, Object> entry = new HashMap<>(4);
             entry.put("address", peer.address().toString());
+            entry.put("kind", peer instanceof final TrackFixture fixture ? fixture.kind() : "modem");
             entry.put("distance", medium.distance(self, peer));
             entry.put("quality", quality);
             out.add(entry);
@@ -178,8 +187,9 @@ public class RailModemPeripheral extends SyncedPeripheral<RailModemBlockEntity> 
     /**
      * List every train signal within range on this rail network.
      *
-     * <p>Each entry has {@code id}, {@code distance} and {@code quality}
-     * as {@link #getPeers}, plus the signal's aspect on each side of the
+     * <p>Each entry has {@code address}, {@code kind}, {@code distance}
+     * and {@code quality} exactly as {@link #getPeers} reports them --
+     * this is that same peer set, filtered -- plus the aspect on each side of the
      * boundary — {@code forward} and {@code reverse}, one of
      * {@code red}, {@code yellow}, {@code green} or {@code invalid} — and
      * {@code forcedRedForward} / {@code forcedRedReverse} for whether
@@ -262,7 +272,8 @@ public class RailModemPeripheral extends SyncedPeripheral<RailModemBlockEntity> 
             if (!Double.isFinite(quality) || quality < RailMedium.FLOOR_DB) continue;
 
             final Map<String, Object> entry = new HashMap<>();
-            entry.put("id", point.getId().toString());
+            entry.put("address", fixture.address().toString());
+            entry.put("kind", fixture.kind());
             entry.put("distance", medium.distance(self, fixture));
             entry.put("quality", quality);
             describe.accept(point, entry);
