@@ -29,6 +29,19 @@ import net.createmod.catnip.data.Couple;
  */
 public record TrackFixture(TrackEdgePoint point) implements RailEndpoint {
 
+    /**
+     * Whether this fixture has an identity yet, and so an address.
+     *
+     * <p>Create assigns a point's id before putting it on the graph, so
+     * this is true for anything actually attached. It is checked anyway
+     * because the alternative is a null dereference in the middle of a
+     * survey, and a fixture with no identity is simply not addressable
+     * yet — the honest thing is to leave it out until it is.</p>
+     */
+    public boolean hasIdentity() {
+        return this.point.getId() != null;
+    }
+
     @Override
     public MacAddress address() {
         return MacAddress.ofStableId(this.point.getId());

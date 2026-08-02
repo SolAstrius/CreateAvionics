@@ -268,6 +268,7 @@ public class RailModemPeripheral extends SyncedPeripheral<RailModemBlockEntity> 
         final List<Map<String, Object>> out = new ArrayList<>();
         for (final T point : graph.getPoints(type)) {
             final TrackFixture fixture = new TrackFixture(point);
+            if (!fixture.hasIdentity()) continue;
             final double quality = medium.linkQualityDb(self, fixture);
             if (!Double.isFinite(quality) || quality < RailMedium.FLOOR_DB) continue;
 

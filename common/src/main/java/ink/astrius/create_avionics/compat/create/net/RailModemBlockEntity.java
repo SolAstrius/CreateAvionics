@@ -133,7 +133,8 @@ public class RailModemBlockEntity extends SmartBlockEntity {
                 if (point instanceof final RailModemPoint modem) {
                     if (modem.isLoaded()) out.add(modem);
                 } else {
-                    out.add(new TrackFixture(point));
+                    final TrackFixture fixture = new TrackFixture(point);
+                    if (fixture.hasIdentity()) out.add(fixture);
                 }
             }
         }
