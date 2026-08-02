@@ -13,6 +13,8 @@ import com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import com.simibubi.create.content.kinetics.speedController.SpeedControllerBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import ink.astrius.create_avionics.compat.create.net.RailModemBlockEntity;
+import ink.astrius.create_avionics.compat.create.net.RailModemPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.CreativeMotorPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.ElevatorContactPeripheral;
 import ink.astrius.create_avionics.compat.create.peripherals.ElevatorPulleyPeripheral;
@@ -71,6 +73,7 @@ public final class CreatePeripheralRegistry {
 
     /** Most specific first; see the ordering note in the class javadoc. */
     private static final List<Entry<?>> ENTRIES = List.of(
+        entry(RailModemBlockEntity.class, RailModemPeripheral::new),
         entry(SequencedGearshiftBlockEntity.class, SequencedGearshiftPeripheral::new),
         entry(SpeedGaugeBlockEntity.class, SpeedGaugePeripheral::new),
         entry(StressGaugeBlockEntity.class, StressGaugePeripheral::new),

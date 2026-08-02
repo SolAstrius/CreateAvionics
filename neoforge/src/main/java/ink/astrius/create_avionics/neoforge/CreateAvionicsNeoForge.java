@@ -49,6 +49,14 @@ public class CreateAvionicsNeoForge {
         // but no SCADA pack.
         PeripheralComposition.register(AllBlockEntityTypes.SEQUENCED_GEARSHIFT);
 
+        // Our own block, so we register its capability directly rather than
+        // going through the mixin that retrofits Create's block entities.
+        event.registerBlockEntity(
+                PeripheralCapability.get(),
+                AvionicsBlockEntities.RAIL_MODEM.get(),
+                (be, context) -> be.computerBehaviour.getPeripheralCapability()
+        );
+
         event.registerBlockEntity(
                 PeripheralCapability.get(),
                 AllBlockEntityTypes.MECHANICAL_BEARING.get(),

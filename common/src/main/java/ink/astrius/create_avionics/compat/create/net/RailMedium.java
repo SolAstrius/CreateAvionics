@@ -14,6 +14,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.function.Supplier;
+import java.util.Collection;
 import java.util.Set;
 import java.util.LinkedHashSet;
 
@@ -80,9 +82,30 @@ public final class RailMedium implements Medium {
 
     private final TrackGraph graph;
     private final Set<RailEndpoint> attached = new LinkedHashSet<>();
+    private final Supplier<Collection<? extends RailEndpoint>> registered;
 
+    /**
+     * A medium with no registered stations of its own; everything on it
+     * must be {@link #attach}ed explicitly.
+     */
     public RailMedium(final TrackGraph graph) {
+        this(graph, List::of);
+    }
+
+    /**
+     * @param graph      The track network this medium runs on.
+     * @param registered Supplies the stations the graph itself knows
+     *                   about, re-read on every use. Kept as a supplier
+     *                   rather than resolved here so this class never has
+     *                   to name Create's edge-point registry — touching
+     *                   that drags in the whole mod registration stack,
+     *                   which cannot load outside a running game and
+     *                   would put the medium's own logic beyond the reach
+     *                   of a unit test.
+     */
+    public RailMedium(final TrackGraph graph, final Supplier<Collection<? extends RailEndpoint>> registered) {
         this.graph = graph;
+        this.registered = registered;
     }
 
     /**
@@ -141,9 +164,7 @@ public final class RailMedium implements Medium {
      */
     private Set<RailEndpoint> stations() {
         final Set<RailEndpoint> out = new LinkedHashSet<>(this.attached);
-        for (final RailModemPoint point : this.graph.getPoints(RailModemPoint.TYPE)) {
-            if (point.isLoaded()) out.add(point);
-        }
+        out.addAll(this.registered.get());
         return out;
     }
 

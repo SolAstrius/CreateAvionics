@@ -1,11 +1,15 @@
 package ink.astrius.create_avionics.compat.create.net;
 
 import com.simibubi.create.Create;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
+import com.simibubi.create.compat.computercraft.ComputerCraftProxy;
 import com.simibubi.create.content.trains.graph.TrackGraph;
 import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import ink.astrius.create_avionics.net.Frame;
+
+import java.nio.charset.StandardCharsets;
 import ink.astrius.create_avionics.registry.AvionicsBlockEntities;
 import ink.astrius.create_avionics.net.MacAddress;
 import net.minecraft.core.BlockPos;
@@ -36,6 +40,8 @@ public class RailModemBlockEntity extends SmartBlockEntity {
 
     public TrackTargetingBehaviour<RailModemPoint> edgePoint;
 
+    public AbstractComputerBehaviour computerBehaviour;
+
     /** Ticks remaining on the activity light; refreshed by traffic. */
     private int activityTicks;
 
@@ -56,6 +62,7 @@ public class RailModemBlockEntity extends SmartBlockEntity {
     @Override
     public void addBehaviours(final List<BlockEntityBehaviour> behaviours) {
         behaviours.add(this.edgePoint = new TrackTargetingBehaviour<>(this, RailModemPoint.TYPE));
+        behaviours.add(this.computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -98,7 +105,11 @@ public class RailModemBlockEntity extends SmartBlockEntity {
     @Nullable
     public RailMedium medium() {
         final TrackGraph graph = this.graph();
-        return graph == null ? null : new RailMedium(graph);
+        if (graph == null) return null;
+        return new RailMedium(graph, () -> graph.getPoints(RailModemPoint.TYPE)
+                .stream()
+                .filter(RailModemPoint::isLoaded)
+                .toList());
     }
 
     /** @return This modem's link-layer address, or null before it resolves. */
@@ -145,10 +156,25 @@ public class RailModemBlockEntity extends SmartBlockEntity {
         if (self != null && !frame.addressedTo(self)) return;
 
         switch (frame.subProtocol()) {
-            case Frame.SUB_COMPUTERCRAFT -> { /* peripheral layer, not wired yet */ }
-            case Frame.SUB_RAIL_CONTROL -> { /* control layer, not wired yet */ }
+            case Frame.SUB_RAIL_CONTROL -> this.queueMessageEvent(frame, qualityDb);
+            case Frame.SUB_COMPUTERCRAFT -> { /* encapsulated CC packets, not wired yet */ }
             default -> { /* foreign traffic -- a bridged guest's own frames */ }
         }
+    }
+
+    /**
+     * Hand a received message to any attached computer.
+     *
+     * <p>The signal margin travels with it deliberately: a receiver that
+     * knows how strongly something arrived knows how far away it came
+     * from, which is what makes locating a transmitter from two or more
+     * listeners possible at all.</p>
+     */
+    private void queueMessageEvent(final Frame frame, final double qualityDb) {
+        if (this.computerBehaviour == null || !this.computerBehaviour.hasAttachedComputer()) return;
+        if (!(this.computerBehaviour.getPeripheralCapability() instanceof final RailModemPeripheral peripheral)) return;
+        peripheral.onMessage(frame.source().toString(),
+                new String(frame.body(), StandardCharsets.UTF_8), qualityDb);
     }
 
     private void noteActivity() {
