@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-01
+
 ### Added
 
 - **`Create_GantryShaft` can now see a carriage while it is moving.** A gantry
@@ -72,6 +74,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   real mechanic. Also now documented: the ±0.49 blocks/tick clamp, and that
   `canAssembleOn` answers per-shaft, with `single` shafts never able to
   assemble and the two ends requiring opposite signs.
+
+### Docs
+
+- `altitude_sensor.getVerticalSpeed` documented a distinction no Lua caller
+  can observe. The note said "server-side only — returns 0 on the client
+  side", which describes the block entity: the finite difference is
+  accumulated in a tick handler that returns early on a client level. But
+  CC:Tweaked runs Lua on the server, so a peripheral call never sees the
+  client copy. Reworded to what is actually observable — one tick of lag, and
+  0 until the sensor has ticked twice after being placed or loaded. Same
+  wording leak removed from four `gas_provider` balloon getters ("or 0 if no
+  server-side balloon" → "or 0 if no balloon is attached"); in a peripheral
+  call an attached balloon is always the server one.
 
 ## [0.5.2] - 2026-07-25
 
@@ -340,7 +355,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
 [#22]: https://github.com/SolAstrius/CreateAvionics/issues/22
 
-[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.4.0...v0.5.0
