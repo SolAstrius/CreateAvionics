@@ -152,7 +152,7 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
     /**
      * Get the balloon's currently filled volume.
      *
-     * @return The filled volume, or 0 if no server-side balloon.
+     * @return The filled volume, or 0 if no balloon is attached.
      */
     @LuaFunction
     public final double getBalloonFilledVolume() {
@@ -163,7 +163,7 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
     /**
      * Get the balloon's target volume.
      *
-     * @return The target volume, or 0 if no server-side balloon.
+     * @return The target volume, or 0 if no balloon is attached.
      */
     @LuaFunction
     public final double getBalloonTargetVolume() {
@@ -174,7 +174,7 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
     /**
      * Get the per-tick volume change of the balloon.
      *
-     * @return The signed volume change, or 0 if no server-side balloon.
+     * @return The signed volume change, or 0 if no balloon is attached.
      */
     @LuaFunction
     public final double getBalloonVolumeChange() {
@@ -185,7 +185,7 @@ public class GasProviderPeripheral<T extends SmartBlockEntity> extends SimPeriph
     /**
      * Get the balloon's lift force.
      *
-     * @return The lift, or 0 if no server-side balloon.
+     * @return The lift, or 0 if no balloon is attached.
      */
     @LuaFunction
     public final double getBalloonLift() {

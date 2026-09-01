@@ -55,8 +55,8 @@ public class AltitudeSensorPeripheral extends dev.simulated_team.simulated.compa
     /**
      * Get the sensor's current vertical speed.
      * Finite-differenced from {@link #getHeight} at the server tick rate
-     * (Δheight × 20). Has one tick of lag. Server-side only — returns 0 on
-     * the client side or before the second tick after placement.
+     * (Δheight × 20), so it lags the true speed by one tick and reads 0
+     * until the sensor has ticked twice after being placed or loaded.
      *
      * @return The vertical speed in m/s (positive = ascending).
      */
