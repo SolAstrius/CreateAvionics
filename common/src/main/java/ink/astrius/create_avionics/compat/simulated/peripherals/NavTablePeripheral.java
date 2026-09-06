@@ -4,6 +4,7 @@ import dan200.computercraft.api.lua.LuaFunction;
 import dev.simulated_team.simulated.content.blocks.nav_table.NavTableBlockEntity;
 import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.NavigationTarget;
 import dev.simulated_team.simulated.index.SimRegistries;
+import ink.astrius.create_avionics.api.simulated.NavTableExt;
 import ink.astrius.create_avionics.api.simulated.NavigationTargetExt;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -208,6 +209,72 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
     @LuaFunction
     public double getBearingRad() {
         return Math.toRadians(this.getBearing());
+    }
+
+    /**
+     * Get the range beyond which the held item's signal cuts off.
+     * Past this range the block stops emitting on every side and the needle
+     * carries no information -- which reads identically to being parked on the
+     * target, so a program that steers on bearing without checking range can
+     * chase a dead needle. Upstream spells "no limit" as a max range of zero;
+     * this reports {@code math.huge} for that case instead, so the value is
+     * always directly comparable against a distance.
+     * <p>
+     * The two most common items are the unlimited ones: both
+     * {@code simulated:compass} and {@code simulated:map} declare no cutoff,
+     * while everything else takes the 200-block default. So neither "always
+     * 200" nor "always unlimited" is a safe assumption to hardcode.
+     * <p>
+     * The cutoff upstream applies is measured in the plane perpendicular to
+     * the block's facing, not along the 3D distance
+     * {@link #getDistanceToTarget} reports, so treat this as the target type's
+     * declared limit rather than an exact predictor of the block's redstone.
+     *
+     * @return The range limit in blocks, {@code math.huge} if the type has
+     *         none, or nil if no item is held.
+     */
+    @LuaFunction
+    public Double getMaxRange() {
+        final NavigationTarget nti = this.blockEntity.getNavTableItem();
+        if (nti == null) {
+            return null;
+        }
+        final float max = nti.getMaxRange();
+        return max > 0 ? (double) max : Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Get the rate at which the bearing to the target is changing.
+     * Positive = the target is drifting to the right of the block's arrow.
+     * This is the intercept signal: with the target ahead and closing, a
+     * bearing rate near zero means the current course arrives at it, while a
+     * steady non-zero rate means the course misses by a margin that only grows
+     * as range falls. Differenced once per server tick, which is the cadence
+     * at which the table itself recomputes the angle, and wrapped across the
+     * +/-180 seam so a needle sweeping past dead astern does not read as a
+     * full turn the other way.
+     * <p>
+     * Zero when no target is resolved, and for one tick after the held item
+     * changes -- a swap re-aims the needle instantly, and that jump is not
+     * motion of the vehicle. The value grows without bound as range goes to
+     * zero (bearing is undefined at the target itself), so gate on
+     * {@link #getDistanceToTarget} before steering on it near arrival.
+     *
+     * @return The bearing rate in degrees/sec.
+     */
+    @LuaFunction
+    public double getBearingRate() {
+        return ((NavTableExt) this.blockEntity).getBearingRate();
+    }
+
+    /**
+     * Get the rate at which the bearing to the target is changing, in radians.
+     *
+     * @return The bearing rate in radians/sec.
+     */
+    @LuaFunction
+    public double getBearingRateRad() {
+        return Math.toRadians(((NavTableExt) this.blockEntity).getBearingRate());
     }
 
     /**
