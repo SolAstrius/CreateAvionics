@@ -5,7 +5,10 @@ import dev.simulated_team.simulated.content.blocks.nav_table.NavTableBlockEntity
 import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.NavigationTarget;
 import dev.simulated_team.simulated.index.SimRegistries;
 import ink.astrius.create_avionics.api.simulated.NavigationTargetExt;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
@@ -15,7 +18,8 @@ import java.util.Map;
 
 /**
  * A navigation table. Reports the resolved target's bearing, distance, closure
- * rate, vertical offset, and the host sub-level's orientation/heading.
+ * rate, vertical offset, the held item's identity and name, and the host
+ * sub-level's orientation/heading.
  *
  * @cc.module navigation_table
  */
@@ -28,8 +32,8 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
     /**
      * Check whether the nav table has resolved a live target.
      * hasTarget reports whether the nav table has resolved a live target
-     * (currentTarget). getTargetType / getTargetMetadata describe the held
-     * nav-table item itself — these can be populated even when no target is
+     * (currentTarget). getTargetType / getTargetMetadata / getTargetName
+     * describe the held nav-table item itself — these can be populated even when no target is
      * locked yet, so hasTarget() == false does not imply getTargetType() == nil.
      *
      * @return True if a live target is resolved.
@@ -52,6 +56,53 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
         }
         final ResourceLocation key = SimRegistries.NAVIGATION_TARGET.getKey(nti);
         return key != null ? key.toString() : null;
+    }
+
+    /**
+     * Get the custom name of the held nav-table item.
+     * This is the name a player gave the item on an anvil, and it is the only
+     * human-readable identity a waypoint has. It matters for the items that
+     * carry a per-item destination: a lodestone-bound compass otherwise
+     * identifies itself only by a tracker UUID and a marked map only by a
+     * numeric id ({@link #getTargetMetadata}), while the Explorer's/Nature's
+     * Compass compat targets expose no metadata at all. The remaining types
+     * resolve to one fixed place — an unbound compass always points at world
+     * spawn — so a name on those is decoration. Nil for an item that was
+     * never renamed, so a display can fall back to
+     * {@link #getTargetDisplayName} or {@link #getTargetType}.
+     *
+     * @return The custom name as plain text, or nil if the item is unnamed or
+     *         nothing is held.
+     */
+    @LuaFunction
+    public String getTargetName() {
+        final ItemStack held = this.blockEntity.getHeldItem();
+        if (held.isEmpty()) {
+            return null;
+        }
+        final Component custom = held.get(DataComponents.CUSTOM_NAME);
+        return custom != null ? custom.getString() : null;
+    }
+
+    /**
+     * Get the display name of the held nav-table item.
+     * The custom name when the item has one, otherwise the item's own name —
+     * so this is never nil while something is held. The fallback is resolved
+     * against whatever language table the server has loaded, which for a
+     * dedicated server is vanilla English only: a modded item with no custom
+     * name can come back as its raw translation key (e.g.
+     * {@code item.simulated.magnet}). Use {@link #getTargetName} when only a
+     * player-chosen label will do.
+     *
+     * @return The display name as plain text, or nil if nothing is held.
+     */
+    @LuaFunction
+    public String getTargetDisplayName() {
+        final ItemStack held = this.blockEntity.getHeldItem();
+        if (held.isEmpty()) {
+            return null;
+        }
+        return held.getHoverName().getString();
     }
 
     /**

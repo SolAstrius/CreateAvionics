@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`navigation_table`: `getTargetName` and `getTargetDisplayName`.** Every
+  nav item that carries a per-item destination was anonymous to a program: a
+  lodestone-bound compass reported only a tracker UUID, a marked map only a
+  numeric id, and the Explorer's/Nature's Compass targets nothing at all. A
+  display could say *where* it was heading but never *what* the waypoint was
+  called. `getTargetName` returns the anvil-given name of the held item — the
+  label a player actually chose — and is nil for an unnamed item;
+  `getTargetDisplayName` falls back to the item's own name so a readout always
+  has something to print ([#28]).
+
 ## [0.6.0] - 2026-09-01
 
 ### Added
@@ -354,6 +366,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
 [#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
 [#22]: https://github.com/SolAstrius/CreateAvionics/issues/22
+[#28]: https://github.com/SolAstrius/CreateAvionics/issues/28
 
 [Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...v0.6.0
