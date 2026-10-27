@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`navigation_table`: `getMaxRange`.** The range at which the held item's
+  signal cuts off, which reads exactly like being parked on the target — so a
+  program steering on bearing alone could chase a dead needle. Upstream spells
+  "no limit" as zero, which is not comparable against a distance; this reports
+  `math.huge` for that case. Both the compass and the map are unlimited while
+  everything else takes the 200-block default, so neither constant was safe to
+  hardcode.
+- **`navigation_table`: `getBearingRate` / `getBearingRateRad`.** How fast the
+  needle is swinging, in degrees (or radians) per second. This is the intercept
+  signal — with the target ahead and closing, a bearing rate near zero means
+  the current course arrives at it, and a steady non-zero rate means it misses
+  by a margin that only grows as range falls. Upstream never computes it, so
+  programs differenced `getBearing()` in Lua and had to handle the ±180 seam
+  themselves, where a needle sweeping past dead astern reads as a full turn the
+  other way. Sampled once per server tick — the cadence at which the table
+  recomputes the angle, not the 11-tick distance cycle — and suppressed for one
+  tick after a waypoint swap, since re-aiming the needle is not motion of the
+  vehicle.
+- **`navigation_table`: `getTargetName` and `getTargetDisplayName`.** Every
+  nav item that carries a per-item destination was anonymous to a program: a
+  lodestone-bound compass reported only a tracker UUID, a marked map only a
+  numeric id, and the Explorer's/Nature's Compass targets nothing at all. A
+  display could say *where* it was heading but never *what* the waypoint was
+  called. `getTargetName` returns the anvil-given name of the held item — the
+  label a player actually chose — and is nil for an unnamed item;
+  `getTargetDisplayName` falls back to the item's own name so a readout always
+  has something to print ([#28]).
+
 ## [0.6.0] - 2026-09-01
 
 ### Added
@@ -354,6 +384,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
 [#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
 [#22]: https://github.com/SolAstrius/CreateAvionics/issues/22
+[#28]: https://github.com/SolAstrius/CreateAvionics/issues/28
 
 [Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...v0.6.0
