@@ -37,6 +37,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `getTargetDisplayName` falls back to the item's own name so a readout always
   has something to print ([#28]).
 
+- **Weather instruments: thermometer, hygrometer, barometer, rain gauge and
+  almanac.** Avionics' first blocks of its own. Each reads one quantity in
+  fixed units (`C`, `rh`, `hPa`, `mm/h`, and `year` or `moon`), sampled once
+  a second and cached, so polling is cheap. Readings are taken at the block's
+  position in the world, projected out of any Sable sub-level, so an
+  instrument on an airship reads the air it is flying through rather than the
+  air of the plot its blocks are stored in. Temperature and humidity come from
+  Thermoo's environment when it is installed, which picks up every climate mod
+  that plugs into Thermoo; pressure comes from Sable's dimension physics, the
+  same curve airship buoyancy uses, lowered by rain and thunder; the almanac
+  follows Serene Seasons in the Overworld and the moon everywhere else. All of
+  them fall back to estimates from vanilla biome data, and `read` reports
+  which source each value came from. The rain gauge also keeps a running total
+  that `empty` resets.
+- **Avionics controller: one wired connection for a whole ship.** Placed on a
+  Sable ship and wired to a computer, it publishes every peripheral on the
+  ship onto that network, as if each had its own modem. Names carry a `ship_`
+  prefix so they never collide with modem-shared ones, keep their number while
+  the block stays on the ship, and survive restarts. Peripherals that measure
+  in a direction are named in ship terms (`ship_velocity_sensor_forward_0`,
+  `ship_optical_sensor_down_0`, `ship_docking_connector_up_0`), and
+  propellers, burners and engines by where they sit on the hull
+  (`ship_propeller_bearing_aft_port_0`), relative to a bow the first
+  controller sets and a wrench moves. Several controllers on one ship share a
+  single set of names, and when the publishing one is destroyed the next takes
+  over without a rename. Computers, modems and pure transmission (the
+  `create_avionics:not_bridged` tag) are left out; the controllers appear once,
+  as `ship_avionics_controller`.
+- **Transponder.** The controller is also the ship's transponder: a wrench on
+  its antenna, or `setTransponder` from Lua, switches it ship-wide. While it is
+  on, a radar that hits the ship reports its name; while it is off, the ship
+  is an unidentified contact.
+- **Radar Mk.1.** One narrow beam straight out of its face, cast twice a
+  second to 256 blocks. `getContact` reports what it meets (`ship`, `terrain`,
+  or `obstructed` by the radar's own ship), the distance, the closing speed and
+  a transponder name; a comparator reads the range from 15 up close to 1 at
+  full range.
+- Recipes for all seven blocks. The instruments are shapeless on andesite
+  casing, like Create's own gauges; the controller is a brass-tier part with a
+  precision mechanism, an electron tube and a wired modem.
+- Guides to [the ship bridge] and [the instruments] on the docs site.
+
+### Changed
+
+- **Avionics now has to be installed on clients as well as the server.** It
+  adds blocks, models and textures, so a client without it cannot join a
+  server with it ([#1]).
+
 ### Fixed
 
 - ComputerCraft no longer logs "Lua Method … should be final" for the
@@ -407,6 +455,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `laser_pointer` published method name (`getLaserRange`).
 - NeoForge version range and CI YAML quoting issues.
 
+[#1]: https://github.com/SolAstrius/CreateAvionics/issues/1
 [#6]: https://github.com/SolAstrius/CreateAvionics/pull/6
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
 [#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
@@ -414,6 +463,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#28]: https://github.com/SolAstrius/CreateAvionics/issues/28
 [#29]: https://github.com/SolAstrius/CreateAvionics/issues/29
 [#30]: https://github.com/SolAstrius/CreateAvionics/issues/30
+
+[the ship bridge]: https://solastrius.github.io/CreateAvionics/guide/ship_bridge.html
+[the instruments]: https://solastrius.github.io/CreateAvionics/guide/instruments.html
 
 [Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...v0.6.0

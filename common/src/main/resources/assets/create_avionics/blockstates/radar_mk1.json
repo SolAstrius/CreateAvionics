@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "create_avionics:block/radar_mk1"
+    },
+    "facing=east": {
+      "model": "create_avionics:block/radar_mk1",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "create_avionics:block/radar_mk1",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "create_avionics:block/radar_mk1",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "create_avionics:block/radar_mk1",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "create_avionics:block/radar_mk1",
+      "x": 90
+    }
+  }
+}

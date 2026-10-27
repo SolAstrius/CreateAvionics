@@ -17,6 +17,13 @@ local engine = peripheral.find("portable_engine")
 print(engine.getRpm())
 ```
 
+## Blocks
+
+Avionics also adds blocks of its own: weather instruments, the avionics
+controller that bridges a ship's peripherals to its computers, and a radar. Start
+with the guides to the [ship bridge](guide/ship_bridge.html) and the
+[instruments](guide/instruments.html).
+
 ## Source
 
 Source: <https://github.com/SolAstrius/CreateAvionics> · License: MIT.

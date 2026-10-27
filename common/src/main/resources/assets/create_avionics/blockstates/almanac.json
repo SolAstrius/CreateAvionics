@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,dial=seasons": {
+      "model": "create_avionics:block/almanac/block"
+    },
+    "facing=east,dial=seasons": {
+      "model": "create_avionics:block/almanac/block",
+      "y": 90
+    },
+    "facing=south,dial=seasons": {
+      "model": "create_avionics:block/almanac/block",
+      "y": 180
+    },
+    "facing=west,dial=seasons": {
+      "model": "create_avionics:block/almanac/block",
+      "y": 270
+    },
+    "facing=north,dial=moon": {
+      "model": "create_avionics:block/almanac/block_moon"
+    },
+    "facing=east,dial=moon": {
+      "model": "create_avionics:block/almanac/block_moon",
+      "y": 90
+    },
+    "facing=south,dial=moon": {
+      "model": "create_avionics:block/almanac/block_moon",
+      "y": 180
+    },
+    "facing=west,dial=moon": {
+      "model": "create_avionics:block/almanac/block_moon",
+      "y": 270
+    }
+  }
+}

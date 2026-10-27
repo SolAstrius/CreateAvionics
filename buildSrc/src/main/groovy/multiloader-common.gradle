@@ -65,6 +65,11 @@ if (project.name == "common") {
         compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-core:${computercraft_tweaked_version}")
         compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-common:${computercraft_tweaked_version}")
         compileOnly("cc.tweaked:cc-tweaked-${minecraft_version}-forge:${computercraft_tweaked_version}")
+
+        // Optional data sources for the instruments
+        compileOnly("maven.modrinth:thermoo:${thermoo_version}")
+        compileOnly("maven.modrinth:serene-seasons:${serene_seasons_version}")
+        compileOnly("maven.modrinth:glitchcore:${glitchcore_version}")
     }
 }
 
