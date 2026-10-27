@@ -36,7 +36,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return The signal, 0..15.
      */
     @LuaFunction
-    public int getSignal() {
+    public final int getSignal() {
         return this.ext().getSignal();
     }
 
@@ -68,7 +68,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return True if externally controlled, false if driven by redstone.
      */
     @LuaFunction
-    public boolean isExternallyControlled() {
+    public final boolean isExternallyControlled() {
         return this.ext().isExternallyControlled();
     }
 
@@ -80,7 +80,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return The rotation modifier.
      */
     @LuaFunction
-    public double getRotationModifier() {
+    public final double getRotationModifier() {
         return this.blockEntity.getRotationModifier();
     }
 
@@ -90,7 +90,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return The output speed.
      */
     @LuaFunction
-    public double getOutputSpeed() {
+    public final double getOutputSpeed() {
         return this.blockEntity.getExtraKinetics().getSpeed();
     }
 
@@ -100,7 +100,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return The output theoretical speed.
      */
     @LuaFunction
-    public double getOutputTheoreticalSpeed() {
+    public final double getOutputTheoreticalSpeed() {
         return this.blockEntity.getExtraKinetics().getTheoreticalSpeed();
     }
 
@@ -112,7 +112,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return The output stress impact.
      */
     @LuaFunction
-    public double getOutputStressImpact() {
+    public final double getOutputStressImpact() {
         return this.blockEntity.getExtraKinetics().calculateStressApplied();
     }
 
@@ -124,7 +124,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return True if oversaturated.
      */
     @LuaFunction
-    public boolean isOversaturated() {
+    public final boolean isOversaturated() {
         return this.ext().isOversaturated();
     }
 
@@ -136,7 +136,7 @@ public class AnalogTransmissionPeripheral extends SimKineticPeripheral<AnalogTra
      * @return The axis as a serialized string ("x", "y", or "z").
      */
     @LuaFunction
-    public String getAxis() {
+    public final String getAxis() {
         return this.blockEntity.getBlockState().getValue(AnalogTransmissionBlock.AXIS).getSerializedName();
     }
 }

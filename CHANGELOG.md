@@ -37,6 +37,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `getTargetDisplayName` falls back to the item's own name so a readout always
   has something to print ([#28]).
 
+### Fixed
+
+- ComputerCraft no longer logs "Lua Method … should be final" for the
+  altitude sensor, navigation table, gimbal sensor, velocity sensor, torsion
+  spring, portable engine, physics assembler, steering wheel and analog
+  transmission peripherals. CC warns about every overridable `@LuaFunction`
+  the first time a computer uses the peripheral; all 62 are now `final`. No
+  behaviour change.
+
 ### Docs
 
 - `propeller_bearing.getRotationSpeed` and `getAngularSpeed` said only "the

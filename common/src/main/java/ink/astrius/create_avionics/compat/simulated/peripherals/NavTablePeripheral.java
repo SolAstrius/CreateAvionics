@@ -40,7 +40,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return True if a live target is resolved.
      */
     @LuaFunction
-    public boolean hasTarget() {
+    public final boolean hasTarget() {
         return this.blockEntity.currentTarget != null;
     }
 
@@ -50,7 +50,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The target type id, or nil if no item is held.
      */
     @LuaFunction
-    public String getTargetType() {
+    public final String getTargetType() {
         final NavigationTarget nti = this.blockEntity.getNavTableItem();
         if (nti == null) {
             return null;
@@ -76,7 +76,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      *         nothing is held.
      */
     @LuaFunction
-    public String getTargetName() {
+    public final String getTargetName() {
         final ItemStack held = this.blockEntity.getHeldItem();
         if (held.isEmpty()) {
             return null;
@@ -98,7 +98,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The display name as plain text, or nil if nothing is held.
      */
     @LuaFunction
-    public String getTargetDisplayName() {
+    public final String getTargetDisplayName() {
         final ItemStack held = this.blockEntity.getHeldItem();
         if (held.isEmpty()) {
             return null;
@@ -156,7 +156,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return A map of target-type-specific metadata, or an empty map.
      */
     @LuaFunction
-    public Map<String, Object> getTargetMetadata() {
+    public final Map<String, Object> getTargetMetadata() {
         final NavigationTarget nti = this.blockEntity.getNavTableItem();
         if (nti == null) {
             return Map.of();
@@ -171,7 +171,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      */
     @Override
     @LuaFunction
-    public Float getRelativeAngle() {
+    public final Float getRelativeAngle() {
         return super.getRelativeAngle();
     }
 
@@ -182,7 +182,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      */
     @Override
     @LuaFunction
-    public double getRelativeAngleRad() {
+    public final double getRelativeAngleRad() {
         return super.getRelativeAngleRad();
     }
 
@@ -196,7 +196,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The bearing in degrees, in [-180, 180].
      */
     @LuaFunction
-    public double getBearing() {
+    public final double getBearing() {
         final double raw = this.blockEntity.getRelativeAngle() - 90.0;
         return ((raw % 360.0) + 540.0) % 360.0 - 180.0;
     }
@@ -207,7 +207,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The bearing in radians.
      */
     @LuaFunction
-    public double getBearingRad() {
+    public final double getBearingRad() {
         return Math.toRadians(this.getBearing());
     }
 
@@ -234,7 +234,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      *         none, or nil if no item is held.
      */
     @LuaFunction
-    public Double getMaxRange() {
+    public final Double getMaxRange() {
         final NavigationTarget nti = this.blockEntity.getNavTableItem();
         if (nti == null) {
             return null;
@@ -263,7 +263,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The bearing rate in degrees/sec.
      */
     @LuaFunction
-    public double getBearingRate() {
+    public final double getBearingRate() {
         return ((NavTableExt) this.blockEntity).getBearingRate();
     }
 
@@ -273,7 +273,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The bearing rate in radians/sec.
      */
     @LuaFunction
-    public double getBearingRateRad() {
+    public final double getBearingRateRad() {
         return Math.toRadians(((NavTableExt) this.blockEntity).getBearingRate());
     }
 
@@ -285,7 +285,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The distance in blocks (= meters in Minecraft units).
      */
     @LuaFunction
-    public double getDistanceToTarget() {
+    public final double getDistanceToTarget() {
         return this.blockEntity.distanceToTarget();
     }
 
@@ -298,7 +298,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The closure rate in blocks/sec (positive = approaching).
      */
     @LuaFunction
-    public double getClosureRate() {
+    public final double getClosureRate() {
         return (this.blockEntity.lastDistanceToTarget() - this.blockEntity.distanceToTarget()) / (11.0 / 20.0);
     }
 
@@ -311,7 +311,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The signed vertical offset {@code target.y - self.y} in blocks.
      */
     @LuaFunction
-    public double getVerticalOffsetToTarget() {
+    public final double getVerticalOffsetToTarget() {
         final Vec3 target = this.blockEntity.getTargetPosition(true);
         if (target == null) {
             return 0.0;
@@ -327,7 +327,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return A four-element list {x, y, z, w}.
      */
     @LuaFunction
-    public List<Double> getOrientation() {
+    public final List<Double> getOrientation() {
         final Quaterniondc q = this.blockEntity.getSublevelRot();
         return List.of(q.x(), q.y(), q.z(), q.w());
     }
@@ -340,7 +340,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The heading in degrees.
      */
     @LuaFunction
-    public double getHeading() {
+    public final double getHeading() {
         return Math.toDegrees(this.computeHeadingRad());
     }
 
@@ -350,7 +350,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The heading in radians.
      */
     @LuaFunction
-    public double getHeadingRad() {
+    public final double getHeadingRad() {
         return this.computeHeadingRad();
     }
 
