@@ -79,6 +79,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   precision mechanism, an electron tube and a wired modem.
 - Guides to [the ship bridge] and [the instruments] on the docs site.
 
+- **A note in chat when a new version arrives.** The first time you join a
+  world after installing or updating to a new minor version, your client says
+  once what it brings, with links to the release notes, the guides and the
+  community ([Discord], or [Telegram] for Russian). Patch releases stay quiet;
+  `announceUpdates = false` in `create_avionics-client.toml` turns it off.
+
 ### Changed
 
 - **Avionics now has to be installed on clients as well as the server.** It
@@ -464,6 +470,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#29]: https://github.com/SolAstrius/CreateAvionics/issues/29
 [#30]: https://github.com/SolAstrius/CreateAvionics/issues/30
 
+[Discord]: https://discord.gg/yZxktK59ux
+[Telegram]: https://t.me/+c3qBAZD2bUw2YjQy
 [the ship bridge]: https://solastrius.github.io/CreateAvionics/guide/ship_bridge.html
 [the instruments]: https://solastrius.github.io/CreateAvionics/guide/instruments.html
 

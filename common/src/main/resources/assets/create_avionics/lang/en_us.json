@@ -11,5 +11,12 @@
   "create_avionics.controller.bow_changed": "Ship's bow moved to this controller's facing; peripheral names follow it",
   "block.create_avionics.radar_mk1": "Radar Mk.1",
   "create_avionics.controller.transponder_on": "Transponder on: radars can identify this ship",
-  "create_avionics.controller.transponder_off": "Transponder off: radio silence"
+  "create_avionics.controller.transponder_off": "Transponder off: radio silence",
+  "create_avionics.announce.updated": "Create: Avionics %s: %s.",
+  "create_avionics.announce.summary": "weather instruments, a controller that connects a whole ship to your computers, and radar",
+  "create_avionics.announce.whats_new": "What's new",
+  "create_avionics.announce.guides": "Guides",
+  "create_avionics.announce.community": "Discord",
+  "create_avionics.announce.community_url": "https://discord.gg/yZxktK59ux",
+  "create_avionics.announce.turn_off": "Shown once per version. To turn it off, set announceUpdates = false in create_avionics-client.toml."
 }

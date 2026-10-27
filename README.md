@@ -4,7 +4,7 @@ ComputerCraft peripherals for [Create: Simulated][simulated] and
 [Create: Aeronautics][aeronautics]. Drop-in: requires unmodified Simulated
 1.2.1+, no fork or patch needed.
 
-**[📖 Docs][docs]** · **[Modrinth][modrinth]** · **[Releases][releases]**
+**[📖 Docs][docs]** · **[Modrinth][modrinth]** · **[Releases][releases]** · **[Discord][discord]** · **[Telegram (RU)][telegram]**
 
 ## What's in the box
 
@@ -64,5 +64,7 @@ MIT, see LICENSE.md and NOTICE.md.
 [modrinth]: https://modrinth.com/mod/create-avionics
 [releases]: https://github.com/SolAstrius/CreateAvionics/releases
 [mainthread-guide]: https://solastrius.github.io/CreateAvionics/guide/mainthread.html
+[discord]: https://discord.gg/yZxktK59ux
+[telegram]: https://t.me/+c3qBAZD2bUw2YjQy
 [bridge-guide]: https://solastrius.github.io/CreateAvionics/guide/ship_bridge.html
 [instruments-guide]: https://solastrius.github.io/CreateAvionics/guide/instruments.html

@@ -24,6 +24,11 @@ controller that bridges a ship's peripherals to its computers, and a radar. Star
 with the guides to the [ship bridge](guide/ship_bridge.html) and the
 [instruments](guide/instruments.html).
 
+## Community
+
+Questions, scripts and ships: [Discord](https://discord.gg/yZxktK59ux), or [Telegram](https://t.me/+c3qBAZD2bUw2YjQy) in Russian.
+Bugs go to [GitHub issues](https://github.com/SolAstrius/CreateAvionics/issues).
+
 ## Source
 
 Source: <https://github.com/SolAstrius/CreateAvionics> · License: MIT.

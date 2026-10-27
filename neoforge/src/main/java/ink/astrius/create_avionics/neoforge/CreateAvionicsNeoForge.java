@@ -20,6 +20,7 @@ import ink.astrius.create_avionics.content.instrument.Instrument;
 import ink.astrius.create_avionics.content.radar.Radars;
 import ink.astrius.create_avionics.content.instrument.InstrumentSources;
 import ink.astrius.create_avionics.content.instrument.Instruments;
+import ink.astrius.create_avionics.neoforge.client.AvionicsClientConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -29,8 +30,10 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -55,8 +58,9 @@ public class CreateAvionicsNeoForge {
                     })
                     .build());
 
-    public CreateAvionicsNeoForge(final IEventBus bus) {
+    public CreateAvionicsNeoForge(final IEventBus bus, final ModContainer container) {
         CreateAvionics.LOGGER.info("Loaded {}", CreateAvionics.MOD_NAME);
+        container.registerConfig(ModConfig.Type.CLIENT, AvionicsClientConfig.SPEC);
         InstrumentSources.thermoo = ModList.get().isLoaded("thermoo");
         InstrumentSources.sereneSeasons = ModList.get().isLoaded("sereneseasons");
         InstrumentSources.downfall = biome -> biome.getModifiedClimateSettings().downfall();
