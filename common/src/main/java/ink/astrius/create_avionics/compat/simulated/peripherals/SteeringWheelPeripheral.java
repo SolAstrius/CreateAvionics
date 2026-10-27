@@ -26,7 +26,7 @@ public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelB
      * @return True if held.
      */
     @LuaFunction
-    public boolean isHeld() {
+    public final boolean isHeld() {
         return this.blockEntity.held;
     }
 
@@ -36,7 +36,7 @@ public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelB
      * @return Current visible wheel angle, degrees. Bounded by ±getMaxAngle().
      */
     @LuaFunction
-    public double getAngle() {
+    public final double getAngle() {
         return this.blockEntity.getAngle();
     }
 
@@ -46,7 +46,7 @@ public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelB
      * @return The current angle in radians.
      */
     @LuaFunction
-    public double getAngleRad() {
+    public final double getAngleRad() {
         return Math.toRadians(this.blockEntity.getAngle());
     }
 
@@ -57,7 +57,7 @@ public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelB
      * @return The target angle in degrees.
      */
     @LuaFunction
-    public double getTargetAngle() {
+    public final double getTargetAngle() {
         return this.blockEntity.targetAngle;
     }
 
@@ -67,7 +67,7 @@ public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelB
      * @return The target angle in radians.
      */
     @LuaFunction
-    public double getTargetAngleRad() {
+    public final double getTargetAngleRad() {
         return Math.toRadians(this.blockEntity.targetAngle);
     }
 
@@ -77,7 +77,7 @@ public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelB
      * @return Maximum deflection in each direction, degrees. Set by the block's scroll value (1..360).
      */
     @LuaFunction
-    public int getMaxAngle() {
+    public final int getMaxAngle() {
         return this.blockEntity.angleInput.getValue();
     }
 
@@ -88,7 +88,7 @@ public class SteeringWheelPeripheral extends SimKineticPeripheral<SteeringWheelB
      * @return The normalized angle in [-1, +1].
      */
     @LuaFunction
-    public double getNormalizedAngle() {
+    public final double getNormalizedAngle() {
         final int max = this.blockEntity.angleInput.getValue();
         return max == 0 ? 0 : this.blockEntity.getAngle() / (float) max;
     }

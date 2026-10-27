@@ -34,7 +34,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      * @return True if assembled.
      */
     @LuaFunction(mainThread = true)
-    public boolean isAssembled() {
+    public final boolean isAssembled() {
         return this.getMassData() != null;
     }
 
@@ -44,7 +44,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      * @return The mass, or 0 if not assembled.
      */
     @LuaFunction(mainThread = true)
-    public double getMass() {
+    public final double getMass() {
         final MassData data = this.getMassData();
         return data == null ? 0.0 : data.getMass();
     }
@@ -55,7 +55,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      * @return A three-element list {x, y, z}.
      */
     @LuaFunction(mainThread = true)
-    public List<Double> getCenterOfMass() {
+    public final List<Double> getCenterOfMass() {
         final MassData data = this.getMassData();
         if (data == null) return List.of(0.0, 0.0, 0.0);
         final Vector3dc com = data.getCenterOfMass();
@@ -70,7 +70,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      * @return A nine-element list of tensor entries.
      */
     @LuaFunction(mainThread = true)
-    public List<Double> getInertiaTensor() {
+    public final List<Double> getInertiaTensor() {
         final MassData data = this.getMassData();
         if (data == null) return List.of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         final Matrix3dc m = data.getInertiaTensor();
@@ -89,7 +89,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      * @return The sub-level UUID string, or nil.
      */
     @LuaFunction(mainThread = true)
-    public String getSubLevelId() {
+    public final String getSubLevelId() {
         final SubLevel subLevel = Sable.HELPER.getContaining(this.blockEntity);
         return subLevel == null ? null : subLevel.getUniqueId().toString();
     }
@@ -101,7 +101,7 @@ public class PhysicsAssemblerPeripheral extends SimPeripheral<PhysicsAssemblerBl
      * @return The sub-level name, or nil.
      */
     @LuaFunction(mainThread = true)
-    public String getSubLevelName() {
+    public final String getSubLevelName() {
         final SubLevel subLevel = Sable.HELPER.getContaining(this.blockEntity);
         return subLevel == null ? null : subLevel.getName();
     }

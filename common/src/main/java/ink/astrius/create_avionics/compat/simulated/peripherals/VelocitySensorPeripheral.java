@@ -36,7 +36,7 @@ public class VelocitySensorPeripheral extends dev.simulated_team.simulated.compa
      */
     @Override
     @LuaFunction
-    public float getVelocity() {
+    public final float getVelocity() {
         return super.getVelocity();
     }
 
@@ -50,7 +50,7 @@ public class VelocitySensorPeripheral extends dev.simulated_team.simulated.compa
      * @return The axis as "x", "y", or "z".
      */
     @LuaFunction
-    public String getAxis() {
+    public final String getAxis() {
         return AbstractDirectionalAxisBlock.getAxis(this.blockEntity.getBlockState()).getSerializedName();
     }
 }

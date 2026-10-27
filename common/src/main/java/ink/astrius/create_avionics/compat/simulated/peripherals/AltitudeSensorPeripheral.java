@@ -26,7 +26,7 @@ public class AltitudeSensorPeripheral extends dev.simulated_team.simulated.compa
      */
     @Override
     @LuaFunction
-    public float getHeight() {
+    public final float getHeight() {
         return super.getHeight();
     }
 
@@ -48,7 +48,7 @@ public class AltitudeSensorPeripheral extends dev.simulated_team.simulated.compa
      */
     @Override
     @LuaFunction
-    public double getAirPressure() {
+    public final double getAirPressure() {
         return super.getAirPressure();
     }
 
@@ -61,7 +61,7 @@ public class AltitudeSensorPeripheral extends dev.simulated_team.simulated.compa
      * @return The vertical speed in m/s (positive = ascending).
      */
     @LuaFunction
-    public double getVerticalSpeed() {
+    public final double getVerticalSpeed() {
         return ((AltitudeSensorExt) this.blockEntity).getVerticalSpeed();
     }
 }

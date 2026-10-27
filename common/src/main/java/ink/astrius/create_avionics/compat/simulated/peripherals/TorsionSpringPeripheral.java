@@ -25,7 +25,7 @@ public class TorsionSpringPeripheral extends SimKineticPeripheral<TorsionSpringB
      * @param limit The new angular limit.
      */
     @LuaFunction(mainThread = true)
-    public void setLimit(final int limit) {
+    public final void setLimit(final int limit) {
         if(this.blockEntity.isSpringStatic()) {
             this.blockEntity.angleInput.setValue(limit);
         }
@@ -37,7 +37,7 @@ public class TorsionSpringPeripheral extends SimKineticPeripheral<TorsionSpringB
      * @return The angle in degrees.
      */
     @LuaFunction
-    public double getAngle() {
+    public final double getAngle() {
         return this.blockEntity.getAngle();
     }
 
@@ -47,7 +47,7 @@ public class TorsionSpringPeripheral extends SimKineticPeripheral<TorsionSpringB
      * @return The angle in radians.
      */
     @LuaFunction
-    public double getAngleRad() {
+    public final double getAngleRad() {
         return Math.toRadians(this.blockEntity.getAngle());
     }
 
@@ -57,7 +57,7 @@ public class TorsionSpringPeripheral extends SimKineticPeripheral<TorsionSpringB
      * @return The angular limit.
      */
     @LuaFunction
-    public int getLimit() {
+    public final int getLimit() {
         return this.blockEntity.angleInput.getValue();
     }
 
@@ -67,7 +67,7 @@ public class TorsionSpringPeripheral extends SimKineticPeripheral<TorsionSpringB
      * @return True if the spring is running.
      */
     @LuaFunction
-    public boolean isRunning() {
+    public final boolean isRunning() {
         return !this.blockEntity.isSpringStatic();
     }
 
