@@ -4,6 +4,7 @@ import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.network.wired.WiredNode;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.shared.peripheral.monitor.MonitorBlockEntity;
 import dev.simulated_team.simulated.content.blocks.lasers.AbstractLaserBlockEntity;
 import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
 import dev.ryanhcode.sable.companion.math.BoundingBox3ic;
@@ -326,12 +327,17 @@ public class ShipBridge implements WiredElement {
 
     /**
      * Modems, computers and turtles network themselves (bridging them would loop or mirror a
-     * computer to itself), controllers are published once as {@link #CONTROLLER_NAME} (the
+     * computer to itself), a multi-block monitor is bridged once (its origin block), controllers are published once as {@link #CONTROLLER_NAME} (the
      * transponder is ship-wide, so which one leads mustn't change what computers see), and blocks tagged
      * {@code create_avionics:not_bridged} are pure transmission.
      */
     private static boolean bridgeable(final ShipScan.Found found) {
         if (found.blockEntity().getBlockState().is(NOT_BRIDGED)) {
+            return false;
+        }
+        // A multi-block monitor is one screen: bridge its origin block only
+        if (found.blockEntity() instanceof final MonitorBlockEntity monitor
+                && (monitor.getXIndex() != 0 || monitor.getYIndex() != 0)) {
             return false;
         }
         return switch (found.peripheral().getType()) {
