@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`navigation_table`: `getMaxRange`.** The range at which the held item's
+  signal cuts off, which reads exactly like being parked on the target — so a
+  program steering on bearing alone could chase a dead needle. Upstream spells
+  "no limit" as zero, which is not comparable against a distance; this reports
+  `math.huge` for that case. Both the compass and the map are unlimited while
+  everything else takes the 200-block default, so neither constant was safe to
+  hardcode.
+- **`navigation_table`: `getBearingRate` / `getBearingRateRad`.** How fast the
+  needle is swinging, in degrees (or radians) per second. This is the intercept
+  signal — with the target ahead and closing, a bearing rate near zero means
+  the current course arrives at it, and a steady non-zero rate means it misses
+  by a margin that only grows as range falls. Upstream never computes it, so
+  programs differenced `getBearing()` in Lua and had to handle the ±180 seam
+  themselves, where a needle sweeping past dead astern reads as a full turn the
+  other way. Sampled once per server tick — the cadence at which the table
+  recomputes the angle, not the 11-tick distance cycle — and suppressed for one
+  tick after a waypoint swap, since re-aiming the needle is not motion of the
+  vehicle.
+- **`navigation_table`: `getTargetName` and `getTargetDisplayName`.** Every
+  nav item that carries a per-item destination was anonymous to a program: a
+  lodestone-bound compass reported only a tracker UUID, a marked map only a
+  numeric id, and the Explorer's/Nature's Compass targets nothing at all. A
+  display could say *where* it was heading but never *what* the waypoint was
+  called. `getTargetName` returns the anvil-given name of the held item — the
+  label a player actually chose — and is nil for an unnamed item;
+  `getTargetDisplayName` falls back to the item's own name so a readout always
+  has something to print ([#28]).
+
+### Fixed
+
+- ComputerCraft no longer logs "Lua Method … should be final" for the
+  altitude sensor, navigation table, gimbal sensor, velocity sensor, torsion
+  spring, portable engine, physics assembler, steering wheel and analog
+  transmission peripherals. CC warns about every overridable `@LuaFunction`
+  the first time a computer uses the peripheral; all 62 are now `final`. No
+  behaviour change.
+
+### Docs
+
+- `propeller_bearing.getRotationSpeed` and `getAngularSpeed` said only "the
+  rotation speed" and "the angular speed" ([#29]). Both are degrees per tick,
+  and both report the propeller's actual speed, not the shaft's: it eases
+  towards the input by `0.4 / sqrt(sailPower)` of the difference each tick, so
+  bigger propellers spin up and down more slowly. The docs now give the unit,
+  the conversion to RPM, the 76.8 that a fully spun-up propeller reads at
+  Create's default maximum, and what happens unassembled and mid-disassembly.
+  From a computer the two functions always return the same value; the
+  difference upstream is confined to the bearing's own tick and to rendering.
+- `getSpeed` on kinetic peripherals now states its unit (RPM, signed) and that
+  it is the network's speed, which inertial blocks may lag.
+- `gimbal_sensor.getAngles` now warns that its two angles break down near
+  vertical, and points to the readings that don't: `getGravity` for tilt and
+  `navigation_table.getOrientation` for the full orientation as a quaternion
+  ([#30]).
+
 ## [0.6.0] - 2026-09-01
 
 ### Added
@@ -354,6 +411,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#15]: https://github.com/SolAstrius/CreateAvionics/issues/15
 [#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
 [#22]: https://github.com/SolAstrius/CreateAvionics/issues/22
+[#28]: https://github.com/SolAstrius/CreateAvionics/issues/28
+[#29]: https://github.com/SolAstrius/CreateAvionics/issues/29
+[#30]: https://github.com/SolAstrius/CreateAvionics/issues/30
 
 [Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...v0.6.0

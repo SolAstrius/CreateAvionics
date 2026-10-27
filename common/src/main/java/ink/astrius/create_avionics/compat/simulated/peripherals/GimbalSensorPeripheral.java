@@ -40,12 +40,20 @@ public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.
      * </ul>
      * Yaw is not measurable from gravity alone and is not reported here; use
      * {@code navigation_table.getHeading()} for yaw.
+     * <p>
+     * Each angle is measured against body-Y, so they become unreliable as the
+     * contraption approaches vertical: near ±90° of pitch or roll, body-Y lies
+     * almost flat and the other angle swings wildly on small movements. For
+     * attitude that stays well-behaved in any orientation, use
+     * {@link #getGravity} (a vector, with no singularities) for tilt, or
+     * {@code navigation_table.getOrientation()} for the full orientation as a
+     * quaternion.
      *
      * @return A two-element list {pitch, roll} in degrees.
      */
     @Override
     @LuaFunction
-    public List<Double> getAngles() {
+    public final List<Double> getAngles() {
         return super.getAngles();
     }
 
@@ -57,7 +65,7 @@ public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.
      */
     @Override
     @LuaFunction
-    public List<Double> getAnglesRad() {
+    public final List<Double> getAnglesRad() {
         return super.getAnglesRad();
     }
 
@@ -72,7 +80,7 @@ public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.
      * @return A three-element list {wx, wy, wz} in degrees/sec.
      */
     @LuaFunction
-    public List<Double> getAngularRates() {
+    public final List<Double> getAngularRates() {
         final Vector3dc w = ((GimbalSensorExt) this.blockEntity).getAngularVelocityBody();
         return List.of(Math.toDegrees(w.x()), Math.toDegrees(w.y()), Math.toDegrees(w.z()));
     }
@@ -84,7 +92,7 @@ public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.
      * @return A three-element list {wx, wy, wz} in radians/sec.
      */
     @LuaFunction
-    public List<Double> getAngularRatesRad() {
+    public final List<Double> getAngularRatesRad() {
         final Vector3dc w = ((GimbalSensorExt) this.blockEntity).getAngularVelocityBody();
         return List.of(w.x(), w.y(), w.z());
     }
@@ -107,7 +115,7 @@ public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.
      * @return A three-element list {gx, gy, gz} in m/s².
      */
     @LuaFunction
-    public List<Double> getGravity() {
+    public final List<Double> getGravity() {
         final Vector3dc g = ((GimbalSensorExt) this.blockEntity).getGravityBody();
         return List.of(g.x(), g.y(), g.z());
     }
@@ -132,7 +140,7 @@ public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.
      * @return A three-element list {ax, ay, az} in m/s².
      */
     @LuaFunction
-    public List<Double> getLinearAcceleration() {
+    public final List<Double> getLinearAcceleration() {
         final Vector3dc a = ((GimbalSensorExt) this.blockEntity).getLinearAccelerationBody();
         return List.of(a.x(), a.y(), a.z());
     }

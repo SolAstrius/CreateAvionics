@@ -35,7 +35,7 @@ public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngin
      * @return The active fuel's remaining burn time in ticks.
      */
     @LuaFunction
-    public int getBurnTime() {
+    public final int getBurnTime() {
         return this.blockEntity.getCurrentBurnTime();
     }
 
@@ -49,7 +49,7 @@ public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngin
      * @return The total remaining burn time in ticks.
      */
     @LuaFunction
-    public int getTotalBurnTime() {
+    public final int getTotalBurnTime() {
         return this.blockEntity.getTotalBurnTime();
     }
 
@@ -59,7 +59,7 @@ public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngin
      * @return True if superheated.
      */
     @LuaFunction
-    public boolean isSuperHeated() {
+    public final boolean isSuperHeated() {
         return this.blockEntity.isSuperHeated();
     }
 
@@ -69,7 +69,7 @@ public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngin
      * @return True if the active fuel is infinite.
      */
     @LuaFunction
-    public boolean isCurrentFuelInfinite() {
+    public final boolean isCurrentFuelInfinite() {
         return this.blockEntity.isCurrentFuelInfinite();
     }
 
@@ -79,7 +79,7 @@ public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngin
      * @return True if the total fuel is infinite.
      */
     @LuaFunction
-    public boolean isTotalFuelInfinite() {
+    public final boolean isTotalFuelInfinite() {
         return this.blockEntity.isTotalFuelInfinite();
     }
 
@@ -91,7 +91,7 @@ public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngin
      * @return True if lit.
      */
     @LuaFunction
-    public boolean isLit() {
+    public final boolean isLit() {
         return this.blockEntity.getBlockState().getValue(BlockStateProperties.LIT);
     }
 
@@ -104,7 +104,7 @@ public class PortableEnginePeripheral extends SimKineticPeripheral<PortableEngin
      * @return The generated speed.
      */
     @LuaFunction
-    public double getGeneratedSpeed() {
+    public final double getGeneratedSpeed() {
         return this.blockEntity.getGeneratedSpeed();
     }
 }

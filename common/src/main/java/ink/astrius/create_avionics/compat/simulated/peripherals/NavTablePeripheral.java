@@ -4,8 +4,12 @@ import dan200.computercraft.api.lua.LuaFunction;
 import dev.simulated_team.simulated.content.blocks.nav_table.NavTableBlockEntity;
 import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.NavigationTarget;
 import dev.simulated_team.simulated.index.SimRegistries;
+import ink.astrius.create_avionics.api.simulated.NavTableExt;
 import ink.astrius.create_avionics.api.simulated.NavigationTargetExt;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaterniondc;
 import org.joml.Vector3d;
@@ -15,7 +19,8 @@ import java.util.Map;
 
 /**
  * A navigation table. Reports the resolved target's bearing, distance, closure
- * rate, vertical offset, and the host sub-level's orientation/heading.
+ * rate, vertical offset, the held item's identity and name, and the host
+ * sub-level's orientation/heading.
  *
  * @cc.module navigation_table
  */
@@ -28,14 +33,14 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
     /**
      * Check whether the nav table has resolved a live target.
      * hasTarget reports whether the nav table has resolved a live target
-     * (currentTarget). getTargetType / getTargetMetadata describe the held
-     * nav-table item itself — these can be populated even when no target is
+     * (currentTarget). getTargetType / getTargetMetadata / getTargetName
+     * describe the held nav-table item itself — these can be populated even when no target is
      * locked yet, so hasTarget() == false does not imply getTargetType() == nil.
      *
      * @return True if a live target is resolved.
      */
     @LuaFunction
-    public boolean hasTarget() {
+    public final boolean hasTarget() {
         return this.blockEntity.currentTarget != null;
     }
 
@@ -45,13 +50,60 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The target type id, or nil if no item is held.
      */
     @LuaFunction
-    public String getTargetType() {
+    public final String getTargetType() {
         final NavigationTarget nti = this.blockEntity.getNavTableItem();
         if (nti == null) {
             return null;
         }
         final ResourceLocation key = SimRegistries.NAVIGATION_TARGET.getKey(nti);
         return key != null ? key.toString() : null;
+    }
+
+    /**
+     * Get the custom name of the held nav-table item.
+     * This is the name a player gave the item on an anvil, and it is the only
+     * human-readable identity a waypoint has. It matters for the items that
+     * carry a per-item destination: a lodestone-bound compass otherwise
+     * identifies itself only by a tracker UUID and a marked map only by a
+     * numeric id ({@link #getTargetMetadata}), while the Explorer's/Nature's
+     * Compass compat targets expose no metadata at all. The remaining types
+     * resolve to one fixed place — an unbound compass always points at world
+     * spawn — so a name on those is decoration. Nil for an item that was
+     * never renamed, so a display can fall back to
+     * {@link #getTargetDisplayName} or {@link #getTargetType}.
+     *
+     * @return The custom name as plain text, or nil if the item is unnamed or
+     *         nothing is held.
+     */
+    @LuaFunction
+    public final String getTargetName() {
+        final ItemStack held = this.blockEntity.getHeldItem();
+        if (held.isEmpty()) {
+            return null;
+        }
+        final Component custom = held.get(DataComponents.CUSTOM_NAME);
+        return custom != null ? custom.getString() : null;
+    }
+
+    /**
+     * Get the display name of the held nav-table item.
+     * The custom name when the item has one, otherwise the item's own name —
+     * so this is never nil while something is held. The fallback is resolved
+     * against whatever language table the server has loaded, which for a
+     * dedicated server is vanilla English only: a modded item with no custom
+     * name can come back as its raw translation key (e.g.
+     * {@code item.simulated.magnet}). Use {@link #getTargetName} when only a
+     * player-chosen label will do.
+     *
+     * @return The display name as plain text, or nil if nothing is held.
+     */
+    @LuaFunction
+    public final String getTargetDisplayName() {
+        final ItemStack held = this.blockEntity.getHeldItem();
+        if (held.isEmpty()) {
+            return null;
+        }
+        return held.getHoverName().getString();
     }
 
     /**
@@ -104,7 +156,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return A map of target-type-specific metadata, or an empty map.
      */
     @LuaFunction
-    public Map<String, Object> getTargetMetadata() {
+    public final Map<String, Object> getTargetMetadata() {
         final NavigationTarget nti = this.blockEntity.getNavTableItem();
         if (nti == null) {
             return Map.of();
@@ -119,7 +171,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      */
     @Override
     @LuaFunction
-    public Float getRelativeAngle() {
+    public final Float getRelativeAngle() {
         return super.getRelativeAngle();
     }
 
@@ -130,7 +182,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      */
     @Override
     @LuaFunction
-    public double getRelativeAngleRad() {
+    public final double getRelativeAngleRad() {
         return super.getRelativeAngleRad();
     }
 
@@ -144,7 +196,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The bearing in degrees, in [-180, 180].
      */
     @LuaFunction
-    public double getBearing() {
+    public final double getBearing() {
         final double raw = this.blockEntity.getRelativeAngle() - 90.0;
         return ((raw % 360.0) + 540.0) % 360.0 - 180.0;
     }
@@ -155,8 +207,74 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The bearing in radians.
      */
     @LuaFunction
-    public double getBearingRad() {
+    public final double getBearingRad() {
         return Math.toRadians(this.getBearing());
+    }
+
+    /**
+     * Get the range beyond which the held item's signal cuts off.
+     * Past this range the block stops emitting on every side and the needle
+     * carries no information -- which reads identically to being parked on the
+     * target, so a program that steers on bearing without checking range can
+     * chase a dead needle. Upstream spells "no limit" as a max range of zero;
+     * this reports {@code math.huge} for that case instead, so the value is
+     * always directly comparable against a distance.
+     * <p>
+     * The two most common items are the unlimited ones: both
+     * {@code simulated:compass} and {@code simulated:map} declare no cutoff,
+     * while everything else takes the 200-block default. So neither "always
+     * 200" nor "always unlimited" is a safe assumption to hardcode.
+     * <p>
+     * The cutoff upstream applies is measured in the plane perpendicular to
+     * the block's facing, not along the 3D distance
+     * {@link #getDistanceToTarget} reports, so treat this as the target type's
+     * declared limit rather than an exact predictor of the block's redstone.
+     *
+     * @return The range limit in blocks, {@code math.huge} if the type has
+     *         none, or nil if no item is held.
+     */
+    @LuaFunction
+    public final Double getMaxRange() {
+        final NavigationTarget nti = this.blockEntity.getNavTableItem();
+        if (nti == null) {
+            return null;
+        }
+        final float max = nti.getMaxRange();
+        return max > 0 ? (double) max : Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Get the rate at which the bearing to the target is changing.
+     * Positive = the target is drifting to the right of the block's arrow.
+     * This is the intercept signal: with the target ahead and closing, a
+     * bearing rate near zero means the current course arrives at it, while a
+     * steady non-zero rate means the course misses by a margin that only grows
+     * as range falls. Differenced once per server tick, which is the cadence
+     * at which the table itself recomputes the angle, and wrapped across the
+     * +/-180 seam so a needle sweeping past dead astern does not read as a
+     * full turn the other way.
+     * <p>
+     * Zero when no target is resolved, and for one tick after the held item
+     * changes -- a swap re-aims the needle instantly, and that jump is not
+     * motion of the vehicle. The value grows without bound as range goes to
+     * zero (bearing is undefined at the target itself), so gate on
+     * {@link #getDistanceToTarget} before steering on it near arrival.
+     *
+     * @return The bearing rate in degrees/sec.
+     */
+    @LuaFunction
+    public final double getBearingRate() {
+        return ((NavTableExt) this.blockEntity).getBearingRate();
+    }
+
+    /**
+     * Get the rate at which the bearing to the target is changing, in radians.
+     *
+     * @return The bearing rate in radians/sec.
+     */
+    @LuaFunction
+    public final double getBearingRateRad() {
+        return Math.toRadians(((NavTableExt) this.blockEntity).getBearingRate());
     }
 
     /**
@@ -167,7 +285,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The distance in blocks (= meters in Minecraft units).
      */
     @LuaFunction
-    public double getDistanceToTarget() {
+    public final double getDistanceToTarget() {
         return this.blockEntity.distanceToTarget();
     }
 
@@ -180,7 +298,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The closure rate in blocks/sec (positive = approaching).
      */
     @LuaFunction
-    public double getClosureRate() {
+    public final double getClosureRate() {
         return (this.blockEntity.lastDistanceToTarget() - this.blockEntity.distanceToTarget()) / (11.0 / 20.0);
     }
 
@@ -193,7 +311,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The signed vertical offset {@code target.y - self.y} in blocks.
      */
     @LuaFunction
-    public double getVerticalOffsetToTarget() {
+    public final double getVerticalOffsetToTarget() {
         final Vec3 target = this.blockEntity.getTargetPosition(true);
         if (target == null) {
             return 0.0;
@@ -209,7 +327,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return A four-element list {x, y, z, w}.
      */
     @LuaFunction
-    public List<Double> getOrientation() {
+    public final List<Double> getOrientation() {
         final Quaterniondc q = this.blockEntity.getSublevelRot();
         return List.of(q.x(), q.y(), q.z(), q.w());
     }
@@ -222,7 +340,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The heading in degrees.
      */
     @LuaFunction
-    public double getHeading() {
+    public final double getHeading() {
         return Math.toDegrees(this.computeHeadingRad());
     }
 
@@ -232,7 +350,7 @@ public class NavTablePeripheral extends dev.simulated_team.simulated.compat.comp
      * @return The heading in radians.
      */
     @LuaFunction
-    public double getHeadingRad() {
+    public final double getHeadingRad() {
         return this.computeHeadingRad();
     }
 
