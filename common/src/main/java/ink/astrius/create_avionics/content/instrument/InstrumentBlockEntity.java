@@ -91,6 +91,14 @@ public class InstrumentBlockEntity extends BlockEntity {
         this.setChanged();
     }
 
+    /** The unit of {@link #value()}: the almanac counts lunar cycles where there is no season calendar. */
+    public String unit() {
+        if (this.instrument == Instrument.ALMANAC && this.date.season().isEmpty()) {
+            return "moon";
+        }
+        return this.instrument.unit();
+    }
+
     /** Dial position 0..1 of the latest sample. */
     public double normalized() {
         return this.instrument.normalize(this.value);

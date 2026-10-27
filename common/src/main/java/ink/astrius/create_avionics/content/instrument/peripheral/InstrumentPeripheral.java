@@ -15,7 +15,7 @@ import java.util.Map;
  * <p>
  * Units by peripheral type: {@code thermometer} degrees Celsius, {@code hygrometer} relative humidity
  * 0..1, {@code barometer} hectopascals, {@code rain_gauge} millimetres per hour,
- * {@code almanac} fraction of the year 0..1.
+ * {@code almanac} fraction of the year 0..1 (or of the lunar cycle without seasons).
  *
  * @cc.module instrument
  */
@@ -58,11 +58,13 @@ public class InstrumentPeripheral implements IPeripheral {
     /**
      * Get the unit readings are in.
      *
-     * @return {@code "C"}, {@code "rh"}, {@code "hPa"}, {@code "mm/h"} or {@code "year"}.
+     * @return {@code "C"}, {@code "rh"}, {@code "hPa"}, {@code "mm/h"}, or for the almanac
+     * {@code "year"} (fraction of the season year) or {@code "moon"} (fraction of the lunar cycle,
+     * where there is no season calendar).
      */
     @LuaFunction
     public final String getUnit() {
-        return this.blockEntity.instrument().unit();
+        return this.blockEntity.unit();
     }
 
     /**
@@ -76,7 +78,7 @@ public class InstrumentPeripheral implements IPeripheral {
     public final Map<String, Object> read() {
         return Map.of(
                 "value", this.blockEntity.value(),
-                "unit", this.blockEntity.instrument().unit(),
+                "unit", this.blockEntity.unit(),
                 "time", this.blockEntity.sampledAt(),
                 "source", this.blockEntity.source()
         );
