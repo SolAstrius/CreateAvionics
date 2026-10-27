@@ -1,0 +1,58 @@
+{
+  "textures": {
+    "sheet": "create_avionics:block/thermometer",
+    "particle": "create_avionics:block/thermometer"
+  },
+  "elements": [
+    {
+      "from": [
+        7.5,
+        5,
+        5.9
+      ],
+      "to": [
+        8.5,
+        13,
+        6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#sheet",
+          "uv": [
+            9.5,
+            0.0,
+            10.0,
+            4.0
+          ]
+        },
+        "east": {
+          "texture": "#sheet",
+          "uv": [
+            10.0,
+            0.0,
+            10.5,
+            4.0
+          ]
+        },
+        "west": {
+          "texture": "#sheet",
+          "uv": [
+            10.0,
+            0.0,
+            10.5,
+            4.0
+          ]
+        },
+        "up": {
+          "texture": "#sheet",
+          "uv": [
+            13.0,
+            6.5,
+            13.5,
+            7.0
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "textures": {
+    "sheet": "create_avionics:block/hygrometer",
+    "particle": "create_avionics:block/hygrometer"
+  },
+  "elements": [
+    {
+      "from": [
+        7.5,
+        4,
+        5.8
+      ],
+      "to": [
+        8.5,
+        7.5,
+        6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#sheet",
+          "uv": [
+            9.0,
+            0.0,
+            9.5,
+            2.0
+          ]
+        },
+        "east": {
+          "texture": "#sheet",
+          "uv": [
+            9.5,
+            0.0,
+            10.0,
+            2.0
+          ]
+        },
+        "west": {
+          "texture": "#sheet",
+          "uv": [
+            9.5,
+            0.0,
+            10.0,
+            2.0
+          ]
+        },
+        "up": {
+          "texture": "#sheet",
+          "uv": [
+            1.0,
+            6.0,
+            1.5,
+            6.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        3.5,
+        5.6
+      ],
+      "to": [
+        9,
+        4.5,
+        6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#sheet",
+          "uv": [
+            15.0,
+            0.0,
+            16.0,
+            0.5
+          ]
+        },
+        "east": {
+          "texture": "#sheet",
+          "uv": [
+            1.5,
+            6.0,
+            2.0,
+            6.5
+          ]
+        },
+        "west": {
+          "texture": "#sheet",
+          "uv": [
+            1.5,
+            6.0,
+            2.0,
+            6.5
+          ]
+        },
+        "up": {
+          "texture": "#sheet",
+          "uv": [
+            0.0,
+            6.0,
+            1.0,
+            6.5
+          ]
+        }
+      }
+    }
+  ]
+}
