@@ -15,8 +15,7 @@ local fwd = peripheral.wrap("ship_velocity_sensor_forward_0")
 print(alt.getHeight(), fwd.getVelocity())
 ```
 
-On the ground a controller bridges nothing; it is then only a peripheral of its
-own (see [Transponder](#transponder)).
+On the ground a controller bridges nothing.
 
 ## What is bridged
 
@@ -26,8 +25,9 @@ tanks, clutches and gearshifts. These are left out:
 
 - **Computers, turtles and modems.** They network themselves; bridging them would
   loop the network or show a computer to itself.
-- **Other avionics controllers.** Each is already on the network it serves, and the
-  transponder is ship-wide, so one is enough.
+- **The controllers themselves,** except once: the ship's controller appears as
+  `ship_avionics_controller`, without a number, whichever controller publishes.
+  It is the [transponder](#transponder) switch, and that is ship-wide.
 - **Blocks tagged `create_avionics:not_bridged`.** Shafts, cogwheels, gearboxes,
   encased shafts, chain drives, belts and chain conveyors: pure transmission, with
   nothing useful to ask and hundreds of them on a large ship. Packs can add to the
@@ -106,7 +106,7 @@ off, the ship shows up as an unidentified contact. The name is the ship's own
 name, or a six-letter code from its id when it has none.
 
 Hit the controller's top (the antenna) with a wrench to switch the transponder, or
-use the controller's peripheral:
+use `ship_avionics_controller` from any computer on the ship:
 
 ```lua
 local controller = peripheral.find("avionics_controller")

@@ -58,6 +58,8 @@ public class ShipBridge implements WiredElement {
     private final Set<WiredNode> peers = new HashSet<>();
     /** Ship peripheral names by block position; saved with the controller so they survive reloads. */
     private final Map<BlockPos, String> names = new HashMap<>();
+    /** The publishing controller's own peripheral (the transponder switch), the same name on every ship. */
+    public static final String CONTROLLER_NAME = "ship_avionics_controller";
     /** The bow the position names were given under; null for names saved before it was recorded. */
     private @Nullable Direction namedFor;
     /** The ship's extent, for position names; set on each publish. */
@@ -219,6 +221,8 @@ public class ShipBridge implements WiredElement {
                 out.put(name, keep.get(f.blockEntity()));
             }
         }
+        // The transponder switch is ship-wide, so the ship has one, whichever controller publishes
+        out.put(CONTROLLER_NAME, this.owner.peripheral());
         return out;
     }
 
@@ -322,8 +326,8 @@ public class ShipBridge implements WiredElement {
 
     /**
      * Modems, computers and turtles network themselves (bridging them would loop or mirror a
-     * computer to itself), controllers are already on the network they publish to (and the
-     * transponder is ship-wide, so one is enough), and blocks tagged
+     * computer to itself), controllers are published once as {@link #CONTROLLER_NAME} (the
+     * transponder is ship-wide, so which one leads mustn't change what computers see), and blocks tagged
      * {@code create_avionics:not_bridged} are pure transmission.
      */
     private static boolean bridgeable(final ShipScan.Found found) {
