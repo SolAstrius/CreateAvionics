@@ -72,3 +72,21 @@ type="optional"
 versionRange="[${offroad_mod_version},)"
 ordering="AFTER"
 side="BOTH"
+
+# Instrument data sources: used when present, vanilla estimates otherwise
+[[dependencies.${mod_id}]]
+modId="thermoo"
+type="optional"
+versionRange="[4.8,)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="sereneseasons"
+type="optional"
+versionRange="[10.1,)"
+ordering="AFTER"
+side="BOTH"
+
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"

@@ -1,0 +1,8 @@
+{
+  "itemGroup.create_avionics": "Create: Avionics",
+  "block.create_avionics.thermometer": "Термометр",
+  "block.create_avionics.hygrometer": "Гигрометр",
+  "block.create_avionics.barometer": "Барометр",
+  "block.create_avionics.rain_gauge": "Осадкомер",
+  "block.create_avionics.almanac": "Альманах"
+}
