@@ -4,5 +4,6 @@
   "block.create_avionics.hygrometer": "Hygrometer",
   "block.create_avionics.barometer": "Barometer",
   "block.create_avionics.rain_gauge": "Rain Gauge",
-  "block.create_avionics.almanac": "Almanac"
+  "block.create_avionics.almanac": "Almanac",
+  "block.create_avionics.avionics_controller": "Avionics Controller"
 }

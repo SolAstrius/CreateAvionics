@@ -4,5 +4,6 @@
   "block.create_avionics.hygrometer": "Гигрометр",
   "block.create_avionics.barometer": "Барометр",
   "block.create_avionics.rain_gauge": "Осадкомер",
-  "block.create_avionics.almanac": "Альманах"
+  "block.create_avionics.almanac": "Альманах",
+  "block.create_avionics.avionics_controller": "Бортовой контроллер"
 }

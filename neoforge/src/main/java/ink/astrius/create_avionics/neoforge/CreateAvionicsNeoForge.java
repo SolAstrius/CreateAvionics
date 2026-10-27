@@ -10,6 +10,8 @@ import ink.astrius.create_avionics.api.create.GantryShaftExt;
 import ink.astrius.create_avionics.api.create.LinearActuatorExt;
 import ink.astrius.create_avionics.api.create.MechanicalBearingExt;
 import ink.astrius.create_avionics.compat.cc.PeripheralComposition;
+import ink.astrius.create_avionics.content.controller.Controllers;
+import ink.astrius.create_avionics.content.controller.ShipScan;
 import ink.astrius.create_avionics.content.instrument.Instrument;
 import ink.astrius.create_avionics.content.instrument.InstrumentSources;
 import ink.astrius.create_avionics.content.instrument.Instruments;
@@ -36,7 +38,10 @@ public class CreateAvionicsNeoForge {
                     .title(Component.translatable("itemGroup." + CreateAvionics.MOD_ID))
                     .icon(() -> Instruments.BLOCKS_BY_INSTRUMENT.get(Instrument.BAROMETER).toStack())
                     .withTabsBefore(ResourceLocation.fromNamespaceAndPath("create", "palettes"))
-                    .displayItems((parameters, output) -> Instruments.BLOCKS_BY_INSTRUMENT.values().forEach(output::accept))
+                    .displayItems((parameters, output) -> {
+                        output.accept(Controllers.BLOCK.get());
+                        Instruments.BLOCKS_BY_INSTRUMENT.values().forEach(output::accept);
+                    })
                     .build());
 
     public CreateAvionicsNeoForge(final IEventBus bus) {
@@ -45,6 +50,8 @@ public class CreateAvionicsNeoForge {
         InstrumentSources.sereneSeasons = ModList.get().isLoaded("sereneseasons");
         InstrumentSources.downfall = biome -> biome.getModifiedClimateSettings().downfall();
         Instruments.registers().forEach(register -> register.register(bus));
+        Controllers.registers().forEach(register -> register.register(bus));
+        ShipScan.lookup = (level, pos) -> level.getCapability(PeripheralCapability.get(), pos, null);
         TABS.register(bus);
         bus.addListener(CreateAvionicsNeoForge::registerCapabilities);
     }
