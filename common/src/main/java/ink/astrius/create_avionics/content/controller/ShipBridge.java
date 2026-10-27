@@ -4,6 +4,7 @@ import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.network.wired.WiredNode;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -22,8 +23,8 @@ import java.util.Set;
 /**
  * The controller's place on a ComputerCraft wired network. Cables and modems connect to it like
  * to any wired block, and the network then sees the ship's peripherals as if each were cabled
- * in: the same peripheral objects, under {@code type_N} names numbered by position on the ship,
- * so every controller on the ship would publish the same names.
+ * in: the same peripheral objects and types, under {@code ship_<type>_<n>} names that stay with
+ * each block. Velocity sensors are named by role instead, e.g. {@code ship_velocity_sensor_forward}.
  * <p>
  * Only one controller per ship publishes (see {@link ShipControllers}); the rest join its
  * network and stand by, so a computer on any of them reaches the whole ship.
@@ -44,6 +45,8 @@ public class ShipBridge implements WiredElement {
     /** Peripheral objects handed to CC, kept per block entity so a rescan doesn't swap them. */
     private final Map<BlockEntity, IPeripheral> stable = new HashMap<>();
     private final Set<WiredNode> peers = new HashSet<>();
+    /** Ship peripheral names by block position; saved with the controller so they survive reloads. */
+    private final Map<BlockPos, String> names = new HashMap<>();
 
     public ShipBridge(final AvionicsControllerBlockEntity owner) {
         this.owner = owner;
@@ -110,37 +113,117 @@ public class ShipBridge implements WiredElement {
         this.peers.addAll(now);
     }
 
-    /** Publish the ship's peripherals, or nothing when another controller is publishing. */
-    public void publish(final List<ShipScan.Found> found, final boolean leader) {
-        final Map<String, IPeripheral> next = leader ? this.names(found) : Map.of();
+    /**
+     * Publish the ship's peripherals. Only the leader may call this: CC removes a withdrawn name
+     * from the whole network whichever node published it, so the leader first makes every other
+     * controller {@link #standDown}, then publishes.
+     */
+    public void publish(final List<ShipScan.Found> found) {
+        this.update(this.assign(found));
+    }
+
+    /** Withdraw everything this controller published; it now stands by and mirrors the leader's names. */
+    public void standDown(final Map<BlockPos, String> leaderNames) {
+        this.names.clear();
+        this.names.putAll(leaderNames);
+        this.update(Map.of());
+    }
+
+    /** Names this controller assigned (as leader) or mirrors (standing by), by block position. */
+    public Map<BlockPos, String> names() {
+        return this.names;
+    }
+
+    private void update(final Map<String, IPeripheral> next) {
         if (!next.equals(this.published)) {
             this.published = next;
             this.getNode().updatePeripherals(next);
+            this.owner.setChanged();
         }
     }
 
-    private Map<String, IPeripheral> names(final List<ShipScan.Found> found) {
-        // Reuse the objects CC already has; only a replaced block gets a new one
+    /**
+     * Give every bridgeable peripheral a name. A block keeps its name for as long as it stays on
+     * the ship; a new one takes the lowest free number for its type. Names carry a {@code ship_}
+     * prefix so they can't collide with the names CC gives modem-shared peripherals.
+     */
+    private Map<String, IPeripheral> assign(final List<ShipScan.Found> found) {
         final Map<BlockEntity, IPeripheral> keep = new HashMap<>();
-        final Map<String, List<IPeripheral>> byType = new LinkedHashMap<>();
+        final Map<BlockPos, String> kept = new HashMap<>();
+        final List<ShipScan.Found> fresh = new ArrayList<>();
+        final Set<String> taken = new HashSet<>();
         for (final ShipScan.Found f : found) {
-            // A ship's own modems already make their own networks; bridging them would loop
-            if ("modem".equals(f.peripheral().getType())) {
+            if (!bridgeable(f.peripheral())) {
                 continue;
             }
-            final IPeripheral peripheral = this.stable.getOrDefault(f.blockEntity(), f.peripheral());
-            keep.put(f.blockEntity(), peripheral);
-            byType.computeIfAbsent(peripheral.getType(), t -> new ArrayList<>()).add(peripheral);
+            // Reuse the objects CC already has; only a replaced block gets a new one
+            keep.put(f.blockEntity(), this.stable.getOrDefault(f.blockEntity(), f.peripheral()));
+            final String old = this.names.get(f.pos());
+            final String base = this.base(f.peripheral());
+            if (old != null && (old.equals(base) || old.startsWith(base + "_"))) {
+                kept.put(f.pos(), old);
+                taken.add(old);
+            } else {
+                fresh.add(f);
+            }
+        }
+        for (final ShipScan.Found f : fresh) {
+            final String base = this.base(f.peripheral());
+            final boolean role = f.peripheral() instanceof VelocitySensorPeripheral;
+            int n = 0;
+            while (taken.contains(numbered(base, n, role))) {
+                n++;
+            }
+            final String name = numbered(base, n, role);
+            kept.put(f.pos(), name);
+            taken.add(name);
         }
         this.stable.clear();
         this.stable.putAll(keep);
-        final Map<String, IPeripheral> names = new LinkedHashMap<>();
-        byType.forEach((type, list) -> {
-            for (int i = 0; i < list.size(); i++) {
-                names.put(type + "_" + i, list.get(i));
+        this.names.clear();
+        this.names.putAll(kept);
+
+        final Map<String, IPeripheral> out = new LinkedHashMap<>();
+        for (final ShipScan.Found f : found) {
+            final String name = kept.get(f.pos());
+            if (name != null) {
+                out.put(name, keep.get(f.blockEntity()));
             }
-        });
-        return names;
+        }
+        return out;
+    }
+
+    /**
+     * The name a peripheral is numbered under: {@code ship_<type>}, except velocity sensors, which
+     * are named by the axis they measure relative to the controller's facing:
+     * {@code ship_velocity_sensor_forward}, {@code _vertical} or {@code _lateral}.
+     */
+    private String base(final IPeripheral peripheral) {
+        if (peripheral instanceof final VelocitySensorPeripheral velocity) {
+            final Direction.Axis axis = Direction.Axis.byName(velocity.getAxis());
+            final Direction forward = this.owner.forward();
+            final String role = axis == Direction.Axis.Y ? "vertical" : axis == forward.getAxis() ? "forward" : "lateral";
+            return "ship_" + peripheral.getType() + "_" + role;
+        }
+        return "ship_" + peripheral.getType();
+    }
+
+    /** Role names start bare ({@code _forward}, then {@code _forward_1}); others count from {@code _0}. */
+    private static String numbered(final String base, final int n, final boolean role) {
+        return role && n == 0 ? base : base + "_" + n;
+    }
+
+    /** Modems, computers and turtles network themselves; bridging them would loop or mirror a computer to itself. */
+    private static boolean bridgeable(final IPeripheral peripheral) {
+        return switch (peripheral.getType()) {
+            case "modem", "computer", "turtle" -> false;
+            default -> true;
+        };
+    }
+
+    public void loadNames(final Map<BlockPos, String> saved) {
+        this.names.clear();
+        this.names.putAll(saved);
     }
 
     /** Leave the network: called when the controller is removed or unloaded. */

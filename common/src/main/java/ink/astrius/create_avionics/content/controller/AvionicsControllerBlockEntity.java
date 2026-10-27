@@ -2,6 +2,10 @@ package ink.astrius.create_avionics.content.controller;
 
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -9,7 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.UUID;
 
@@ -85,13 +91,54 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         this.bridge.connectNeighbours();
         if (now == null) {
             this.bridge.linkPeers(List.of());
-            this.bridge.publish(List.of(), false);
+            this.bridge.standDown(Map.of());
             return;
         }
         ShipControllers.join(now, this);
         final List<AvionicsControllerBlockEntity> peers = ShipControllers.on(now);
         this.bridge.linkPeers(peers);
-        this.bridge.publish(this.found, !peers.isEmpty() && peers.get(0) == this);
+        final AvionicsControllerBlockEntity leader = peers.get(0);
+        if (leader != this) {
+            // The leader publishes; make sure this one isn't, and keep a copy of its names
+            this.bridge.standDown(leader.bridge().names());
+            return;
+        }
+        // CC drops a withdrawn name network-wide, so the others step down before this publishes
+        for (final AvionicsControllerBlockEntity other : peers) {
+            if (other != this) {
+                other.bridge().standDown(this.bridge.names());
+            }
+        }
+        this.bridge.publish(this.found);
+        for (final AvionicsControllerBlockEntity other : peers) {
+            if (other != this) {
+                other.bridge().loadNames(this.bridge.names());
+            }
+        }
+    }
+
+    @Override
+    protected void saveAdditional(final CompoundTag tag, final HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        final ListTag names = new ListTag();
+        this.bridge.names().forEach((pos, name) -> {
+            final CompoundTag entry = new CompoundTag();
+            entry.putLong("Pos", pos.asLong());
+            entry.putString("Name", name);
+            names.add(entry);
+        });
+        tag.put("PeripheralNames", names);
+    }
+
+    @Override
+    protected void loadAdditional(final CompoundTag tag, final HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        final Map<BlockPos, String> names = new HashMap<>();
+        for (final Tag t : tag.getList("PeripheralNames", Tag.TAG_COMPOUND)) {
+            final CompoundTag entry = (CompoundTag) t;
+            names.put(BlockPos.of(entry.getLong("Pos")), entry.getString("Name"));
+        }
+        this.bridge.loadNames(names);
     }
 
     private void leaveShip() {
