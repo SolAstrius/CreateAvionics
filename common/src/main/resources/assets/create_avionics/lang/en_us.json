@@ -8,7 +8,7 @@
   "block.create_avionics.avionics_controller": "Avionics Controller",
   "create_avionics.controller.bow_set": "Ship's bow set: the way this controller faces",
   "create_avionics.controller.bow_followed": "Following the ship's bow: see the arrow on top",
-  "create_avionics.controller.bow_changed": "Ship's bow moved to this controller's facing",
+  "create_avionics.controller.bow_changed": "Ship's bow moved to this controller's facing; peripheral names follow it",
   "block.create_avionics.radar_mk1": "Radar Mk.1",
   "create_avionics.controller.transponder_on": "Transponder on: radars can identify this ship",
   "create_avionics.controller.transponder_off": "Transponder off: radio silence"

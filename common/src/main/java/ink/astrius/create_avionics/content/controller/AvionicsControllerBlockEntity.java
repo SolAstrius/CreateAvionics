@@ -156,7 +156,7 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         this.bridge.connectNeighbours();
         if (now == null) {
             this.bridge.linkPeers(List.of());
-            this.bridge.standDown(Map.of());
+            this.bridge.standDown(Map.of(), null);
             return;
         }
         ShipControllers.join(now, this);
@@ -166,14 +166,14 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         final AvionicsControllerBlockEntity leader = peers.get(0);
         if (leader != this) {
             // The leader publishes; make sure this one isn't, and keep a copy of its names
-            this.bridge.standDown(leader.bridge().names());
+            this.bridge.standDown(leader.bridge().names(), leader.bridge().namedFor());
             return;
         }
         // A controller that just became leader starts from the names the ship already uses
         if (this.bridge.names().isEmpty()) {
             for (final AvionicsControllerBlockEntity other : peers) {
                 if (other != this && !other.bridge().names().isEmpty()) {
-                    this.bridge.loadNames(other.bridge().names());
+                    this.bridge.loadNames(other.bridge().names(), other.bridge().namedFor());
                     break;
                 }
             }
@@ -181,13 +181,13 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         // CC drops a withdrawn name network-wide, so the others step down before this publishes
         for (final AvionicsControllerBlockEntity other : peers) {
             if (other != this) {
-                other.bridge().standDown(this.bridge.names());
+                other.bridge().standDown(this.bridge.names(), this.bridge.namedFor());
             }
         }
         this.bridge.publish(this.found, subLevel.getPlot().getBoundingBox());
         for (final AvionicsControllerBlockEntity other : peers) {
             if (other != this) {
-                other.bridge().loadNames(this.bridge.names());
+                other.bridge().loadNames(this.bridge.names(), this.bridge.namedFor());
             }
         }
     }
@@ -203,6 +203,9 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
             names.add(entry);
         });
         tag.put("PeripheralNames", names);
+        if (this.bridge.namedFor() != null) {
+            tag.putString("NamedFor", this.bridge.namedFor().getSerializedName());
+        }
         if (this.bow != null) {
             tag.putString("Bow", this.bow.getSerializedName());
             tag.putLong("BowSetAt", this.bowSetAt);
@@ -217,7 +220,7 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
             final CompoundTag entry = (CompoundTag) t;
             names.put(BlockPos.of(entry.getLong("Pos")), entry.getString("Name"));
         }
-        this.bridge.loadNames(names);
+        this.bridge.loadNames(names, tag.contains("NamedFor") ? Direction.byName(tag.getString("NamedFor")) : null);
         this.bow = tag.contains("Bow") ? Direction.byName(tag.getString("Bow")) : null;
         this.bowSetAt = tag.contains("BowSetAt") ? tag.getLong("BowSetAt") : Long.MIN_VALUE;
     }

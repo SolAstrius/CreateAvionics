@@ -58,6 +58,8 @@ public class ShipBridge implements WiredElement {
     private final Set<WiredNode> peers = new HashSet<>();
     /** Ship peripheral names by block position; saved with the controller so they survive reloads. */
     private final Map<BlockPos, String> names = new HashMap<>();
+    /** The bow the position names were given under; null for names saved before it was recorded. */
+    private @Nullable Direction namedFor;
     /** The ship's extent, for position names; set on each publish. */
     private @Nullable BoundingBox3ic bounds;
 
@@ -146,14 +148,19 @@ public class ShipBridge implements WiredElement {
     }
 
     /** Withdraw everything this controller published; it now stands by and mirrors the leader's names. */
-    public void standDown(final Map<BlockPos, String> leaderNames) {
-        this.loadNames(leaderNames);
+    public void standDown(final Map<BlockPos, String> leaderNames, final @Nullable Direction leaderNamedFor) {
+        this.loadNames(leaderNames, leaderNamedFor);
         this.update(Map.of());
     }
 
     /** Names this controller assigned (as leader) or mirrors (standing by), by block position. */
     public Map<BlockPos, String> names() {
         return this.names;
+    }
+
+    /** The bow the position names were given under. */
+    public @Nullable Direction namedFor() {
+        return this.namedFor;
     }
 
     private void update(final Map<String, IPeripheral> next) {
@@ -203,6 +210,7 @@ public class ShipBridge implements WiredElement {
         this.stable.putAll(keep);
         this.names.clear();
         this.names.putAll(kept);
+        this.namedFor = this.owner.forward();
 
         final Map<String, IPeripheral> out = new LinkedHashMap<>();
         for (final ShipScan.Found f : found) {
@@ -278,10 +286,14 @@ public class ShipBridge implements WiredElement {
 
     /**
      * Whether a block may keep the name it has. Position names stay put when the ship grows (the
-     * block hasn't moved, only the hull around it); every other name must still match the role.
+     * block hasn't moved, only the hull around it) but are zoned again when the bow changes, since
+     * fore, aft, port and starboard now mean other places; every other name must still match the role.
      */
     private boolean stillFits(final ShipScan.Found found, final String old, final String base) {
         if (found.blockEntity().getBlockState().is(NAMED_BY_POSITION)) {
+            if (this.namedFor != null && this.namedFor != this.owner.forward()) {
+                return false;
+            }
             final String type = "ship_" + found.peripheral().getType();
             return old.matches(Pattern.quote(type) + "(_fore|_aft)?(_port|_starboard)?_\\d+");
         }
