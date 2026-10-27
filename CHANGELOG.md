@@ -37,6 +37,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `getTargetDisplayName` falls back to the item's own name so a readout always
   has something to print ([#28]).
 
+### Docs
+
+- `propeller_bearing.getRotationSpeed` and `getAngularSpeed` said only "the
+  rotation speed" and "the angular speed" ([#29]). Both are degrees per tick,
+  and both report the propeller's actual speed, not the shaft's: it eases
+  towards the input by `0.4 / sqrt(sailPower)` of the difference each tick, so
+  bigger propellers spin up and down more slowly. The docs now give the unit,
+  the conversion to RPM, the 76.8 that a fully spun-up propeller reads at
+  Create's default maximum, and what happens unassembled and mid-disassembly.
+  From a computer the two functions always return the same value; the
+  difference upstream is confined to the bearing's own tick and to rendering.
+- `getSpeed` on kinetic peripherals now states its unit (RPM, signed) and that
+  it is the network's speed, which inertial blocks may lag.
+
 ## [0.6.0] - 2026-09-01
 
 ### Added
@@ -385,6 +399,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#18]: https://github.com/SolAstrius/CreateAvionics/issues/18
 [#22]: https://github.com/SolAstrius/CreateAvionics/issues/22
 [#28]: https://github.com/SolAstrius/CreateAvionics/issues/28
+[#29]: https://github.com/SolAstrius/CreateAvionics/issues/29
 
 [Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...v0.6.0

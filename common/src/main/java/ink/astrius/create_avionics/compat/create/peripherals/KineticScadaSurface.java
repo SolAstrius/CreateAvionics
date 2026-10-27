@@ -82,8 +82,11 @@ public interface KineticScadaSurface {
     /**
      * Get the local rotational speed at this block.
      * Signed; same value across a speed zone, changes across a split-shaft.
+     * This is the network's speed, which takes effect instantly; blocks with
+     * inertia of their own (such as a propeller bearing) may lag behind it.
      *
-     * @return The local speed.
+     * @return The local speed in RPM; the sign is the direction of rotation.
+     * Bounded by Create's {@code maxRotationSpeed} config (256 by default).
      */
     @LuaFunction
     default double getSpeed() {
