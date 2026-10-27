@@ -76,6 +76,14 @@ public class RadarBlockEntity extends BlockEntity {
     }
 
     private void sweep(final Level level) {
+        final int signal = this.comparatorSignal();
+        this.cast(level);
+        if (this.comparatorSignal() != signal) {
+            level.updateNeighbourForOutputSignal(this.worldPosition, this.getBlockState().getBlock());
+        }
+    }
+
+    private void cast(final Level level) {
         final Direction facing = this.facing();
         final Vec3 normal = Vec3.atLowerCornerOf(facing.getNormal());
         // Start just outside the radar's face so it doesn't see itself
