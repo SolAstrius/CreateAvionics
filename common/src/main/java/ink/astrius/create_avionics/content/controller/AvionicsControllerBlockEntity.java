@@ -1,6 +1,11 @@
 package ink.astrius.create_avionics.content.controller;
 
+import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import ink.astrius.create_avionics.content.radio.Airwaves;
+import ink.astrius.create_avionics.content.radio.Identity;
+import ink.astrius.create_avionics.content.radio.Receiver;
+import ink.astrius.create_avionics.content.radio.Station;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
@@ -14,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -26,10 +32,16 @@ import java.util.UUID;
  * Keeps track of the ship the controller is on: rescans it for sensors every couple of seconds.
  * The channels are for gauges, which can't combine sensor readings themselves; computers get
  * the sensors directly instead, through the controller's wired bridge, and do their own maths.
+ * <p>
+ * It is also the ship's radio: it always listens, and while the transponder is on the ship's
+ * leading controller broadcasts the ship's report. Callsign, squawk and power are the ship's,
+ * kept like the bow: a copy on every controller with the time it was set, the newest wins.
  */
-public class AvionicsControllerBlockEntity extends BlockEntity {
+public class AvionicsControllerBlockEntity extends BlockEntity implements Station {
 
     public static final int SCAN_INTERVAL = 40;
+    public static final double DEFAULT_POWER = 30;
+    public static final double MAX_POWER = 40;
 
     private final ShipBridge bridge = new ShipBridge(this);
     private @Nullable Direction bow;
@@ -41,6 +53,17 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
     private @Nullable UUID ship;
     private List<ShipScan.Found> found = List.of();
     private volatile ChannelMap channels = new ChannelMap(List.of(), Direction.NORTH);
+    /** Null until set: the ship's own name or id code stands in. */
+    private volatile @Nullable String callsign;
+    private volatile String squawk = Identity.DEFAULT_SQUAWK;
+    private volatile double power = DEFAULT_POWER;
+    private long radioSetAt = Long.MIN_VALUE;
+    private final Receiver receiver = new Receiver((event, sign) -> {
+        if (this.peripheral != null) {
+            this.peripheral.queue(event, sign);
+        }
+    });
+    private boolean onAir;
 
     public AvionicsControllerBlockEntity(final BlockPos pos, final BlockState state) {
         super(Controllers.BLOCK_ENTITY.get(), pos, state);
@@ -97,6 +120,83 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         }
     }
 
+    /** The callsign this ship sends: the one set, else the ship's name or id code; null on the ground until set. */
+    public @Nullable String callsign() {
+        if (this.callsign != null) {
+            return this.callsign;
+        }
+        final SubLevel subLevel = ShipScan.shipOf(this);
+        return subLevel == null ? null : Identity.defaultCallsign(subLevel.getUniqueId(), subLevel.getName());
+    }
+
+    public String squawk() {
+        return this.squawk;
+    }
+
+    public double power() {
+        return this.power;
+    }
+
+    public void setShipCallsign(final String callsign) {
+        this.setShipRadio(callsign, this.squawk, this.power);
+    }
+
+    public void setShipSquawk(final String squawk) {
+        this.setShipRadio(this.callsign, squawk, this.power);
+    }
+
+    public void setShipPower(final double power) {
+        this.setShipRadio(this.callsign, this.squawk, Math.clamp(power, 0, MAX_POWER));
+    }
+
+    /** Set the radio on every controller on this ship (or just this one on the ground). */
+    private void setShipRadio(final @Nullable String callsign, final String squawk, final double power) {
+        if (this.level == null) {
+            return;
+        }
+        final long at = this.level.getGameTime();
+        final List<AvionicsControllerBlockEntity> all = this.ship == null ? List.of() : ShipControllers.on(this.ship);
+        for (final AvionicsControllerBlockEntity c : all.isEmpty() ? List.of(this) : all) {
+            c.adoptRadio(callsign, squawk, power, at);
+        }
+    }
+
+    private void adoptRadio(final @Nullable String callsign, final String squawk, final double power, final long at) {
+        this.callsign = callsign;
+        this.squawk = squawk;
+        this.power = power;
+        this.radioSetAt = at;
+        this.setChanged();
+    }
+
+    @Override
+    public Receiver receiver() {
+        return this.receiver;
+    }
+
+    @Override
+    public Vec3 antenna() {
+        return this.level == null ? Vec3.atCenterOf(this.worldPosition)
+                : Sable.HELPER.projectOutOfSubLevel(this.level, Vec3.atCenterOf(this.worldPosition));
+    }
+
+    /** Only the ship's leading controller sends, so a ship is one transmitter however many it carries. */
+    @Override
+    public @Nullable Broadcast broadcast() {
+        if (this.ship == null || !this.transponderOn()) {
+            return null;
+        }
+        final List<AvionicsControllerBlockEntity> peers = ShipControllers.on(this.ship);
+        final SubLevel subLevel = ShipScan.shipOf(this);
+        if (peers.isEmpty() || peers.get(0) != this || subLevel == null || subLevel.isRemoved()) {
+            return null;
+        }
+        final String sign = this.callsign != null ? this.callsign
+                : Identity.defaultCallsign(subLevel.getUniqueId(), subLevel.getName());
+        return new Broadcast(this.ship, this.antenna(),
+                Airwaves.measure(subLevel, this.worldPosition, this.forward(), sign, this.squawk), this.power);
+    }
+
     public AvionicsControllerPeripheral peripheral() {
         if (this.peripheral == null) {
             this.peripheral = new AvionicsControllerPeripheral(this);
@@ -141,6 +241,12 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
             be.rescanSoon = false;
             be.rescan(level);
         }
+        final Airwaves air = Airwaves.of(level);
+        if (!be.onAir) {
+            be.onAir = true;
+            air.join(be);
+        }
+        air.tick(level);
     }
 
     private void rescan(final Level level) {
@@ -163,6 +269,7 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         final List<AvionicsControllerBlockEntity> peers = ShipControllers.on(now);
         this.bridge.linkPeers(peers);
         this.agreeOnBow(level, peers);
+        this.agreeOnRadio(peers);
         final AvionicsControllerBlockEntity leader = peers.get(0);
         if (leader != this) {
             // The leader publishes; make sure this one isn't, and keep a copy of its names
@@ -210,6 +317,14 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
             tag.putString("Bow", this.bow.getSerializedName());
             tag.putLong("BowSetAt", this.bowSetAt);
         }
+        if (this.callsign != null) {
+            tag.putString("Callsign", this.callsign);
+        }
+        tag.putString("Squawk", this.squawk);
+        tag.putDouble("TransmitPower", this.power);
+        if (this.radioSetAt != Long.MIN_VALUE) {
+            tag.putLong("RadioSetAt", this.radioSetAt);
+        }
     }
 
     @Override
@@ -223,6 +338,10 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         this.bridge.loadNames(names, tag.contains("NamedFor") ? Direction.byName(tag.getString("NamedFor")) : null);
         this.bow = tag.contains("Bow") ? Direction.byName(tag.getString("Bow")) : null;
         this.bowSetAt = tag.contains("BowSetAt") ? tag.getLong("BowSetAt") : Long.MIN_VALUE;
+        this.callsign = tag.contains("Callsign") ? tag.getString("Callsign") : null;
+        this.squawk = tag.contains("Squawk") ? tag.getString("Squawk") : Identity.DEFAULT_SQUAWK;
+        this.power = tag.contains("TransmitPower") ? tag.getDouble("TransmitPower") : DEFAULT_POWER;
+        this.radioSetAt = tag.contains("RadioSetAt") ? tag.getLong("RadioSetAt") : Long.MIN_VALUE;
     }
 
     /**
@@ -261,6 +380,19 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         }
     }
 
+    /** Adopt the newest radio settings any controller on the ship has, as with the bow. */
+    private void agreeOnRadio(final List<AvionicsControllerBlockEntity> peers) {
+        AvionicsControllerBlockEntity newest = this;
+        for (final AvionicsControllerBlockEntity c : peers) {
+            if (c.radioSetAt > newest.radioSetAt) {
+                newest = c;
+            }
+        }
+        if (newest != this) {
+            this.adoptRadio(newest.callsign, newest.squawk, newest.power, newest.radioSetAt);
+        }
+    }
+
     private void leaveShip() {
         if (this.ship == null) {
             return;
@@ -279,6 +411,8 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         if (this.level != null && !this.level.isClientSide) {
             this.leaveShip();
             this.bridge.remove();
+            Airwaves.of(this.level).leave(this);
+            this.onAir = false;
         }
     }
 

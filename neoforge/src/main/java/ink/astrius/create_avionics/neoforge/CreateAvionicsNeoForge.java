@@ -34,6 +34,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -61,6 +62,9 @@ public class CreateAvionicsNeoForge {
     public CreateAvionicsNeoForge(final IEventBus bus, final ModContainer container) {
         CreateAvionics.LOGGER.info("Loaded {}", CreateAvionics.MOD_NAME);
         container.registerConfig(ModConfig.Type.CLIENT, AvionicsClientConfig.SPEC);
+        container.registerConfig(ModConfig.Type.SERVER, AvionicsServerConfig.SPEC);
+        bus.addListener(ModConfigEvent.Loading.class, AvionicsServerConfig::onLoad);
+        bus.addListener(ModConfigEvent.Reloading.class, AvionicsServerConfig::onLoad);
         InstrumentSources.thermoo = ModList.get().isLoaded("thermoo");
         InstrumentSources.sereneSeasons = ModList.get().isLoaded("sereneseasons");
         InstrumentSources.downfall = biome -> biome.getModifiedClimateSettings().downfall();
@@ -95,7 +99,7 @@ public class CreateAvionicsNeoForge {
                 Radars.BLOCK_ENTITY.get(),
                 (be, side) -> be.peripheral()
         );
-        // The controller's own peripheral is only its transponder switch
+        // The controller's own peripheral is the ship's radio
         event.registerBlockEntity(
                 PeripheralCapability.get(),
                 Controllers.BLOCK_ENTITY.get(),
