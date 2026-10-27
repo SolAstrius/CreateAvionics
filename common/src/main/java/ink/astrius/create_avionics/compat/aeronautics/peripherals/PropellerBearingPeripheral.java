@@ -79,9 +79,26 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
     // --- Rotation ---
 
     /**
-     * Get the bearing's rotation speed.
+     * Get how fast the propeller is actually turning.
+     * <p>
+     * This is the current speed, not the target: the propeller has inertia and
+     * eases towards the input shaft's speed ({@link #getSpeed}, in RPM), each
+     * tick covering {@code 0.4 / sqrt(sailPower)} of the remaining difference.
+     * A propeller with one sail block closes 40% of the gap per tick; one with
+     * 25 sails closes 8%, so larger propellers take longer to spin up and to
+     * slow down. Without sails it follows the shaft immediately.
+     * <p>
+     * An unassembled bearing reads 0 whatever the shaft is doing. While a
+     * disassembly is in progress (the propeller turning on until it lines up
+     * to come apart) this keeps the value it had when disassembly started, and
+     * it drops to 0 once the propeller has disassembled.
+     * <p>
+     * To compare against {@link #getSpeed}, multiply by {@code 10 / 3}: that
+     * gives RPM.
      *
-     * @return The rotation speed.
+     * @return The rotation speed in degrees per tick (multiply by 20 for
+     * degrees per second). Signed like {@link #getSpeed}; at Create's default
+     * maximum of 256 RPM a fully spun-up propeller reads 76.8.
      */
     @LuaFunction
     public final double getRotationSpeed() {
@@ -90,8 +107,12 @@ public class PropellerBearingPeripheral<T extends PropellerBearingBlockEntity> e
 
     /**
      * Get the bearing's angular speed.
+     * <p>
+     * Read from a computer, this is always the same value as
+     * {@link #getRotationSpeed}: the two only differ inside the bearing's own
+     * tick and in client-side rendering, neither of which a script observes.
      *
-     * @return The angular speed.
+     * @return The angular speed in degrees per tick, as {@link #getRotationSpeed}.
      */
     @LuaFunction
     public final double getAngularSpeed() {
