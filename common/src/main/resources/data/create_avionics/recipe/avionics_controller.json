@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "create:brass_casing"
+    },
+    {
+      "item": "create:precision_mechanism"
+    },
+    {
+      "item": "create:electron_tube"
+    },
+    {
+      "item": "computercraft:wired_modem"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_avionics:avionics_controller"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "create:andesite_casing"
+    },
+    {
+      "item": "minecraft:clock"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_avionics:almanac"
+  }
+}

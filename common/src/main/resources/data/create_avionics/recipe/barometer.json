@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "create:andesite_casing"
+    },
+    {
+      "item": "minecraft:glass_pane"
+    },
+    {
+      "item": "create:copper_sheet"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_avionics:barometer"
+  }
+}

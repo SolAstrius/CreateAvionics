@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "create:copper_sheet"
+    },
+    "B": {
+      "item": "create:brass_ingot"
+    },
+    "E": {
+      "item": "create:electron_tube"
+    },
+    "A": {
+      "item": "create:andesite_casing"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "BEB",
+    " A "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_avionics:radar_mk1"
+  }
+}
