@@ -4,6 +4,7 @@
     "create_avionics:hygrometer",
     "create_avionics:barometer",
     "create_avionics:rain_gauge",
-    "create_avionics:avionics_controller"
+    "create_avionics:avionics_controller",
+    "create_avionics:radar_mk1"
   ]
 }

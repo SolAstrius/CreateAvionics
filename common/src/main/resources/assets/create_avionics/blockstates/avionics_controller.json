@@ -1,63 +1,123 @@
 {
   "variants": {
-    "bow=fore,facing=north": {
-      "model": "create_avionics:block/avionics_controller_fore"
+    "bow=fore,facing=north,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_fore_on"
     },
-    "bow=starboard,facing=north": {
-      "model": "create_avionics:block/avionics_controller_starboard"
+    "bow=fore,facing=north,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_fore_off"
     },
-    "bow=aft,facing=north": {
-      "model": "create_avionics:block/avionics_controller_aft"
+    "bow=starboard,facing=north,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_starboard_on"
     },
-    "bow=port,facing=north": {
-      "model": "create_avionics:block/avionics_controller_port"
+    "bow=starboard,facing=north,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_starboard_off"
     },
-    "bow=fore,facing=east": {
-      "model": "create_avionics:block/avionics_controller_fore",
+    "bow=aft,facing=north,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_aft_on"
+    },
+    "bow=aft,facing=north,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_aft_off"
+    },
+    "bow=port,facing=north,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_port_on"
+    },
+    "bow=port,facing=north,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_port_off"
+    },
+    "bow=fore,facing=east,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_fore_on",
       "y": 90
     },
-    "bow=starboard,facing=east": {
-      "model": "create_avionics:block/avionics_controller_starboard",
+    "bow=fore,facing=east,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_fore_off",
       "y": 90
     },
-    "bow=aft,facing=east": {
-      "model": "create_avionics:block/avionics_controller_aft",
+    "bow=starboard,facing=east,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_starboard_on",
       "y": 90
     },
-    "bow=port,facing=east": {
-      "model": "create_avionics:block/avionics_controller_port",
+    "bow=starboard,facing=east,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_starboard_off",
       "y": 90
     },
-    "bow=fore,facing=south": {
-      "model": "create_avionics:block/avionics_controller_fore",
+    "bow=aft,facing=east,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_aft_on",
+      "y": 90
+    },
+    "bow=aft,facing=east,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_aft_off",
+      "y": 90
+    },
+    "bow=port,facing=east,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_port_on",
+      "y": 90
+    },
+    "bow=port,facing=east,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_port_off",
+      "y": 90
+    },
+    "bow=fore,facing=south,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_fore_on",
       "y": 180
     },
-    "bow=starboard,facing=south": {
-      "model": "create_avionics:block/avionics_controller_starboard",
+    "bow=fore,facing=south,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_fore_off",
       "y": 180
     },
-    "bow=aft,facing=south": {
-      "model": "create_avionics:block/avionics_controller_aft",
+    "bow=starboard,facing=south,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_starboard_on",
       "y": 180
     },
-    "bow=port,facing=south": {
-      "model": "create_avionics:block/avionics_controller_port",
+    "bow=starboard,facing=south,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_starboard_off",
       "y": 180
     },
-    "bow=fore,facing=west": {
-      "model": "create_avionics:block/avionics_controller_fore",
+    "bow=aft,facing=south,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_aft_on",
+      "y": 180
+    },
+    "bow=aft,facing=south,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_aft_off",
+      "y": 180
+    },
+    "bow=port,facing=south,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_port_on",
+      "y": 180
+    },
+    "bow=port,facing=south,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_port_off",
+      "y": 180
+    },
+    "bow=fore,facing=west,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_fore_on",
       "y": 270
     },
-    "bow=starboard,facing=west": {
-      "model": "create_avionics:block/avionics_controller_starboard",
+    "bow=fore,facing=west,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_fore_off",
       "y": 270
     },
-    "bow=aft,facing=west": {
-      "model": "create_avionics:block/avionics_controller_aft",
+    "bow=starboard,facing=west,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_starboard_on",
       "y": 270
     },
-    "bow=port,facing=west": {
-      "model": "create_avionics:block/avionics_controller_port",
+    "bow=starboard,facing=west,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_starboard_off",
+      "y": 270
+    },
+    "bow=aft,facing=west,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_aft_on",
+      "y": 270
+    },
+    "bow=aft,facing=west,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_aft_off",
+      "y": 270
+    },
+    "bow=port,facing=west,transponder=true": {
+      "model": "create_avionics:block/avionics_controller_port_on",
+      "y": 270
+    },
+    "bow=port,facing=west,transponder=false": {
+      "model": "create_avionics:block/avionics_controller_port_off",
       "y": 270
     }
   }

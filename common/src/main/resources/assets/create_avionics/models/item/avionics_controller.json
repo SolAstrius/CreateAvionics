@@ -1,3 +1,3 @@
 {
-  "parent": "create_avionics:block/avionics_controller_fore"
+  "parent": "create_avionics:block/avionics_controller_fore_on"
 }

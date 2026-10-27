@@ -35,6 +35,7 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
     private @Nullable Direction bow;
     private long bowSetAt = Long.MIN_VALUE;
     private @Nullable UUID placer;
+    private @Nullable AvionicsControllerPeripheral peripheral;
     /** Scan on the first tick after loading. */
     private boolean rescanSoon = true;
     private @Nullable UUID ship;
@@ -73,6 +74,34 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
                 other.rescanSoon();
             }
         }
+    }
+
+    public boolean transponderOn() {
+        return this.getBlockState().getValue(AvionicsControllerBlock.TRANSPONDER);
+    }
+
+    /**
+     * Switch the transponder on every controller on this ship (or just this one on the ground),
+     * so a redundant controller can't keep broadcasting by accident.
+     */
+    public void setShipTransponder(final boolean on) {
+        if (this.level == null) {
+            return;
+        }
+        final List<AvionicsControllerBlockEntity> all = this.ship == null ? List.of(this) : ShipControllers.on(this.ship);
+        for (final AvionicsControllerBlockEntity c : all.isEmpty() ? List.of(this) : all) {
+            final BlockState state = c.getBlockState();
+            if (state.getValue(AvionicsControllerBlock.TRANSPONDER) != on) {
+                this.level.setBlock(c.getBlockPos(), state.setValue(AvionicsControllerBlock.TRANSPONDER, on), Block.UPDATE_ALL);
+            }
+        }
+    }
+
+    public AvionicsControllerPeripheral peripheral() {
+        if (this.peripheral == null) {
+            this.peripheral = new AvionicsControllerPeripheral(this);
+        }
+        return this.peripheral;
     }
 
     /** Remember who placed this, to tell them whether it set the bow or followed it. */

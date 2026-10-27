@@ -15,6 +15,7 @@ import ink.astrius.create_avionics.content.controller.Controllers;
 import ink.astrius.create_avionics.content.controller.ShipBridge;
 import ink.astrius.create_avionics.content.controller.ShipScan;
 import ink.astrius.create_avionics.content.instrument.Instrument;
+import ink.astrius.create_avionics.content.radar.Radars;
 import ink.astrius.create_avionics.content.instrument.InstrumentSources;
 import ink.astrius.create_avionics.content.instrument.Instruments;
 import net.minecraft.core.registries.Registries;
@@ -42,6 +43,7 @@ public class CreateAvionicsNeoForge {
                     .withTabsBefore(ResourceLocation.fromNamespaceAndPath("create", "palettes"))
                     .displayItems((parameters, output) -> {
                         output.accept(Controllers.BLOCK.get());
+                        output.accept(Radars.MK1.get());
                         Instruments.BLOCKS_BY_INSTRUMENT.values().forEach(output::accept);
                     })
                     .build());
@@ -53,6 +55,7 @@ public class CreateAvionicsNeoForge {
         InstrumentSources.downfall = biome -> biome.getModifiedClimateSettings().downfall();
         Instruments.registers().forEach(register -> register.register(bus));
         Controllers.registers().forEach(register -> register.register(bus));
+        Radars.registers().forEach(register -> register.register(bus));
         ShipScan.lookup = (level, pos) -> level.getCapability(PeripheralCapability.get(), pos, null);
         ShipBridge.elementAt = (level, pos, side) -> level.getCapability(WiredElementCapability.get(), pos, side);
         TABS.register(bus);
@@ -62,6 +65,17 @@ public class CreateAvionicsNeoForge {
     private static void registerCapabilities(final RegisterCapabilitiesEvent event) {
         if (!Mods.COMPUTERCRAFT.isLoaded()) return;
 
+        event.registerBlockEntity(
+                PeripheralCapability.get(),
+                Radars.BLOCK_ENTITY.get(),
+                (be, side) -> be.peripheral()
+        );
+        // The controller's own peripheral is only its transponder switch
+        event.registerBlockEntity(
+                PeripheralCapability.get(),
+                Controllers.BLOCK_ENTITY.get(),
+                (be, side) -> be.peripheral()
+        );
         // The controller is a wired-network block: cables and modems connect to it
         event.registerBlockEntity(
                 WiredElementCapability.get(),

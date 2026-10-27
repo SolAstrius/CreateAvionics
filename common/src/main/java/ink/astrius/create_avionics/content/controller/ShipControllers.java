@@ -1,11 +1,15 @@
 package ink.astrius.create_avionics.content.controller;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,6 +37,20 @@ public final class ShipControllers {
                 SHIPS.remove(ship);
             }
         }
+    }
+
+    /**
+     * What a ship's transponder says, or empty if no controller on it is transmitting: the ship's
+     * name, or a short code from its id when it has none.
+     */
+    public static synchronized Optional<String> transponder(final UUID ship, final @Nullable String name) {
+        for (final AvionicsControllerBlockEntity c : SHIPS.getOrDefault(ship, Set.of())) {
+            if (!c.isRemoved() && c.getBlockState().getValue(AvionicsControllerBlock.TRANSPONDER)) {
+                return Optional.of(name != null && !name.isBlank()
+                        ? name : ship.toString().substring(0, 6).toUpperCase(Locale.ROOT));
+            }
+        }
+        return Optional.empty();
     }
 
     /** Live controllers on the ship, the publishing one first. */

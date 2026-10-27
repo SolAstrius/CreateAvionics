@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,12 +55,14 @@ public class AvionicsControllerBlock extends HorizontalDirectionalBlock implemen
     }
 
     public static final EnumProperty<BowSide> BOW = EnumProperty.create("bow", BowSide.class);
+    /** The controller doubles as the ship's transponder; this lights its beacon. */
+    public static final BooleanProperty TRANSPONDER = BooleanProperty.create("transponder");
 
     public static final MapCodec<AvionicsControllerBlock> CODEC = simpleCodec(AvionicsControllerBlock::new);
 
     public AvionicsControllerBlock(final Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(BOW, BowSide.FORE));
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(BOW, BowSide.FORE).setValue(TRANSPONDER, true));
     }
 
     @Override
@@ -69,7 +72,7 @@ public class AvionicsControllerBlock extends HorizontalDirectionalBlock implemen
 
     @Override
     protected void createBlockStateDefinition(final StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, BOW);
+        builder.add(FACING, BOW, TRANSPONDER);
     }
 
     /** Points the way the player is looking, so placing it while facing the bow marks the nose. */
@@ -88,7 +91,10 @@ public class AvionicsControllerBlock extends HorizontalDirectionalBlock implemen
         }
     }
 
-    /** Turn the controller and make its new facing the ship's bow. Sneak-wrench picks it up as usual. */
+    /**
+     * Wrench on top (the antenna) switches the ship's transponder; wrench on a side turns the
+     * controller and makes its new facing the ship's bow. Sneak-wrench picks it up as usual.
+     */
     @Override
     public InteractionResult onWrenched(final BlockState state, final UseOnContext context) {
         final Level level = context.getLevel();
@@ -96,6 +102,18 @@ public class AvionicsControllerBlock extends HorizontalDirectionalBlock implemen
             return InteractionResult.SUCCESS;
         }
         final BlockPos pos = context.getClickedPos();
+        if (context.getClickedFace() == Direction.UP) {
+            if (level.getBlockEntity(pos) instanceof final AvionicsControllerBlockEntity be) {
+                final boolean on = !state.getValue(TRANSPONDER);
+                be.setShipTransponder(on);
+                IWrenchable.playRotateSound(level, pos);
+                if (context.getPlayer() != null) {
+                    context.getPlayer().displayClientMessage(Component.translatable(on
+                            ? "create_avionics.controller.transponder_on" : "create_avionics.controller.transponder_off"), true);
+                }
+            }
+            return InteractionResult.SUCCESS;
+        }
         level.setBlock(pos, state.setValue(FACING, state.getValue(FACING).getClockWise()), Block.UPDATE_ALL);
         if (level.getBlockEntity(pos) instanceof final AvionicsControllerBlockEntity be) {
             be.takeBow();

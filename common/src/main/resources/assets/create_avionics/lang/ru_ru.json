@@ -8,5 +8,8 @@
   "block.create_avionics.avionics_controller": "Бортовой контроллер",
   "create_avionics.controller.bow_set": "Нос корабля задан: куда смотрит контроллер",
   "create_avionics.controller.bow_followed": "Нос корабля уже задан: см. стрелку сверху",
-  "create_avionics.controller.bow_changed": "Нос корабля перенесён: куда теперь смотрит контроллер"
+  "create_avionics.controller.bow_changed": "Нос корабля перенесён: куда теперь смотрит контроллер",
+  "block.create_avionics.radar_mk1": "Радар Mk.1",
+  "create_avionics.controller.transponder_on": "Транспондер включён: радары опознают корабль",
+  "create_avionics.controller.transponder_off": "Транспондер выключен: радиомолчание"
 }

@@ -8,6 +8,7 @@ import dev.simulated_team.simulated.content.blocks.lasers.AbstractLaserBlockEnti
 import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
 import dev.ryanhcode.sable.companion.math.BoundingBox3ic;
 import ink.astrius.create_avionics.CreateAvionics;
+import ink.astrius.create_avionics.content.radar.RadarBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -231,6 +232,9 @@ public class ShipBridge implements WiredElement {
         }
         if (found.blockEntity() instanceof final AbstractLaserBlockEntity laser) {
             return base + "_" + side(laser.getDirection(), forward);
+        }
+        if (found.blockEntity() instanceof final RadarBlockEntity radar) {
+            return base + "_" + side(radar.facing(), forward);
         }
         final BlockState state = found.blockEntity().getBlockState();
         if ("docking_connector".equals(peripheral.getType()) && state.hasProperty(BlockStateProperties.FACING)) {
