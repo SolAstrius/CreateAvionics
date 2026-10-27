@@ -40,6 +40,14 @@ public class GimbalSensorPeripheral extends dev.simulated_team.simulated.compat.
      * </ul>
      * Yaw is not measurable from gravity alone and is not reported here; use
      * {@code navigation_table.getHeading()} for yaw.
+     * <p>
+     * Each angle is measured against body-Y, so they become unreliable as the
+     * contraption approaches vertical: near ±90° of pitch or roll, body-Y lies
+     * almost flat and the other angle swings wildly on small movements. For
+     * attitude that stays well-behaved in any orientation, use
+     * {@link #getGravity} (a vector, with no singularities) for tilt, or
+     * {@code navigation_table.getOrientation()} for the full orientation as a
+     * quaternion.
      *
      * @return A two-element list {pitch, roll} in degrees.
      */

@@ -50,6 +50,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   difference upstream is confined to the bearing's own tick and to rendering.
 - `getSpeed` on kinetic peripherals now states its unit (RPM, signed) and that
   it is the network's speed, which inertial blocks may lag.
+- `gimbal_sensor.getAngles` now warns that its two angles break down near
+  vertical, and points to the readings that don't: `getGravity` for tilt and
+  `navigation_table.getOrientation` for the full orientation as a quaternion
+  ([#30]).
 
 ## [0.6.0] - 2026-09-01
 
@@ -400,6 +404,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#22]: https://github.com/SolAstrius/CreateAvionics/issues/22
 [#28]: https://github.com/SolAstrius/CreateAvionics/issues/28
 [#29]: https://github.com/SolAstrius/CreateAvionics/issues/29
+[#30]: https://github.com/SolAstrius/CreateAvionics/issues/30
 
 [Unreleased]: https://github.com/SolAstrius/CreateAvionics/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/SolAstrius/CreateAvionics/compare/v0.5.2...v0.6.0
