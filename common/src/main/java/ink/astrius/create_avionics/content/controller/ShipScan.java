@@ -26,7 +26,7 @@ public final class ShipScan {
      */
     public static BiFunction<Level, BlockPos, @Nullable IPeripheral> lookup = (level, pos) -> null;
 
-    public record Found(BlockPos pos, IPeripheral peripheral) {
+    public record Found(BlockPos pos, BlockEntity blockEntity, IPeripheral peripheral) {
     }
 
     private ShipScan() {
@@ -48,7 +48,7 @@ public final class ShipScan {
             for (final BlockEntity be : chunk.getBlockEntities().values()) {
                 final IPeripheral peripheral = lookup.apply(level, be.getBlockPos());
                 if (peripheral != null) {
-                    found.add(new Found(be.getBlockPos().immutable(), peripheral));
+                    found.add(new Found(be.getBlockPos().immutable(), be, peripheral));
                 }
             }
         }

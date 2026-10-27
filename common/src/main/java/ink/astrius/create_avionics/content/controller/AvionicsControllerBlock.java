@@ -43,6 +43,16 @@ public class AvionicsControllerBlock extends HorizontalDirectionalBlock implemen
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection());
     }
 
+    /** A cable or modem placed next to the controller connects straight away. */
+    @Override
+    protected void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block neighbour,
+                                   final BlockPos neighbourPos, final boolean moving) {
+        super.neighborChanged(state, level, pos, neighbour, neighbourPos, moving);
+        if (level.getBlockEntity(pos) instanceof final AvionicsControllerBlockEntity be) {
+            be.rescanSoon();
+        }
+    }
+
     @Override
     public BlockEntity newBlockEntity(final BlockPos pos, final BlockState state) {
         return new AvionicsControllerBlockEntity(pos, state);

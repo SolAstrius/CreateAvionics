@@ -22,6 +22,9 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
 
     public static final int SCAN_INTERVAL = 40;
 
+    private final ShipBridge bridge = new ShipBridge(this);
+    /** Scan on the first tick after loading. */
+    private boolean rescanSoon = true;
     private @Nullable UUID ship;
     private List<ShipScan.Found> found = List.of();
     private volatile ChannelMap channels = new ChannelMap(List.of(), Direction.NORTH);
@@ -52,23 +55,64 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         return this.channels.read(channel);
     }
 
+    public ShipBridge bridge() {
+        return this.bridge;
+    }
+
+    /** Rescan on the next tick instead of waiting, e.g. after a neighbour or peer changed. */
+    public void rescanSoon() {
+        this.rescanSoon = true;
+    }
+
     public static void serverTick(final Level level, final BlockPos pos, final BlockState state,
                                   final AvionicsControllerBlockEntity be) {
-        if ((level.getGameTime() + pos.hashCode()) % SCAN_INTERVAL == 0) {
+        if (be.rescanSoon || (level.getGameTime() + pos.hashCode()) % SCAN_INTERVAL == 0) {
+            be.rescanSoon = false;
             be.rescan(level);
         }
     }
 
     private void rescan(final Level level) {
         final SubLevel subLevel = ShipScan.shipOf(this);
-        if (subLevel == null || subLevel.isRemoved()) {
-            this.ship = null;
-            this.found = List.of();
-        } else {
-            this.ship = subLevel.getUniqueId();
-            this.found = ShipScan.scan(level, subLevel);
+        final UUID now = subLevel == null || subLevel.isRemoved() ? null : subLevel.getUniqueId();
+        if (this.ship != null && !this.ship.equals(now)) {
+            this.leaveShip();
         }
+        this.ship = now;
+        this.found = now == null ? List.of() : ShipScan.scan(level, subLevel);
         this.channels = new ChannelMap(this.found, this.forward());
+
+        this.bridge.connectNeighbours();
+        if (now == null) {
+            this.bridge.linkPeers(List.of());
+            this.bridge.publish(List.of(), false);
+            return;
+        }
+        ShipControllers.join(now, this);
+        final List<AvionicsControllerBlockEntity> peers = ShipControllers.on(now);
+        this.bridge.linkPeers(peers);
+        this.bridge.publish(this.found, !peers.isEmpty() && peers.get(0) == this);
+    }
+
+    private void leaveShip() {
+        if (this.ship == null) {
+            return;
+        }
+        ShipControllers.leave(this.ship, this);
+        // The next controller in line takes over publishing straight away
+        for (final AvionicsControllerBlockEntity other : ShipControllers.on(this.ship)) {
+            other.rescanSoon();
+        }
+    }
+
+    /** Also called when the chunk unloads. */
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (this.level != null && !this.level.isClientSide) {
+            this.leaveShip();
+            this.bridge.remove();
+        }
     }
 
 }

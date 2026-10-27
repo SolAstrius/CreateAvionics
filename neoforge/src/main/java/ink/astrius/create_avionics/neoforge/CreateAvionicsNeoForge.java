@@ -2,6 +2,7 @@ package ink.astrius.create_avionics.neoforge;
 
 import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.compat.Mods;
+import dan200.computercraft.api.network.wired.WiredElementCapability;
 import dan200.computercraft.api.peripheral.PeripheralCapability;
 import ink.astrius.create_avionics.CreateAvionics;
 import ink.astrius.create_avionics.api.create.ElevatorContactExt;
@@ -11,6 +12,7 @@ import ink.astrius.create_avionics.api.create.LinearActuatorExt;
 import ink.astrius.create_avionics.api.create.MechanicalBearingExt;
 import ink.astrius.create_avionics.compat.cc.PeripheralComposition;
 import ink.astrius.create_avionics.content.controller.Controllers;
+import ink.astrius.create_avionics.content.controller.ShipBridge;
 import ink.astrius.create_avionics.content.controller.ShipScan;
 import ink.astrius.create_avionics.content.instrument.Instrument;
 import ink.astrius.create_avionics.content.instrument.InstrumentSources;
@@ -52,6 +54,7 @@ public class CreateAvionicsNeoForge {
         Instruments.registers().forEach(register -> register.register(bus));
         Controllers.registers().forEach(register -> register.register(bus));
         ShipScan.lookup = (level, pos) -> level.getCapability(PeripheralCapability.get(), pos, null);
+        ShipBridge.elementAt = (level, pos, side) -> level.getCapability(WiredElementCapability.get(), pos, side);
         TABS.register(bus);
         bus.addListener(CreateAvionicsNeoForge::registerCapabilities);
     }
@@ -59,6 +62,12 @@ public class CreateAvionicsNeoForge {
     private static void registerCapabilities(final RegisterCapabilitiesEvent event) {
         if (!Mods.COMPUTERCRAFT.isLoaded()) return;
 
+        // The controller is a wired-network block: cables and modems connect to it
+        event.registerBlockEntity(
+                WiredElementCapability.get(),
+                Controllers.BLOCK_ENTITY.get(),
+                (be, side) -> be.bridge()
+        );
         event.registerBlockEntity(
                 PeripheralCapability.get(),
                 Instruments.BLOCK_ENTITY.get(),
