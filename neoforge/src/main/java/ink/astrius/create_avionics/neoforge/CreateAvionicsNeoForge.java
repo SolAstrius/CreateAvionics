@@ -3,7 +3,9 @@ package ink.astrius.create_avionics.neoforge;
 import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.compat.Mods;
 import dan200.computercraft.api.network.wired.WiredElementCapability;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.PeripheralCapability;
+import dan200.computercraft.impl.Peripherals;
 import ink.astrius.create_avionics.CreateAvionics;
 import ink.astrius.create_avionics.api.create.ElevatorContactExt;
 import ink.astrius.create_avionics.api.create.ElevatorPulleyExt;
@@ -18,16 +20,21 @@ import ink.astrius.create_avionics.content.instrument.Instrument;
 import ink.astrius.create_avionics.content.radar.Radars;
 import ink.astrius.create_avionics.content.instrument.InstrumentSources;
 import ink.astrius.create_avionics.content.instrument.Instruments;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.jetbrains.annotations.Nullable;
 
 @Mod(CreateAvionics.MOD_ID)
 public class CreateAvionicsNeoForge {
@@ -56,10 +63,24 @@ public class CreateAvionicsNeoForge {
         Instruments.registers().forEach(register -> register.register(bus));
         Controllers.registers().forEach(register -> register.register(bus));
         Radars.registers().forEach(register -> register.register(bus));
-        ShipScan.lookup = (level, pos) -> level.getCapability(PeripheralCapability.get(), pos, null);
+        ShipScan.lookup = CreateAvionicsNeoForge::peripheralAt;
         ShipBridge.elementAt = (level, pos, side) -> level.getCapability(WiredElementCapability.get(), pos, side);
         TABS.register(bus);
         bus.addListener(CreateAvionicsNeoForge::registerCapabilities);
+    }
+
+    /**
+     * What a wired modem would see at a position: the block's own peripheral if it has one, else
+     * CC's generic peripheral (inventories, tanks, Create's kinetic blocks), which CC serves through
+     * its own lookup rather than the capability.
+     */
+    private static @Nullable IPeripheral peripheralAt(final Level level, final BlockPos pos) {
+        final IPeripheral own = level.getCapability(PeripheralCapability.get(), pos, null);
+        if (own != null || !(level instanceof final ServerLevel server)) {
+            return own;
+        }
+        final BlockEntity be = level.getBlockEntity(pos);
+        return be == null ? null : Peripherals.getGenericPeripheral(server, pos, null, be);
     }
 
     private static void registerCapabilities(final RegisterCapabilitiesEvent event) {

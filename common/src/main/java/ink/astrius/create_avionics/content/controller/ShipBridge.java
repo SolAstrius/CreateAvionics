@@ -310,22 +310,25 @@ public class ShipBridge implements WiredElement {
 
     /**
      * Modems, computers and turtles network themselves (bridging them would loop or mirror a
-     * computer to itself), and blocks tagged {@code create_avionics:not_bridged} are pure transmission.
+     * computer to itself), controllers are already on the network they publish to (and the
+     * transponder is ship-wide, so one is enough), and blocks tagged
+     * {@code create_avionics:not_bridged} are pure transmission.
      */
     private static boolean bridgeable(final ShipScan.Found found) {
         if (found.blockEntity().getBlockState().is(NOT_BRIDGED)) {
             return false;
         }
         return switch (found.peripheral().getType()) {
-            case "modem", "computer", "turtle" -> false;
+            case "modem", "computer", "turtle", "avionics_controller" -> false;
             default -> true;
         };
     }
 
-    public void loadNames(final Map<BlockPos, String> saved) {
-        if (!this.names.equals(saved)) {
+    public void loadNames(final Map<BlockPos, String> saved, final @Nullable Direction savedFor) {
+        if (!this.names.equals(saved) || this.namedFor != savedFor) {
             this.names.clear();
             this.names.putAll(saved);
+            this.namedFor = savedFor;
             this.owner.setChanged();
         }
     }
