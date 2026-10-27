@@ -17,6 +17,6 @@
   "create_avionics.announce.whats_new": "What's new",
   "create_avionics.announce.guides": "Guides",
   "create_avionics.announce.community": "Discord",
-  "create_avionics.announce.community_url": "",
+  "create_avionics.announce.community_url": "https://discord.gg/yZxktK59ux",
   "create_avionics.announce.turn_off": "Shown once per version. To turn it off, set announceUpdates = false in create_avionics-client.toml."
 }

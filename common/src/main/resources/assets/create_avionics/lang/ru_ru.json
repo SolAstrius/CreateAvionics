@@ -17,6 +17,6 @@
   "create_avionics.announce.whats_new": "Что нового",
   "create_avionics.announce.guides": "Руководства",
   "create_avionics.announce.community": "Telegram",
-  "create_avionics.announce.community_url": "",
+  "create_avionics.announce.community_url": "https://t.me/+c3qBAZD2bUw2YjQy",
   "create_avionics.announce.turn_off": "Показывается один раз на версию. Отключить: announceUpdates = false в create_avionics-client.toml."
 }
