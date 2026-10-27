@@ -5,5 +5,8 @@
   "block.create_avionics.barometer": "Barometer",
   "block.create_avionics.rain_gauge": "Rain Gauge",
   "block.create_avionics.almanac": "Almanac",
-  "block.create_avionics.avionics_controller": "Avionics Controller"
+  "block.create_avionics.avionics_controller": "Avionics Controller",
+  "create_avionics.controller.bow_set": "Ship's bow set: the way this controller faces",
+  "create_avionics.controller.bow_followed": "Following the ship's bow: see the arrow on top",
+  "create_avionics.controller.bow_changed": "Ship's bow moved to this controller's facing"
 }

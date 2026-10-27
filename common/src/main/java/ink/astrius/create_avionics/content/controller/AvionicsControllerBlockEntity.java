@@ -3,11 +3,14 @@ package ink.astrius.create_avionics.content.controller;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,6 +32,9 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
     public static final int SCAN_INTERVAL = 40;
 
     private final ShipBridge bridge = new ShipBridge(this);
+    private @Nullable Direction bow;
+    private long bowSetAt = Long.MIN_VALUE;
+    private @Nullable UUID placer;
     /** Scan on the first tick after loading. */
     private boolean rescanSoon = true;
     private @Nullable UUID ship;
@@ -39,9 +45,39 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         super(Controllers.BLOCK_ENTITY.get(), pos, state);
     }
 
-    /** The ship's nose, as marked by the controller's facing. */
+    /**
+     * The ship's bow, in the ship's own frame. It belongs to the ship, not to this controller: the
+     * first controller placed on a ship sets it to its facing, later ones adopt it, and a wrench
+     * moves it on purpose. Every controller keeps a copy with the time it was set, and the newest
+     * wins, so losing any one controller changes nothing.
+     */
     public Direction forward() {
+        return this.bow != null ? this.bow : this.facing();
+    }
+
+    public Direction facing() {
         return this.getBlockState().getValue(HorizontalDirectionalBlock.FACING);
+    }
+
+    /** Make this controller's facing the ship's bow (the wrench action). */
+    public void takeBow() {
+        if (this.level == null) {
+            return;
+        }
+        this.bow = this.facing();
+        this.bowSetAt = this.level.getGameTime();
+        this.setChanged();
+        this.rescanSoon();
+        if (this.ship != null) {
+            for (final AvionicsControllerBlockEntity other : ShipControllers.on(this.ship)) {
+                other.rescanSoon();
+            }
+        }
+    }
+
+    /** Remember who placed this, to tell them whether it set the bow or followed it. */
+    public void placedBy(final UUID player) {
+        this.placer = player;
     }
 
     public @Nullable UUID ship() {
@@ -97,11 +133,21 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
         ShipControllers.join(now, this);
         final List<AvionicsControllerBlockEntity> peers = ShipControllers.on(now);
         this.bridge.linkPeers(peers);
+        this.agreeOnBow(level, peers);
         final AvionicsControllerBlockEntity leader = peers.get(0);
         if (leader != this) {
             // The leader publishes; make sure this one isn't, and keep a copy of its names
             this.bridge.standDown(leader.bridge().names());
             return;
+        }
+        // A controller that just became leader starts from the names the ship already uses
+        if (this.bridge.names().isEmpty()) {
+            for (final AvionicsControllerBlockEntity other : peers) {
+                if (other != this && !other.bridge().names().isEmpty()) {
+                    this.bridge.loadNames(other.bridge().names());
+                    break;
+                }
+            }
         }
         // CC drops a withdrawn name network-wide, so the others step down before this publishes
         for (final AvionicsControllerBlockEntity other : peers) {
@@ -109,7 +155,7 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
                 other.bridge().standDown(this.bridge.names());
             }
         }
-        this.bridge.publish(this.found);
+        this.bridge.publish(this.found, subLevel.getPlot().getBoundingBox());
         for (final AvionicsControllerBlockEntity other : peers) {
             if (other != this) {
                 other.bridge().loadNames(this.bridge.names());
@@ -128,6 +174,10 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
             names.add(entry);
         });
         tag.put("PeripheralNames", names);
+        if (this.bow != null) {
+            tag.putString("Bow", this.bow.getSerializedName());
+            tag.putLong("BowSetAt", this.bowSetAt);
+        }
     }
 
     @Override
@@ -139,6 +189,44 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
             names.put(BlockPos.of(entry.getLong("Pos")), entry.getString("Name"));
         }
         this.bridge.loadNames(names);
+        this.bow = tag.contains("Bow") ? Direction.byName(tag.getString("Bow")) : null;
+        this.bowSetAt = tag.contains("BowSetAt") ? tag.getLong("BowSetAt") : Long.MIN_VALUE;
+    }
+
+    /**
+     * Adopt the newest bow any controller on the ship knows. If none has one, this controller is
+     * the first and sets it. Then point the arrow on top at it and tell whoever placed this.
+     */
+    private void agreeOnBow(final Level level, final List<AvionicsControllerBlockEntity> peers) {
+        AvionicsControllerBlockEntity newest = null;
+        for (final AvionicsControllerBlockEntity c : peers) {
+            if (c.bow != null && (newest == null || c.bowSetAt > newest.bowSetAt)) {
+                newest = c;
+            }
+        }
+        final boolean setsIt = newest == null;
+        if (setsIt) {
+            this.bow = this.facing();
+            this.bowSetAt = level.getGameTime();
+            this.setChanged();
+        } else if (newest != this && (this.bow != newest.bow || this.bowSetAt != newest.bowSetAt)) {
+            this.bow = newest.bow;
+            this.bowSetAt = newest.bowSetAt;
+            this.setChanged();
+        }
+        final BlockState state = this.getBlockState();
+        final AvionicsControllerBlock.BowSide side = AvionicsControllerBlock.BowSide.of(this.forward(), this.facing());
+        if (state.getValue(AvionicsControllerBlock.BOW) != side) {
+            level.setBlock(this.worldPosition, state.setValue(AvionicsControllerBlock.BOW, side), Block.UPDATE_CLIENTS);
+        }
+        if (this.placer != null) {
+            final Player player = level.getPlayerByUUID(this.placer);
+            if (player != null) {
+                player.displayClientMessage(Component.translatable(setsIt
+                        ? "create_avionics.controller.bow_set" : "create_avionics.controller.bow_followed"), true);
+            }
+            this.placer = null;
+        }
     }
 
     private void leaveShip() {

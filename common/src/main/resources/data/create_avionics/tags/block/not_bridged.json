@@ -1,0 +1,18 @@
+{
+  "values": [
+    "create:shaft",
+    "create:cogwheel",
+    "create:large_cogwheel",
+    "create:andesite_encased_shaft",
+    "create:brass_encased_shaft",
+    "create:metal_girder_encased_shaft",
+    "create:andesite_encased_cogwheel",
+    "create:brass_encased_cogwheel",
+    "create:andesite_encased_large_cogwheel",
+    "create:brass_encased_large_cogwheel",
+    "create:gearbox",
+    "create:encased_chain_drive",
+    "create:belt",
+    "create:chain_conveyor"
+  ]
+}

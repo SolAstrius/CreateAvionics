@@ -4,11 +4,20 @@ import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.network.wired.WiredNode;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dev.simulated_team.simulated.content.blocks.lasers.AbstractLaserBlockEntity;
 import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
+import dev.ryanhcode.sable.companion.math.BoundingBox3ic;
+import ink.astrius.create_avionics.CreateAvionics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,12 +28,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * The controller's place on a ComputerCraft wired network. Cables and modems connect to it like
  * to any wired block, and the network then sees the ship's peripherals as if each were cabled
  * in: the same peripheral objects and types, under {@code ship_<type>_<n>} names that stay with
- * each block. Velocity sensors are named by role instead, e.g. {@code ship_velocity_sensor_forward}.
+ * each block. Directional sensors carry their role, e.g. {@code ship_velocity_sensor_forward_0}.
  * <p>
  * Only one controller per ship publishes (see {@link ShipControllers}); the rest join its
  * network and stand by, so a computer on any of them reaches the whole ship.
@@ -47,6 +57,17 @@ public class ShipBridge implements WiredElement {
     private final Set<WiredNode> peers = new HashSet<>();
     /** Ship peripheral names by block position; saved with the controller so they survive reloads. */
     private final Map<BlockPos, String> names = new HashMap<>();
+    /** The ship's extent, for position names; set on each publish. */
+    private @Nullable BoundingBox3ic bounds;
+
+    /** Pure transmission (shafts, cogwheels, gearboxes...): nothing to ask, and a ship has hundreds. */
+    public static final TagKey<Block> NOT_BRIDGED = tag("not_bridged");
+    /** Named by where on the ship they sit (propellers, engines, burners), e.g. {@code ship_propeller_bearing_aft_port_0}. */
+    public static final TagKey<Block> NAMED_BY_POSITION = tag("named_by_position");
+
+    private static TagKey<Block> tag(final String name) {
+        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(CreateAvionics.MOD_ID, name));
+    }
 
     public ShipBridge(final AvionicsControllerBlockEntity owner) {
         this.owner = owner;
@@ -118,14 +139,14 @@ public class ShipBridge implements WiredElement {
      * from the whole network whichever node published it, so the leader first makes every other
      * controller {@link #standDown}, then publishes.
      */
-    public void publish(final List<ShipScan.Found> found) {
+    public void publish(final List<ShipScan.Found> found, final BoundingBox3ic bounds) {
+        this.bounds = bounds;
         this.update(this.assign(found));
     }
 
     /** Withdraw everything this controller published; it now stands by and mirrors the leader's names. */
     public void standDown(final Map<BlockPos, String> leaderNames) {
-        this.names.clear();
-        this.names.putAll(leaderNames);
+        this.loadNames(leaderNames);
         this.update(Map.of());
     }
 
@@ -153,14 +174,14 @@ public class ShipBridge implements WiredElement {
         final List<ShipScan.Found> fresh = new ArrayList<>();
         final Set<String> taken = new HashSet<>();
         for (final ShipScan.Found f : found) {
-            if (!bridgeable(f.peripheral())) {
+            if (!bridgeable(f)) {
                 continue;
             }
             // Reuse the objects CC already has; only a replaced block gets a new one
             keep.put(f.blockEntity(), this.stable.getOrDefault(f.blockEntity(), f.peripheral()));
             final String old = this.names.get(f.pos());
-            final String base = this.base(f.peripheral());
-            if (old != null && (old.equals(base) || old.startsWith(base + "_"))) {
+            final String base = this.base(f);
+            if (old != null && this.stillFits(f, old, base)) {
                 kept.put(f.pos(), old);
                 taken.add(old);
             } else {
@@ -168,13 +189,12 @@ public class ShipBridge implements WiredElement {
             }
         }
         for (final ShipScan.Found f : fresh) {
-            final String base = this.base(f.peripheral());
-            final boolean role = f.peripheral() instanceof VelocitySensorPeripheral;
+            final String base = this.base(f);
             int n = 0;
-            while (taken.contains(numbered(base, n, role))) {
+            while (taken.contains(base + "_" + n)) {
                 n++;
             }
-            final String name = numbered(base, n, role);
+            final String name = base + "_" + n;
             kept.put(f.pos(), name);
             taken.add(name);
         }
@@ -194,36 +214,116 @@ public class ShipBridge implements WiredElement {
     }
 
     /**
-     * The name a peripheral is numbered under: {@code ship_<type>}, except velocity sensors, which
-     * are named by the axis they measure relative to the controller's facing:
-     * {@code ship_velocity_sensor_forward}, {@code _vertical} or {@code _lateral}.
+     * The name a peripheral is numbered under. Usually {@code ship_<type>}; peripherals that
+     * measure in a direction are named by that direction relative to the controller's facing:
+     * velocity sensors by axis ({@code ship_velocity_sensor_forward}, {@code _vertical},
+     * {@code _lateral}; an axis, not a side), laser and optical sensors by where the beam points,
+     * docking connectors by the side they face ({@code _fore}, {@code _aft}, {@code _port},
+     * {@code _starboard}, {@code _up}, {@code _down}).
      */
-    private String base(final IPeripheral peripheral) {
+    private String base(final ShipScan.Found found) {
+        final IPeripheral peripheral = found.peripheral();
+        final String base = "ship_" + peripheral.getType();
+        final Direction forward = this.owner.forward();
         if (peripheral instanceof final VelocitySensorPeripheral velocity) {
             final Direction.Axis axis = Direction.Axis.byName(velocity.getAxis());
-            final Direction forward = this.owner.forward();
-            final String role = axis == Direction.Axis.Y ? "vertical" : axis == forward.getAxis() ? "forward" : "lateral";
-            return "ship_" + peripheral.getType() + "_" + role;
+            return base + "_" + (axis == Direction.Axis.Y ? "vertical" : axis == forward.getAxis() ? "forward" : "lateral");
         }
-        return "ship_" + peripheral.getType();
+        if (found.blockEntity() instanceof final AbstractLaserBlockEntity laser) {
+            return base + "_" + side(laser.getDirection(), forward);
+        }
+        final BlockState state = found.blockEntity().getBlockState();
+        if ("docking_connector".equals(peripheral.getType()) && state.hasProperty(BlockStateProperties.FACING)) {
+            return base + "_" + side(state.getValue(BlockStateProperties.FACING), forward);
+        }
+        if (state.is(NAMED_BY_POSITION) && this.bounds != null) {
+            return base + zone(found.pos(), this.bounds, forward);
+        }
+        return base;
     }
 
-    /** Role names start bare ({@code _forward}, then {@code _forward_1}); others count from {@code _0}. */
-    private static String numbered(final String base, final int n, final boolean role) {
-        return role && n == 0 ? base : base + "_" + n;
+    /**
+     * Where on the ship a block sits: {@code _fore} or {@code _aft} outside the middle third of
+     * its length, then {@code _port} or {@code _starboard} off the centreline. Neutral parts are
+     * left out, so a central block gets no zone at all.
+     */
+    static String zone(final BlockPos pos, final BoundingBox3ic bounds, final Direction forward) {
+        final Direction starboard = forward.getClockWise();
+        final double cx = (bounds.minX() + bounds.maxX()) / 2.0;
+        final double cz = (bounds.minZ() + bounds.maxZ()) / 2.0;
+        final double dx = pos.getX() - cx;
+        final double dz = pos.getZ() - cz;
+        final double along = dx * forward.getStepX() + dz * forward.getStepZ();
+        final double across = dx * starboard.getStepX() + dz * starboard.getStepZ();
+        final double halfLength = (forward.getAxis() == Direction.Axis.X
+                ? bounds.maxX() - bounds.minX() : bounds.maxZ() - bounds.minZ()) / 2.0;
+        final StringBuilder zone = new StringBuilder();
+        if (along > halfLength / 3) {
+            zone.append("_fore");
+        } else if (along < -halfLength / 3) {
+            zone.append("_aft");
+        }
+        // Half a block off-centre already counts: on an even-width ship the centreline runs between blocks
+        if (across >= 0.5) {
+            zone.append("_starboard");
+        } else if (across <= -0.5) {
+            zone.append("_port");
+        }
+        return zone.toString();
     }
 
-    /** Modems, computers and turtles network themselves; bridging them would loop or mirror a computer to itself. */
-    private static boolean bridgeable(final IPeripheral peripheral) {
-        return switch (peripheral.getType()) {
+    /**
+     * Whether a block may keep the name it has. Position names stay put when the ship grows (the
+     * block hasn't moved, only the hull around it); every other name must still match the role.
+     */
+    private boolean stillFits(final ShipScan.Found found, final String old, final String base) {
+        if (found.blockEntity().getBlockState().is(NAMED_BY_POSITION)) {
+            final String type = "ship_" + found.peripheral().getType();
+            return old.matches(Pattern.quote(type) + "(_fore|_aft)?(_port|_starboard)?_\\d+");
+        }
+        return old.startsWith(base + "_") && old.substring(base.length() + 1).matches("\\d+");
+    }
+
+    /**
+     * Which side of the ship a direction points to, in ship terms with the controller's facing as
+     * the bow: fore, aft, port (left), starboard (right), up or down.
+     */
+    private static String side(final Direction direction, final Direction forward) {
+        if (direction == Direction.UP) {
+            return "up";
+        }
+        if (direction == Direction.DOWN) {
+            return "down";
+        }
+        if (direction == forward) {
+            return "fore";
+        }
+        if (direction == forward.getOpposite()) {
+            return "aft";
+        }
+        return direction == forward.getClockWise() ? "starboard" : "port";
+    }
+
+    /**
+     * Modems, computers and turtles network themselves (bridging them would loop or mirror a
+     * computer to itself), and blocks tagged {@code create_avionics:not_bridged} are pure transmission.
+     */
+    private static boolean bridgeable(final ShipScan.Found found) {
+        if (found.blockEntity().getBlockState().is(NOT_BRIDGED)) {
+            return false;
+        }
+        return switch (found.peripheral().getType()) {
             case "modem", "computer", "turtle" -> false;
             default -> true;
         };
     }
 
     public void loadNames(final Map<BlockPos, String> saved) {
-        this.names.clear();
-        this.names.putAll(saved);
+        if (!this.names.equals(saved)) {
+            this.names.clear();
+            this.names.putAll(saved);
+            this.owner.setChanged();
+        }
     }
 
     /** Leave the network: called when the controller is removed or unloaded. */

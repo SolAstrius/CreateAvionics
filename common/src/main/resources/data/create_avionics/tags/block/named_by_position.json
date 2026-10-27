@@ -1,0 +1,84 @@
+{
+  "values": [
+    {
+      "id": "aeronautics:propeller_bearing",
+      "required": false
+    },
+    {
+      "id": "aeronautics:gyroscopic_propeller_bearing",
+      "required": false
+    },
+    {
+      "id": "aeronautics:adjustable_burner",
+      "required": false
+    },
+    {
+      "id": "aeronautics:steam_vent",
+      "required": false
+    },
+    {
+      "id": "simulated:white_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:orange_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:magenta_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:light_blue_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:yellow_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:lime_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:pink_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:gray_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:light_gray_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:cyan_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:purple_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:blue_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:brown_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:green_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:red_portable_engine",
+      "required": false
+    },
+    {
+      "id": "simulated:black_portable_engine",
+      "required": false
+    }
+  ]
+}

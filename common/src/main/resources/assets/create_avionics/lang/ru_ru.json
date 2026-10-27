@@ -5,5 +5,8 @@
   "block.create_avionics.barometer": "Барометр",
   "block.create_avionics.rain_gauge": "Осадкомер",
   "block.create_avionics.almanac": "Альманах",
-  "block.create_avionics.avionics_controller": "Бортовой контроллер"
+  "block.create_avionics.avionics_controller": "Бортовой контроллер",
+  "create_avionics.controller.bow_set": "Нос корабля задан: куда смотрит контроллер",
+  "create_avionics.controller.bow_followed": "Нос корабля уже задан: см. стрелку сверху",
+  "create_avionics.controller.bow_changed": "Нос корабля перенесён: куда теперь смотрит контроллер"
 }

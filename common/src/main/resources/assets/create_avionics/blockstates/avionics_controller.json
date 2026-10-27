@@ -1,18 +1,63 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "create_avionics:block/avionics_controller"
+    "bow=fore,facing=north": {
+      "model": "create_avionics:block/avionics_controller_fore"
     },
-    "facing=east": {
-      "model": "create_avionics:block/avionics_controller",
+    "bow=starboard,facing=north": {
+      "model": "create_avionics:block/avionics_controller_starboard"
+    },
+    "bow=aft,facing=north": {
+      "model": "create_avionics:block/avionics_controller_aft"
+    },
+    "bow=port,facing=north": {
+      "model": "create_avionics:block/avionics_controller_port"
+    },
+    "bow=fore,facing=east": {
+      "model": "create_avionics:block/avionics_controller_fore",
       "y": 90
     },
-    "facing=south": {
-      "model": "create_avionics:block/avionics_controller",
+    "bow=starboard,facing=east": {
+      "model": "create_avionics:block/avionics_controller_starboard",
+      "y": 90
+    },
+    "bow=aft,facing=east": {
+      "model": "create_avionics:block/avionics_controller_aft",
+      "y": 90
+    },
+    "bow=port,facing=east": {
+      "model": "create_avionics:block/avionics_controller_port",
+      "y": 90
+    },
+    "bow=fore,facing=south": {
+      "model": "create_avionics:block/avionics_controller_fore",
       "y": 180
     },
-    "facing=west": {
-      "model": "create_avionics:block/avionics_controller",
+    "bow=starboard,facing=south": {
+      "model": "create_avionics:block/avionics_controller_starboard",
+      "y": 180
+    },
+    "bow=aft,facing=south": {
+      "model": "create_avionics:block/avionics_controller_aft",
+      "y": 180
+    },
+    "bow=port,facing=south": {
+      "model": "create_avionics:block/avionics_controller_port",
+      "y": 180
+    },
+    "bow=fore,facing=west": {
+      "model": "create_avionics:block/avionics_controller_fore",
+      "y": 270
+    },
+    "bow=starboard,facing=west": {
+      "model": "create_avionics:block/avionics_controller_starboard",
+      "y": 270
+    },
+    "bow=aft,facing=west": {
+      "model": "create_avionics:block/avionics_controller_aft",
+      "y": 270
+    },
+    "bow=port,facing=west": {
+      "model": "create_avionics:block/avionics_controller_port",
       "y": 270
     }
   }
