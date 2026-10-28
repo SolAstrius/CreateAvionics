@@ -36,12 +36,44 @@ says where a value came from.
   and weather.
 - **Pressure** comes from Sable's dimension physics: the same pressure that airship
   buoyancy uses, so it falls with altitude exactly as lift does. Rain lowers it by
-  8 hPa, thunder by 22.
+  8 hPa, thunder by 22. With a weather mod installed (below), its highs and lows
+  replace those offsets, and the source reads `sable+<mod id>`.
 - **Precipitation** is what is falling on the gauge right now; snow counts as its
-  water equivalent. A gauge under a roof catches nothing.
+  water equivalent. A gauge under a roof catches nothing. Vanilla rain is one
+  switch for the whole world; a mod with local weather (Driftward's weather layer,
+  for example) can say where it rains and how hard, and the source is then that
+  mod's id.
 - **The year** comes from [Serene Seasons] in the Overworld. Without it, or in
   other dimensions, the almanac's dial shows the moon instead: the unit is `moon`,
   the season methods return nil, and `getMoonPhase` still works.
+
+## For mod authors: weather sources
+
+A mod that keeps its own weather can feed the rain gauge and barometer without
+depending on Avionics. During `InterModEnqueueEvent`, send a
+`java.util.function.BiFunction<Level, BlockPos, double[]>` with method
+`weather_source`:
+
+```java
+if (ModList.get().isLoaded("create_avionics")) {
+    BiFunction<Level, BlockPos, double[]> source = MyWeather::sample;
+    InterModComms.sendTo("create_avionics", "weather_source", () -> source);
+}
+```
+
+- It is called on the server thread with the instrument's world position (outside
+  any Sable sub-level), about once a second per rain gauge or barometer. Keep it
+  cheap.
+- Return `null` to leave the position to vanilla: another dimension, or your
+  weather switched off. The gauge and barometer then behave as without your mod.
+- Otherwise return `{kind, rate, pressure}`:
+  - `kind`: 0 nothing falls, 1 rain, 2 snow. Decide roofs and cloud height
+    yourself; Avionics doesn't check the sky for you.
+  - `rate`: millimetres per hour, as liquid water for snow. Ignored when `kind` is 0.
+  - `pressure`: hPa added to Sable's altitude curve, in place of the vanilla rain
+    and thunder offsets. Return 0 if your weather has no highs and lows.
+- Readings report the sending mod's id as their `source`. Only one source is used:
+  the first message Avionics processes; any others are logged and ignored.
 
 [Thermoo]: https://modrinth.com/mod/thermoo
 [Serene Seasons]: https://modrinth.com/mod/serene-seasons

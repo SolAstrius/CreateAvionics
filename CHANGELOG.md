@@ -36,6 +36,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   big ones. `getRange()` returns the range for that typical ship.
 - **`getNoiseFloor()`** on the controller: the weakest broadcast it hears and
   the weakest echo a radar reports (-100 dBm).
+- **Weather sources for the rain gauge and barometer.** A mod with local
+  weather can send a `weather_source` over InterModComms (a
+  `BiFunction<Level, BlockPos, double[]>`, no dependency either way): where it
+  answers, the gauge reports its rain or snow and rate, and the barometer adds
+  its highs and lows to Sable's altitude curve instead of the vanilla rain and
+  thunder offsets. The source is reported as the sending mod's id. Driftward
+  uses it for its weather layer, where vanilla's rain flag says nothing about
+  the rain at the gauge. See "For mod authors" in the instruments guide.
 
 ### Changed
 

@@ -1,7 +1,11 @@
 package ink.astrius.create_avionics.content.instrument;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiFunction;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -19,6 +23,14 @@ public final class InstrumentSources {
      * the climate settings private, and NeoForge redirects every read of them to its own getter.
      */
     public static ToDoubleFunction<Biome> downfall = biome -> 0.5;
+    /**
+     * A weather layer from another mod, sent over InterModComms as {@code weather_source}: for a
+     * world position on the server, null to leave it to vanilla, else
+     * {@code {kind (0 none, 1 rain, 2 snow), mm/h as liquid water, hPa added to Sable's curve}}.
+     */
+    public static @Nullable BiFunction<Level, BlockPos, double[]> weather;
+    /** The mod that sent {@link #weather}, reported as the readings' source. */
+    public static String weatherSource = "vanilla";
 
     private InstrumentSources() {
     }

@@ -33,12 +33,17 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.BiFunction;
 
 @Mod(CreateAvionics.MOD_ID)
 public class CreateAvionicsNeoForge {
@@ -75,6 +80,32 @@ public class CreateAvionicsNeoForge {
         ShipBridge.elementAt = (level, pos, side) -> level.getCapability(WiredElementCapability.get(), pos, side);
         TABS.register(bus);
         bus.addListener(CreateAvionicsNeoForge::registerCapabilities);
+        bus.addListener(CreateAvionicsNeoForge::processIMC);
+    }
+
+    /**
+     * A mod with a local weather layer sends {@code weather_source}: a
+     * {@code BiFunction<Level, BlockPos, double[]>} for the rain gauge and barometer (see
+     * {@link InstrumentSources#weather}). The first one received is used; more are logged and ignored.
+     */
+    @SuppressWarnings("unchecked")
+    private static void processIMC(final InterModProcessEvent event) {
+        final List<InterModComms.IMCMessage> messages = event.getIMCStream("weather_source"::equals).toList();
+        for (final InterModComms.IMCMessage message : messages) {
+            if (InstrumentSources.weather != null) {
+                CreateAvionics.LOGGER.warn("Ignoring a second weather source from {}; using {}",
+                        message.senderModId(), InstrumentSources.weatherSource);
+                continue;
+            }
+            if (!(message.messageSupplier().get() instanceof final BiFunction<?, ?, ?> source)) {
+                CreateAvionics.LOGGER.warn("Weather source from {} is not a BiFunction<Level, BlockPos, double[]>",
+                        message.senderModId());
+                continue;
+            }
+            InstrumentSources.weather = (BiFunction<Level, BlockPos, double[]>) source;
+            InstrumentSources.weatherSource = message.senderModId();
+            CreateAvionics.LOGGER.info("Rain gauge and barometer follow the weather of {}", message.senderModId());
+        }
     }
 
     /**
