@@ -1,0 +1,137 @@
+{
+ "parent": "block/block",
+ "textures": {
+  "casing": "create:block/andesite_casing",
+  "parts": "create_avionics:block/weather_radar",
+  "particle": "create:block/andesite_casing"
+ },
+ "elements": [
+  {
+   "from": [
+    0,
+    0,
+    0
+   ],
+   "to": [
+    16,
+    6,
+    16
+   ],
+   "faces": {
+    "north": {
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ],
+     "texture": "#casing"
+    },
+    "south": {
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ],
+     "texture": "#casing"
+    },
+    "east": {
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ],
+     "texture": "#casing"
+    },
+    "west": {
+     "uv": [
+      0,
+      10,
+      16,
+      16
+     ],
+     "texture": "#casing"
+    },
+    "up": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#casing"
+    },
+    "down": {
+     "uv": [
+      0,
+      0,
+      16,
+      16
+     ],
+     "texture": "#casing"
+    }
+   }
+  },
+  {
+   "from": [
+    4,
+    6,
+    4
+   ],
+   "to": [
+    12,
+    7,
+    12
+   ],
+   "faces": {
+    "up": {
+     "uv": [
+      12.0,
+      0.0,
+      16.0,
+      4.0
+     ],
+     "texture": "#parts"
+    },
+    "north": {
+     "uv": [
+      5.0,
+      14.0,
+      6.0,
+      15.0
+     ],
+     "texture": "#parts"
+    },
+    "south": {
+     "uv": [
+      5.0,
+      14.0,
+      6.0,
+      15.0
+     ],
+     "texture": "#parts"
+    },
+    "east": {
+     "uv": [
+      5.0,
+      14.0,
+      6.0,
+      15.0
+     ],
+     "texture": "#parts"
+    },
+    "west": {
+     "uv": [
+      5.0,
+      14.0,
+      6.0,
+      15.0
+     ],
+     "texture": "#parts"
+    }
+   }
+  }
+ ]
+}

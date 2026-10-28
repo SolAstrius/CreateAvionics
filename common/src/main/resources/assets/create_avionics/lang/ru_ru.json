@@ -10,6 +10,7 @@
   "create_avionics.controller.bow_followed": "Нос корабля уже задан: см. стрелку сверху",
   "create_avionics.controller.bow_changed": "Нос корабля перенесён: куда теперь смотрит контроллер. Имена периферии пересчитаны под него",
   "block.create_avionics.radar_mk1": "Радар Mk.1",
+  "block.create_avionics.weather_radar": "Метеорадар",
   "create_avionics.controller.transponder_on": "Транспондер включён: корабль передаёт свои координаты",
   "create_avionics.controller.transponder_off": "Транспондер выключен: радиомолчание",
   "create_avionics.announce.updated": "Create: Avionics %s: %s.",

@@ -60,6 +60,7 @@ public class CreateAvionicsNeoForge {
                     .displayItems((parameters, output) -> {
                         output.accept(Controllers.BLOCK.get());
                         output.accept(Radars.MK1.get());
+                        output.accept(Radars.WEATHER.get());
                         Instruments.BLOCKS_BY_INSTRUMENT.values().forEach(output::accept);
                     })
                     .build());
@@ -86,7 +87,10 @@ public class CreateAvionicsNeoForge {
     /**
      * A mod with a local weather layer sends {@code weather_source}: a
      * {@code BiFunction<Level, BlockPos, double[]>} for the rain gauge and barometer (see
-     * {@link InstrumentSources#weather}). The first one received is used; more are logged and ignored.
+     * {@link InstrumentSources#weather}). It can also send {@code weather_field}: a
+     * {@code BiFunction<Level, double[], double[]>} giving the weather by column for the weather
+     * radar (see {@link InstrumentSources#field}). Of each, the first one received is used; more are
+     * logged and ignored.
      */
     @SuppressWarnings("unchecked")
     private static void processIMC(final InterModProcessEvent event) {
@@ -105,6 +109,22 @@ public class CreateAvionicsNeoForge {
             InstrumentSources.weather = (BiFunction<Level, BlockPos, double[]>) source;
             InstrumentSources.weatherSource = message.senderModId();
             CreateAvionics.LOGGER.info("Rain gauge and barometer follow the weather of {}", message.senderModId());
+        }
+        final List<InterModComms.IMCMessage> fields = event.getIMCStream("weather_field"::equals).toList();
+        for (final InterModComms.IMCMessage message : fields) {
+            if (InstrumentSources.field != null) {
+                CreateAvionics.LOGGER.warn("Ignoring a second weather field from {}; using {}",
+                        message.senderModId(), InstrumentSources.fieldSource);
+                continue;
+            }
+            if (!(message.messageSupplier().get() instanceof final BiFunction<?, ?, ?> field)) {
+                CreateAvionics.LOGGER.warn("Weather field from {} is not a BiFunction<Level, double[], double[]>",
+                        message.senderModId());
+                continue;
+            }
+            InstrumentSources.field = (BiFunction<Level, double[], double[]>) field;
+            InstrumentSources.fieldSource = message.senderModId();
+            CreateAvionics.LOGGER.info("The weather radar sees the weather of {}", message.senderModId());
         }
     }
 
@@ -128,6 +148,11 @@ public class CreateAvionicsNeoForge {
         event.registerBlockEntity(
                 PeripheralCapability.get(),
                 Radars.BLOCK_ENTITY.get(),
+                (be, side) -> be.peripheral()
+        );
+        event.registerBlockEntity(
+                PeripheralCapability.get(),
+                Radars.WEATHER_BLOCK_ENTITY.get(),
                 (be, side) -> be.peripheral()
         );
         // The controller's own peripheral is the ship's radio

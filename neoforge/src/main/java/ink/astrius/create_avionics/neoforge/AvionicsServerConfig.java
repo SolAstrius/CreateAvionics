@@ -1,5 +1,6 @@
 package ink.astrius.create_avionics.neoforge;
 
+import ink.astrius.create_avionics.content.radar.WeatherField;
 import ink.astrius.create_avionics.content.radio.RadioConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -12,6 +13,7 @@ public final class AvionicsServerConfig {
     public static final ModConfigSpec.IntValue MAX_TRACKS;
     public static final ModConfigSpec.IntValue TRACK_EXPIRY;
     public static final ModConfigSpec.IntValue MESSAGE_BUFFER;
+    public static final ModConfigSpec.IntValue WEATHER_COLUMNS;
 
     static {
         final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -29,6 +31,12 @@ public final class AvionicsServerConfig {
                 .comment("Raw messages one controller keeps for getMessages.")
                 .defineInRange("messageBufferSize", 256, 0, 4096);
         builder.pop();
+        builder.push("weather_radar");
+        WEATHER_COLUMNS = builder
+                .comment("Weather columns sampled per level per tick for the weather radars, shared by all of them.",
+                        "More radars than this keeps fresh see older weather; it never costs more.")
+                .defineInRange("columnsPerTick", 32, 1, 1024);
+        builder.pop();
         SPEC = builder.build();
     }
 
@@ -44,5 +52,6 @@ public final class AvionicsServerConfig {
         RadioConfig.maxTracks = MAX_TRACKS.get();
         RadioConfig.trackExpirySeconds = TRACK_EXPIRY.get();
         RadioConfig.messageBufferSize = MESSAGE_BUFFER.get();
+        WeatherField.columnsPerTick = WEATHER_COLUMNS.get();
     }
 }

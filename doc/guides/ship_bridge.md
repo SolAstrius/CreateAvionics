@@ -225,7 +225,8 @@ own echo.
 
 The echo falls with the fourth power of distance and grows with the target's
 cross-section, the area its bounding box shows the beam. Rain and snow weaken
-it. A target is reported while its echo clears the noise floor (-100 dBm), so
+it, by how hard they fall: the rate the rain gauge would read halfway along the
+beam. A target is reported while its echo clears the noise floor (-100 dBm), so
 range depends on the target: a ship showing a 10x10 face is seen out to about
 250 blocks (`getRange()`), a bigger one further, up to 512 blocks. Terrain counts
 as a 20x20 face. A comparator reads 15 right in front of the radar, falling to 1
@@ -255,3 +256,103 @@ if c and c.kind == "ship" then
   print(("%d m ahead: %s"):format(c.distance, #found > 0 and table.concat(found, " or ") or "unidentified"))
 end
 ```
+
+## Weather radar
+
+The weather radar hears rain, snow and cloud instead of ships. Its dish turns
+once every 12 seconds. Each turn is a sweep at one elevation angle: 64 radials
+(5.6° each) of 64 range bins, 32 blocks each, out to 2048 blocks. Radial 1 is
+the block's front (the way you faced when placing it), and the radials go
+clockwise as seen from above. On a ship the beam stays level with the horizon
+and turns with the hull, so add the ship's heading for a north-up picture.
+
+Each bin carries the **reflectivity** in dBZ and the **radial velocity** of
+what is in it, in blocks per second, positive away from the radar.
+
+- Precipitation follows the usual Z-R relations: rain Z = 200 R^1.6 (1 mm/h is
+  23 dBZ, 10 mm/h is 39, 25 mm/h is 45) and snow Ze = 400 R². Above the
+  freezing level, rain shows as ice, 7 dB weaker and thinning with height.
+  Nothing returns from above the cloud top.
+- The echo falls with the square of distance. The weakest one the radar hears is
+  -20 dBZ at 100 blocks, -6 at 512 and +6 at 2048. Cloud without precipitation
+  (-25 to -10 dBZ) shows only close in.
+- What the radar reports is apparent reflectivity. Heavy rain weakens the beam
+  (25 mm/h costs about 0.07 dB per block, each way), so a storm core shadows
+  what is behind it.
+- Terrain in the beam returns strong ground clutter (55 dBZ, 25 off water), and
+  nothing is heard behind it. Site the radar high, or tilt the beam up with
+  `setElevations`. The radar's own hull blocks the beam as well.
+- Clutter moves only with the radar. On the ground, `setClutterFilter(true)`
+  removes it, along with any weather that happens to move across the beam.
+- Velocity needs a weather mod that reports wind. Without one the velocity bins
+  read "no data".
+
+Where the weather comes from: a weather mod that sends a weather field (see
+[For mod authors](instruments.md#for-mod-authors-weather-sources)) gives the
+radar its whole range, cloud heights, the freezing level and wind. Without one,
+the radar sees what the rain gauge would read at the surface: vanilla's rain
+(the same everywhere it falls) reaching up to the cloud layer at y 192, and only
+over loaded chunks. Beyond them it reads "no data".
+
+`getSweep()` returns the latest sweep, with each radial as a binary string of
+one byte per bin. `0` is no echo, `1` beam blocked, `2` no data. A
+reflectivity byte `b` of 3 and up is `(b - 3) / 2 - 32` dBZ. A velocity byte
+is `(b - 129) / 4` blocks per second. Computers get a `weather_radar_sweep`
+event each time a turn completes. The weather is sampled on a shared grid under
+a per-tick budget (`[weather_radar] columnsPerTick` in the server config, default
+32). Many radars therefore see older weather, but they never cost more.
+
+This draws the sweep on a monitor, with the dish's front at the top:
+
+```lua
+local radar = peripheral.find("weather_radar")
+local mon = peripheral.find("monitor")
+mon.setTextScale(0.5)
+-- Reflectivity colours, 5 dBZ steps from 5 dBZ, in palette slots 1..14
+local scale = {0x04e9e7, 0x019ff4, 0x0300f4, 0x02fd02, 0x01c501, 0x008e00, 0xfdf802,
+               0xe5bc00, 0xfd9500, 0xfd0000, 0xd40000, 0xbc0000, 0xf800fd, 0x9854c6}
+for i, rgb in ipairs(scale) do mon.setPaletteColour(2 ^ i, rgb) end
+mon.setPaletteColour(2 ^ 0, 0x404040)   -- "0": blocked or no data
+mon.setPaletteColour(2 ^ 15, 0x000000)  -- "f": nothing
+local W, H = mon.getSize()
+local cx, cy = (W + 1) / 2, (H + 1) / 2
+local R = math.min(cx, cy * 1.5)        -- a character is about 1.5 times taller than wide
+
+local function draw(s)
+  for y = 1, H do
+    local row = {}
+    for x = 1, W do
+      local dx, dy = x - cx, (y - cy) * 1.5
+      local r = math.sqrt(dx * dx + dy * dy) / R * s.bins
+      local c = "f"
+      if r < s.bins then
+        local az = math.atan2(dx, -dy) % (2 * math.pi)
+        local b = s.reflectivity[math.floor(az / (2 * math.pi) * s.radials) + 1]:byte(math.floor(r) + 1)
+        if b == 1 or b == 2 then
+          c = "0"
+        elseif b >= 3 then
+          local level = math.floor(((b - 3) / 2 - 32 - 5) / 5) + 1
+          if level >= 1 then c = ("%x"):format(math.min(level, 14)) end
+        end
+      end
+      row[x] = c
+    end
+    local line = table.concat(row)
+    mon.setCursorPos(1, y)
+    mon.blit((" "):rep(W), line, line)
+  end
+end
+
+local s = radar.getSweep()
+if s then draw(s) end
+while true do
+  os.pullEvent("weather_radar_sweep")
+  draw(radar.getSweep())
+end
+```
+
+For a volume scan, set several elevations: `radar.setElevations({0.5, 2, 5, 10})`.
+The radar takes one per turn, and `getSweep(i)` returns the latest sweep at
+elevation `i`. A bin's height above the dish is its distance times the sine of
+the elevation. The highest elevation where a bin still reads 18 dBZ or more
+gives the echo top over it.

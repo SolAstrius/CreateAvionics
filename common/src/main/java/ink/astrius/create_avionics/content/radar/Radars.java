@@ -15,7 +15,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.List;
 
 /**
- * Registers the radars. Only Mk.1 (a single beam) for now.
+ * Registers the radars: Mk.1 (a single beam) and the weather radar.
  */
 public final class Radars {
 
@@ -32,13 +32,27 @@ public final class Radars {
                     .noOcclusion()
                     .requiresCorrectToolForDrops()));
 
+    public static final DeferredBlock<WeatherRadarBlock> WEATHER = BLOCKS.register("weather_radar",
+            () -> new WeatherRadarBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(3f)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops()));
+
     static {
         ITEMS.register("radar_mk1", () -> new BlockItem(MK1.get(), new Item.Properties()));
+        ITEMS.register("weather_radar", () -> new BlockItem(WEATHER.get(), new Item.Properties()));
     }
 
     @SuppressWarnings("DataFlowIssue") // Block entity types are never used with a datafixer
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RadarBlockEntity>> BLOCK_ENTITY =
             BLOCK_ENTITIES.register("radar", () -> BlockEntityType.Builder.of(RadarBlockEntity::new, MK1.get()).build(null));
+
+    @SuppressWarnings("DataFlowIssue")
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WeatherRadarBlockEntity>> WEATHER_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("weather_radar",
+                    () -> BlockEntityType.Builder.of(WeatherRadarBlockEntity::new, WEATHER.get()).build(null));
 
     private Radars() {
     }

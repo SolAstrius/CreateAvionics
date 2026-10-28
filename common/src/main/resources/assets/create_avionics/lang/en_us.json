@@ -10,6 +10,7 @@
   "create_avionics.controller.bow_followed": "Following the ship's bow: see the arrow on top",
   "create_avionics.controller.bow_changed": "Ship's bow moved to this controller's facing; peripheral names follow it",
   "block.create_avionics.radar_mk1": "Radar Mk.1",
+  "block.create_avionics.weather_radar": "Weather Radar",
   "create_avionics.controller.transponder_on": "Transponder on: the ship broadcasts its position",
   "create_avionics.controller.transponder_off": "Transponder off: radio silence",
   "create_avionics.announce.updated": "Create: Avionics %s: %s.",

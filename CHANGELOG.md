@@ -44,6 +44,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   thunder offsets. The source is reported as the sending mod's id. Driftward
   uses it for its weather layer, where vanilla's rain flag says nothing about
   the rain at the gauge. See "For mod authors" in the instruments guide.
+- **Weather radar** (`weather_radar`). A dish that turns once every 12 seconds
+  and hears rain, snow and cloud out to 2048 blocks: 64 radials of 64 range
+  bins, 32 blocks each.
+  - Each bin reports the reflectivity in dBZ (Z-R relations: rain
+    Z = 200 R^1.6, snow Ze = 400 R²) and the radial velocity. Ground clutter
+    blocks the beam, and the radar's own hull blocks it too.
+  - What the radar reports is apparent reflectivity, not corrected for rain on
+    the way, so heavy cores cast shadows.
+  - `getSweep` returns each radial as a binary string. Also `getBin`,
+    `setElevations` (volume scans, one elevation per turn), `setClutterFilter`,
+    `getMinimumDetectable`, `getAzimuth`, `getRange`, and a
+    `weather_radar_sweep` event.
+  - Crafted from a Radar Mk.1 ([#38]).
+  - The weather comes from a new `weather_field` IMC message: a weather mod's
+    precipitation, cloud heights, freezing level and wind by column, also over
+    unloaded chunks. Without one, the radar sees what the rain gauge would read
+    in loaded chunks.
+  - Server config `[weather_radar] columnsPerTick` (default 32) bounds the
+    sampling.
+- **`SignalModel` scatters weather.** `reflectivity`, `specificAttenuation`,
+  `volumeEcho` and `weatherRadial` join the interface, so a fuller signal
+  model can replace the weather physics too.
 
 ### Changed
 
@@ -54,6 +76,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   matching track.
 - The transponder switch now controls the radio broadcast; the receiver
   listens whatever it is set to.
+- Rain and snow attenuate Radar Mk.1's echo and radio broadcasts by how hard
+  they fall: the rate the rain gauge reads halfway along the path, so a weather
+  mod's local rain counts. It is 0.0015 R^1.2 dB per block, and a tenth of that
+  for snow. That is 0.0045 dB per block in vanilla rain (0.02 before) and about
+  the same as before in a thunderstorm.
 
 ### Fixed
 
@@ -528,6 +555,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#29]: https://github.com/SolAstrius/CreateAvionics/issues/29
 [#30]: https://github.com/SolAstrius/CreateAvionics/issues/30
 [#37]: https://github.com/SolAstrius/CreateAvionics/issues/37
+[#38]: https://github.com/SolAstrius/CreateAvionics/issues/38
 
 [Discord]: https://discord.gg/yZxktK59ux
 [Telegram]: https://t.me/+c3qBAZD2bUw2YjQy

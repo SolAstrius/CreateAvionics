@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "create_avionics:block/weather_radar/block"
+    },
+    "facing=east": {
+      "model": "create_avionics:block/weather_radar/block",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "create_avionics:block/weather_radar/block",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "create_avionics:block/weather_radar/block",
+      "y": 270
+    }
+  }
+}

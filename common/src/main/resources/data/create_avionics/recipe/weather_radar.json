@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": {
+      "item": "create:iron_sheet"
+    },
+    "E": {
+      "item": "create:electron_tube"
+    },
+    "P": {
+      "item": "create:precision_mechanism"
+    },
+    "R": {
+      "item": "create_avionics:radar_mk1"
+    }
+  },
+  "pattern": [
+    "SSS",
+    "EPE",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_avionics:weather_radar"
+  }
+}

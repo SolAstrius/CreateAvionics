@@ -31,6 +31,15 @@ public final class InstrumentSources {
     public static @Nullable BiFunction<Level, BlockPos, double[]> weather;
     /** The mod that sent {@link #weather}, reported as the readings' source. */
     public static String weatherSource = "vanilla";
+    /**
+     * The same mod's weather by column, for the weather radar, sent as {@code weather_field}: for
+     * {@code {x0, z0, x1, z1, ...}} world columns (loaded or not), null to leave the level to
+     * {@link #weather}, else {@code n * stride} values per column in the order of
+     * {@link ink.astrius.create_avionics.content.radar.WeatherField.Column}; NaN for unknown.
+     */
+    public static @Nullable BiFunction<Level, double[], double[]> field;
+    /** The mod that sent {@link #field}. */
+    public static String fieldSource = "vanilla";
 
     private InstrumentSources() {
     }

@@ -75,5 +75,37 @@ if (ModList.get().isLoaded("create_avionics")) {
 - Readings report the sending mod's id as their `source`. Only one source is used:
   the first message Avionics processes; any others are logged and ignored.
 
+### The weather radar: `weather_field`
+
+The [weather radar](ship_bridge.md#weather-radar) needs more than what falls on
+one spot. It needs the precipitation *column*, out to 2048 blocks and over
+chunks that aren't loaded. A mod can send a second function, with method
+`weather_field`:
+
+```java
+BiFunction<Level, double[], double[]> field = MyWeather::columns;
+InterModComms.sendTo("create_avionics", "weather_field", () -> field);
+```
+
+- It is called on the server thread with `{x0, z0, x1, z1, ...}`: world columns
+  on a 64-block grid, up to 256 per call. The total is limited by the server's
+  `[weather_radar] columnsPerTick` (default 32 per tick), and each column is
+  asked again about every 10 seconds while a radar looks at it.
+- It must never load a chunk. Return `null` to leave the level to
+  `weather_source` and vanilla.
+- Otherwise return `stride` values per column, where `stride` is the array's
+  length divided by the number of columns. The fields go in this order, and new
+  ones will only ever be appended. A shorter row, or `NaN` in any field, means
+  unknown.
+  0. `kind`: 0 none, 1 rain, 2 snow. What falls out of the cloud base,
+     whatever roofs or terrain are under it.
+  1. `rate`: mm/h as liquid water.
+  2. `cloudBase`, 3. `cloudTop`: world y.
+  4. `windX`, 5. `windZ`: blocks per second, x east and z south.
+  6. `freezingLevel`: world y of the snow line in the air.
+  7. `cloud`: cover, 0 to 1.
+- Only the first `weather_field` is used, as with `weather_source`. The two are
+  independent, and older versions of Avionics ignore `weather_field`.
+
 [Thermoo]: https://modrinth.com/mod/thermoo
 [Serene Seasons]: https://modrinth.com/mod/serene-seasons
