@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Avionics controller: the ship's radio, like ADS-B.** While the
+  transponder is on, the ship broadcasts its callsign, squawk code, position,
+  altitude, heading, ground speed and vertical rate twice a second; one
+  controller per ship sends. `setCallsign`, `setSquawk` (four octal digits) and
+  `setTransponderPower` (dBm, 0 to 40, default 30, about 3000 blocks) are
+  ship-wide and saved, like the transponder switch. Every controller listens,
+  on a ship or on the ground: `getTraffic()` is its track table, one entry per
+  ship heard with its latest report, `signal` in dBm and `age` in seconds;
+  `getMessages(since)` reads the last raw messages by sequence number. The
+  table holds 64 tracks (when full, the stalest goes first, then the weakest)
+  and drops a ship 30 seconds after its last message. Attached computers get
+  `traffic_new` and `traffic_lost` events ([#37]).
+- **Server config for the radio** (`create_avionics-server.toml`, `[radio]`):
+  broadcast interval, track cap, track expiry and message buffer size.
+- **Radar Mk.1: echo strength.** Contacts carry `signal`, the echo in dBm. It
+  falls with the fourth power of distance, grows with the target's
+  cross-section (the area its bounding box shows the beam) and is weakened by
+  rain and snow. A target is reported only while its echo clears the noise
+  floor, so the range depends on the target instead of a fixed 256 blocks:
+  about 250 blocks for a ship with a 10x10 face to the beam, up to 512 for
+  big ones. `getRange()` returns the range for that typical ship.
+- **`getNoiseFloor()`** on the controller: the weakest broadcast it hears and
+  the weakest echo a radar reports (-100 dBm).
+
+### Changed
+
+- **Breaking**: radar contacts no longer carry `name`. The radar is a primary
+  radar and hears only its echo; read identities from `getTraffic()` on a
+  controller and match them to contacts by position ([the ship bridge]
+  guide has an example). A ship with its transponder off is a contact with no
+  matching track.
+- The transponder switch now controls the radio broadcast; the receiver
+  listens whatever it is set to.
+
+### Fixed
+
+- A multi-block monitor on a ship was bridged once per block, so a 3x2 screen
+  showed up as six `ship_monitor_<n>` names. Only its origin block, the one
+  CC's monitor methods act on, is bridged now.
+- The transponder antenna on the controller read as black from any distance.
+  It is recoloured, and its tip glows while the transponder is on.
+
 ## [0.7.0] - 2026-10-28
 
 ### Added
@@ -471,6 +515,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#28]: https://github.com/SolAstrius/CreateAvionics/issues/28
 [#29]: https://github.com/SolAstrius/CreateAvionics/issues/29
 [#30]: https://github.com/SolAstrius/CreateAvionics/issues/30
+[#37]: https://github.com/SolAstrius/CreateAvionics/issues/37
 
 [Discord]: https://discord.gg/yZxktK59ux
 [Telegram]: https://t.me/+c3qBAZD2bUw2YjQy
