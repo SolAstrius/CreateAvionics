@@ -5,7 +5,7 @@
   "side": "create:block/andesite_casing",
   "parts": "create_avionics:block/transceiver",
   "window": "create_avionics:block/transceiver_window",
-  "antenna": "create:block/redstone_antenna_powered",
+  "antenna": "create_avionics:block/transponder_antenna_on",
   "particle": "create:block/andesite_casing"
  },
  "elements": [
