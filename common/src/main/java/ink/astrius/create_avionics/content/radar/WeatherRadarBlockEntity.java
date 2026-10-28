@@ -20,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -248,11 +249,14 @@ public class WeatherRadarBlockEntity extends BlockEntity {
             final double y = origin.y + range * sinE;
             final int bx = (int) Math.floor(x);
             final int bz = (int) Math.floor(z);
-            // Terrain: the heightmap, where the chunk is loaded; never loads one
-            if (level.hasChunk(SectionPos.blockToSectionCoord(bx), SectionPos.blockToSectionCoord(bz))) {
-                final int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, bx, bz);
+            // Terrain: the heightmap, where the chunk is loaded. Read from the chunk itself: Level's
+            // getHeight waits for the chunk even where hasChunk said it was there
+            final LevelChunk chunk = level.getChunkSource().getChunkNow(
+                    SectionPos.blockToSectionCoord(bx), SectionPos.blockToSectionCoord(bz));
+            if (chunk != null) {
+                final int top = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, bx & 15, bz & 15) + 1;
                 if (y < top) {
-                    kind[i] = level.getFluidState(new BlockPos(bx, top - 1, bz)).is(FluidTags.WATER)
+                    kind[i] = chunk.getFluidState(new BlockPos(bx, top - 1, bz)).is(FluidTags.WATER)
                             ? Scatterer.SEA : Scatterer.GROUND;
                     wind[i] = 0;
                     blockedFrom = i + 1;

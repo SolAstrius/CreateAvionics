@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.jetbrains.annotations.Nullable;
 
@@ -211,10 +212,12 @@ public final class WeatherField {
 
     /** What the rain gauge would read at the surface of a loaded column; null if it isn't loaded. */
     private static @Nullable Column samplePoint(final ServerLevel level, final int x, final int z) {
-        if (!level.hasChunk(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z))) {
+        // From the chunk itself: Level's getHeight waits for the chunk even where hasChunk said it was there
+        final LevelChunk chunk = level.getChunkSource().getChunkNow(SectionPos.blockToSectionCoord(x), SectionPos.blockToSectionCoord(z));
+        if (chunk == null) {
             return null;
         }
-        final int y = Math.min(level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z), level.getMaxBuildHeight() - 2);
+        final int y = Math.min(chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x & 15, z & 15) + 1, level.getMaxBuildHeight() - 2);
         final BlockPos pos = new BlockPos(x, y, z);
         final int kind = switch (Atmosphere.precipitation(level, pos)) {
             case NONE -> 0;
