@@ -14,7 +14,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RadioTest {
 
     private static ShipReport report(final String callsign) {
-        return new ShipReport(callsign, "1200", 0, 100, 0, 0, 0, 0);
+        return new ShipReport("ABC123", callsign, "1200", 0, 100, 0, 0, 0, 0);
+    }
+
+    @Test
+    void addressIsSixHexDigitsAndStable() {
+        final java.util.UUID ship = java.util.UUID.fromString("7df82d1c-4b2e-4a77-9c11-0d3e5f6a7b8c");
+        final String a = Identity.address(ship);
+        org.junit.jupiter.api.Assertions.assertTrue(a.matches("[0-9A-F]{6}"), a);
+        assertEquals(a, Identity.address(java.util.UUID.fromString(ship.toString())));
+        assertEquals(a, Identity.defaultCallsign(ship, null));
+        assertEquals("Heron", Identity.defaultCallsign(ship, "Heron"));
     }
 
     @Test
@@ -47,7 +57,7 @@ class RadioTest {
     @Test
     void fullTableGivesUpTheStalestThenTheWeakest() {
         final List<String> events = new ArrayList<>();
-        final Receiver r = new Receiver((event, sign) -> events.add(event + " " + sign));
+        final Receiver r = new Receiver((event, report) -> events.add(event + " " + report.callsign()));
         final UUID a = UUID.randomUUID(), b = UUID.randomUUID(), c = UUID.randomUUID(), d = UUID.randomUUID();
         r.hear(List.of(new Receiver.Heard(a, report("A"), -50)), 0, 2, 8);
         r.hear(List.of(new Receiver.Heard(b, report("B"), -60)), 10, 2, 8);
@@ -67,7 +77,7 @@ class RadioTest {
     @Test
     void tracksExpireAndTheBufferIsBounded() {
         final List<String> events = new ArrayList<>();
-        final Receiver r = new Receiver((event, sign) -> events.add(event + " " + sign));
+        final Receiver r = new Receiver((event, report) -> events.add(event + " " + report.callsign()));
         final UUID a = UUID.randomUUID();
         for (int i = 0; i < 10; i++) {
             r.hear(List.of(new Receiver.Heard(a, report("A"), -50)), i * 10L, 64, 4);

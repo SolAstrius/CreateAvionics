@@ -110,8 +110,11 @@ everything around it.
 
 While the transponder is on, the ship broadcasts a report with:
 
-- its `callsign`: the ship's name until you set one, or a six-character code
-  from its id when it has no name;
+- its `address`: six hex digits derived from the ship itself, like an
+  aircraft's ICAO address. It never changes, so it tells apart ships that share
+  a callsign (`radio.getAddress()` reads your own);
+- its `callsign`: the ship's name until you set one, or its address when it has
+  no name;
 - its `squawk`: four octal digits, `"1200"` until you set one;
 - its position (`x`, `y`, `z` of the sending controller, and `altitude`, the
   same as `y`), `heading` (the compass bearing of the [bow](#the-bow): 0 north,
@@ -172,12 +175,12 @@ end
 
 Every computer attached to the controller, directly or through the bridge, gets:
 
-- `traffic_new` (peripheral name, callsign) when a ship is first heard;
-- `traffic_lost` (peripheral name, callsign) when its track is dropped.
+- `traffic_new` (peripheral name, callsign, address) when a ship is first heard;
+- `traffic_lost` (peripheral name, callsign, address) when its track is dropped.
 
 ```lua
 while true do
-  local event, side, callsign = os.pullEvent()
+  local event, side, callsign, address = os.pullEvent()
   if event == "traffic_new" then print("new contact", callsign)
   elseif event == "traffic_lost" then print("lost", callsign) end
 end

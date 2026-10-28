@@ -17,7 +17,7 @@ public final class Receiver {
     /** Where {@code traffic_new} and {@code traffic_lost} go: the controller's attached computers. */
     @FunctionalInterface
     public interface Events {
-        void queue(String event, String callsign);
+        void queue(String event, ShipReport report);
     }
 
     /** A message as received: whom it came from, what it said, and how strong it was. */
@@ -66,7 +66,7 @@ public final class Receiver {
                 this.lose(victim);
             }
             this.tracks.put(h.ship(), track);
-            this.events.queue("traffic_new", h.report().callsign());
+            this.events.queue("traffic_new", h.report());
         }
         while (this.messages.size() > Math.max(0, bufferSize)) {
             this.messages.removeFirst();
@@ -87,7 +87,7 @@ public final class Receiver {
 
     private void lose(final Track track) {
         this.tracks.remove(track.ship());
-        this.events.queue("traffic_lost", track.report().callsign());
+        this.events.queue("traffic_lost", track.report());
     }
 
     /** Every track, strongest first. */

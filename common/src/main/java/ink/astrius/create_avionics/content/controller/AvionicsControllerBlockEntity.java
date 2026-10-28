@@ -58,9 +58,9 @@ public class AvionicsControllerBlockEntity extends BlockEntity implements Statio
     private volatile String squawk = Identity.DEFAULT_SQUAWK;
     private volatile double power = DEFAULT_POWER;
     private long radioSetAt = Long.MIN_VALUE;
-    private final Receiver receiver = new Receiver((event, sign) -> {
+    private final Receiver receiver = new Receiver((event, report) -> {
         if (this.peripheral != null) {
-            this.peripheral.queue(event, sign);
+            this.peripheral.queue(event, report);
         }
     });
     private boolean onAir;
@@ -120,7 +120,13 @@ public class AvionicsControllerBlockEntity extends BlockEntity implements Statio
         }
     }
 
-    /** The callsign this ship sends: the one set, else the ship's name or id code; null on the ground until set. */
+    /** This ship's address; null on the ground. */
+    public @Nullable String address() {
+        final SubLevel subLevel = ShipScan.shipOf(this);
+        return subLevel == null ? null : Identity.address(subLevel.getUniqueId());
+    }
+
+    /** The callsign this ship sends: the one set, else the ship's name or address; null on the ground until set. */
     public @Nullable String callsign() {
         if (this.callsign != null) {
             return this.callsign;

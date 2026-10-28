@@ -15,9 +15,19 @@ public final class Identity {
     private Identity() {
     }
 
-    /** A ship's callsign until one is set: its Sable name, or a six-character code from its id. */
+    /**
+     * A ship's address, like an aircraft's 24-bit ICAO address: six hex digits derived from its
+     * Sable id, so it never changes while callsigns and names do. It tells apart ships that share a
+     * callsign.
+     */
+    public static String address(final UUID ship) {
+        final long mixed = ship.getMostSignificantBits() ^ ship.getLeastSignificantBits();
+        return String.format(Locale.ROOT, "%06X", (mixed ^ (mixed >>> 24) ^ (mixed >>> 48)) & 0xFFFFFF);
+    }
+
+    /** A ship's callsign until one is set: its Sable name, or its address. */
     public static String defaultCallsign(final UUID ship, final String name) {
-        return name != null && !name.isBlank() ? name : ship.toString().substring(0, 6).toUpperCase(Locale.ROOT);
+        return name != null && !name.isBlank() ? name : address(ship);
     }
 
     /** The callsign trimmed, or an exception saying what is wrong with it. */

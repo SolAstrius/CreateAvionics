@@ -105,7 +105,7 @@ public final class Airwaves {
         final Vec3 nose = ship.logicalPose().transformNormal(new Vec3(bow.getStepX(), 0, bow.getStepZ()));
         // Compass bearing, north -z, east +x; rounded so due north reads 0, not 359.99..
         final double heading = (Math.round(Math.toDegrees(Math.atan2(nose.x, -nose.z)) * 1e6) / 1e6 + 360) % 360;
-        return new ShipReport(callsign, squawk, now.x, now.y, now.z, heading,
+        return new ShipReport(Identity.address(ship.getUniqueId()), callsign, squawk, now.x, now.y, now.z, heading,
                 Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z), velocity.y);
     }
 }

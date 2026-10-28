@@ -29,8 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * The receiver is always on. It keeps a track per ship it hears, and queues two events on every
  * computer attached to it:
  * <ul>
- *   <li>{@code traffic_new}: args: the peripheral's name, the new track's callsign.</li>
- *   <li>{@code traffic_lost}: args: the peripheral's name, the lost track's callsign. A track is
+ *   <li>{@code traffic_new}: args: the peripheral's name, the new track's callsign and address.</li>
+ *   <li>{@code traffic_lost}: args: the peripheral's name, the lost track's callsign and address. A track is
  *   lost when nothing has been heard from that ship for a while, or when the table is full and
  *   it is the stalest (then weakest) track.</li>
  * </ul>
@@ -67,10 +67,10 @@ public class AvionicsControllerPeripheral implements IPeripheral {
     }
 
     /** Queue a traffic event on every attached computer, under the name it knows this by. */
-    void queue(final String event, final String callsign) {
+    void queue(final String event, final ShipReport report) {
         for (final IComputerAccess computer : this.computers) {
             try {
-                computer.queueEvent(event, computer.getAttachmentName(), callsign);
+                computer.queueEvent(event, computer.getAttachmentName(), report.callsign(), report.address());
             } catch (final NotAttachedException e) {
                 this.computers.remove(computer);
             }
@@ -100,13 +100,23 @@ public class AvionicsControllerPeripheral implements IPeripheral {
     /**
      * Get the callsign the ship broadcasts.
      *
-     * @return The callsign set with {@link #setCallsign}; until one is set, the ship's name, or a
-     * six-character code from its id when it has none. Nil for a controller on the ground with no
-     * callsign set.
+     * @return The callsign set with {@link #setCallsign}; until one is set, the ship's name, or its
+     * address when it has none. Nil for a controller on the ground with no callsign set.
      */
     @LuaFunction
     public final @Nullable String getCallsign() {
         return this.blockEntity.callsign();
+    }
+
+    /**
+     * Get the ship's address: six hex digits, like an aircraft's ICAO address. It is derived from
+     * the ship itself and never changes, so it tells apart ships that share a callsign.
+     *
+     * @return The address, or nil for a controller on the ground.
+     */
+    @LuaFunction
+    public final @Nullable String getAddress() {
+        return this.blockEntity.address();
     }
 
     /**
@@ -178,7 +188,7 @@ public class AvionicsControllerPeripheral implements IPeripheral {
     /**
      * Get the ships this receiver hears.
      *
-     * @return A list of tracks, strongest first, each a table with {@code callsign}, {@code squawk},
+     * @return A list of tracks, strongest first, each a table with {@code address}, {@code callsign}, {@code squawk},
      * world position {@code x}, {@code y}, {@code z}, {@code altitude} (the same as {@code y}),
      * {@code heading} in degrees (0 north, clockwise, the way the ship's bow points),
      * {@code speed} over the ground and {@code verticalRate} in blocks per second, {@code signal}
@@ -240,6 +250,7 @@ public class AvionicsControllerPeripheral implements IPeripheral {
 
     private static Map<String, Object> entry(final ShipReport r, final double signal, final long ageTicks) {
         final Map<String, Object> e = new HashMap<>();
+        e.put("address", r.address());
         e.put("callsign", r.callsign());
         e.put("squawk", r.squawk());
         e.put("x", r.x());
