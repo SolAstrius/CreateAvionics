@@ -101,7 +101,8 @@ others stand by. If it is destroyed, the next takes over with the same names.
 ## Radio (ADS-B)
 
 The controller is the ship's radio. It works like ADS-B: a ship with its
-transponder on broadcasts who and where it is a couple of times a second, and
+transponder on broadcasts who it is and what its instruments read a couple of
+times a second, and
 every controller in range hears it, on another ship or on the ground. A
 controller on the ground is a ground station: it never transmits, but it hears
 everything around it.
@@ -116,10 +117,17 @@ While the transponder is on, the ship broadcasts a report with:
 - its `callsign`: the ship's name until you set one, or its address when it has
   no name;
 - its `squawk`: four octal digits, `"1200"` until you set one;
-- its position (`x`, `y`, `z` of the sending controller, and `altitude`, the
-  same as `y`), `heading` (the compass bearing of the [bow](#the-bow): 0 north,
-  90 east), `speed` over the ground and `verticalRate`, both in blocks per
-  second.
+- what its instruments measure, and only that:
+
+| Field | Sent when the ship carries |
+|---|---|
+| `altitude` (blocks) | an altitude sensor; with only a barometer, to the nearest 10 |
+| `verticalRate` (blocks/s) | an altitude sensor |
+| `heading` (0 north, clockwise, the way the [bow](#the-bow) points) | a navigation table holding a compass |
+| `speed` over the ground (blocks/s) | a velocity sensor on the ship's forward axis |
+
+A field the ship can't measure is nil. No positions are sent: the radio says who
+is out there and what they report, not where they are.
 
 Only one controller per ship sends, so a ship is one transmitter however many
 controllers it carries. Hit the controller's top (the antenna) with a wrench to
@@ -148,9 +156,10 @@ The receiver is always on, whatever the transponder switch says. It keeps a
 how strong it came in (`signal`, in dBm) and how many seconds ago (`age`).
 
 ```lua
+local function num(v, fmt) return v and fmt:format(v) or "--" end
 for _, t in ipairs(radio.getTraffic()) do
-  print(("%-12s %s  alt %4d  hdg %03d  %5.1f b/s  %4.0f dBm  %.1fs ago"):format(
-    t.callsign, t.squawk, t.altitude, t.heading, t.speed, t.signal, t.age))
+  print(("%-12s %s %s  alt %s  hdg %s  %4.0f dBm  %.1fs ago"):format(t.callsign, t.address, t.squawk,
+    num(t.altitude, "%d"), num(t.heading, "%03d"), t.signal, t.age))
 end
 ```
 
@@ -226,31 +235,23 @@ There is no sweep: point the radar where you want to look, or put it on a bearin
 
 ### Identifying a contact
 
-The radar says something is there; the radio says who is where. To identify a
-contact, look for a track whose position matches it. A contact with no matching
-track is a ship with its transponder off. A report gives the position of the
-ship's transmitting controller, not of the hull the beam hit, so allow for the
-ship's size.
+The radar says something is there; the radio says who is out there. Neither
+says both, so a script matches them up. A level radar sees ships at about its
+own height, so a good candidate is a track whose reported altitude is close to
+yours; a contact with no candidate is a ship with its transponder off, or one
+without an altitude instrument.
 
 ```lua
 local radar = peripheral.wrap("ship_radar_fore_0")
 local radio = peripheral.find("avionics_controller")
-local gps_x, gps_y, gps_z = gps.locate()
-
-local function identify(contact, me, beam)
-  -- Where the echo came from: our position plus the distance along the beam
-  local px, py, pz = me.x + beam.x * contact.distance, me.y + beam.y * contact.distance, me.z + beam.z * contact.distance
-  local best, bestD = nil, 16  -- accept a match within 16 blocks
-  for _, t in ipairs(radio.getTraffic()) do
-    local d = math.sqrt((t.x - px)^2 + (t.y - py)^2 + (t.z - pz)^2)
-    if d < bestD then best, bestD = t, d end
-  end
-  return best
-end
+local altimeter = peripheral.wrap("ship_altitude_sensor_0")
 
 local c = radar.getContact()
 if c and c.kind == "ship" then
-  local t = identify(c, { x = gps_x, y = gps_y, z = gps_z }, { x = 0, y = 0, z = -1 })  -- beam pointing north
-  print(t and ("%s (squawk %s)"):format(t.callsign, t.squawk) or "unidentified ship")
+  local mine, found = altimeter.getHeight(), {}
+  for _, t in ipairs(radio.getTraffic()) do
+    if t.altitude and math.abs(t.altitude - mine) < 15 then found[#found + 1] = t.callsign end
+  end
+  print(("%d m ahead: %s"):format(c.distance, #found > 0 and table.concat(found, " or ") or "unidentified"))
 end
 ```

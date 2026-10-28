@@ -92,12 +92,16 @@ public final class Airwaves {
         }
     }
 
+    /** Pressure altitude from a barometer alone is only this precise, in blocks (Mode C reports in 100 ft steps). */
+    public static final double BAROMETRIC_STEP = 10;
+
     /**
-     * A ship's report as measured at its antenna: world position, the bow's compass heading, and
-     * velocity from how far the antenna moved since the last physics pose.
+     * A ship's report as measured at its antenna, with only the fields its instruments give: the
+     * antenna's height, the bow's compass heading, and velocity from how far the antenna moved
+     * since the last physics pose.
      */
     public static ShipReport measure(final SubLevel ship, final BlockPos antenna, final Direction bow,
-                                     final String callsign, final String squawk) {
+                                     final String callsign, final String squawk, final Equipment has) {
         final Vec3 local = Vec3.atCenterOf(antenna);
         final Vec3 now = ship.logicalPose().transformPosition(local);
         final Vec3 before = ship.lastPose().transformPosition(local);
@@ -105,7 +109,11 @@ public final class Airwaves {
         final Vec3 nose = ship.logicalPose().transformNormal(new Vec3(bow.getStepX(), 0, bow.getStepZ()));
         // Compass bearing, north -z, east +x; rounded so due north reads 0, not 359.99..
         final double heading = (Math.round(Math.toDegrees(Math.atan2(nose.x, -nose.z)) * 1e6) / 1e6 + 360) % 360;
-        return new ShipReport(Identity.address(ship.getUniqueId()), callsign, squawk, now.x, now.y, now.z, heading,
-                Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z), velocity.y);
+        final Double altitude = has.altitudeSensor() ? Double.valueOf(now.y)
+                : has.barometer() ? Double.valueOf(Math.round(now.y / BAROMETRIC_STEP) * BAROMETRIC_STEP) : null;
+        return new ShipReport(Identity.address(ship.getUniqueId()), callsign, squawk, altitude,
+                has.compass() ? Double.valueOf(heading) : null,
+                has.forwardSpeed() ? Double.valueOf(Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z)) : null,
+                has.altitudeSensor() ? Double.valueOf(velocity.y) : null);
     }
 }

@@ -2,18 +2,22 @@ package ink.astrius.create_avionics.content.controller;
 
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import dev.simulated_team.simulated.content.blocks.nav_table.NavTableBlockEntity;
+import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
 import ink.astrius.create_avionics.content.radio.Airwaves;
+import ink.astrius.create_avionics.content.radio.Equipment;
 import ink.astrius.create_avionics.content.radio.Identity;
 import ink.astrius.create_avionics.content.radio.Receiver;
 import ink.astrius.create_avionics.content.radio.Station;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -21,7 +25,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -200,7 +203,29 @@ public class AvionicsControllerBlockEntity extends BlockEntity implements Statio
         final String sign = this.callsign != null ? this.callsign
                 : Identity.defaultCallsign(subLevel.getUniqueId(), subLevel.getName());
         return new Broadcast(this.ship, this.antenna(),
-                Airwaves.measure(subLevel, this.worldPosition, this.forward(), sign, this.squawk), this.power);
+                Airwaves.measure(subLevel, this.worldPosition, this.forward(), sign, this.squawk, this.equipment()), this.power);
+    }
+
+    /** What the ship carries that its report can draw on (see {@link Equipment}). */
+    private Equipment equipment() {
+        boolean altitude = false, barometer = false, compass = false, speed = false;
+        final Direction.Axis forward = this.forward().getAxis();
+        for (final ShipScan.Found f : this.found) {
+            switch (f.peripheral().getType()) {
+                case "altitude_sensor" -> altitude = true;
+                case "barometer" -> barometer = true;
+                default -> {
+                }
+            }
+            if (f.blockEntity() instanceof final NavTableBlockEntity table && table.getHeldItem().is(Items.COMPASS)) {
+                compass = true;
+            }
+            if (f.peripheral() instanceof final VelocitySensorPeripheral velocity
+                    && Direction.Axis.byName(velocity.getAxis()) == forward) {
+                speed = true;
+            }
+        }
+        return new Equipment(altitude, barometer, compass, speed);
     }
 
     public AvionicsControllerPeripheral peripheral() {

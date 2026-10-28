@@ -11,8 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Avionics controller: the ship's radio, like ADS-B.** While the
   transponder is on, the ship broadcasts its address (six hex digits fixed to
-  the ship, like an ICAO address; `getAddress`), callsign, squawk code, position,
-  altitude, heading, ground speed and vertical rate twice a second; one
+  the ship, like an ICAO address; `getAddress`), callsign and squawk code, plus
+  what its instruments measure: altitude (altitude sensor, or a barometer to
+  the nearest 10 blocks), vertical rate (altitude sensor), heading (navigation
+  table holding a compass) and ground speed (forward velocity sensor). No
+  positions are sent. Twice a second; one
   controller per ship sends. `setCallsign`, `setSquawk` (four octal digits) and
   `setTransponderPower` (dBm, 0 to 40, default 30, about 3000 blocks) are
   ship-wide and saved, like the transponder switch. Every controller listens,

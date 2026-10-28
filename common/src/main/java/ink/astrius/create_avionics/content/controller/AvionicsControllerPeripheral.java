@@ -188,11 +188,13 @@ public class AvionicsControllerPeripheral implements IPeripheral {
     /**
      * Get the ships this receiver hears.
      *
-     * @return A list of tracks, strongest first, each a table with {@code address}, {@code callsign}, {@code squawk},
-     * world position {@code x}, {@code y}, {@code z}, {@code altitude} (the same as {@code y}),
-     * {@code heading} in degrees (0 north, clockwise, the way the ship's bow points),
-     * {@code speed} over the ground and {@code verticalRate} in blocks per second, {@code signal}
-     * in dBm and {@code age}, the seconds since the ship was last heard.
+     * @return A list of tracks, strongest first, each a table with {@code address}, {@code callsign},
+     * {@code squawk}, {@code signal} in dBm and {@code age} (seconds since the ship was last heard),
+     * plus what the sending ship can measure: {@code altitude} in blocks (with an altitude sensor;
+     * with only a barometer, to the nearest 10), {@code verticalRate} in blocks per second (altitude
+     * sensor), {@code heading} in degrees, 0 north, clockwise (a navigation table holding a compass)
+     * and {@code speed} over the ground in blocks per second (a velocity sensor on the ship's forward
+     * axis). Fields the ship can't measure are nil. No positions are sent.
      */
     @LuaFunction
     public final List<Map<String, Object>> getTraffic() {
@@ -253,13 +255,11 @@ public class AvionicsControllerPeripheral implements IPeripheral {
         e.put("address", r.address());
         e.put("callsign", r.callsign());
         e.put("squawk", r.squawk());
-        e.put("x", r.x());
-        e.put("y", r.y());
-        e.put("z", r.z());
-        e.put("altitude", r.y());
-        e.put("heading", r.heading());
-        e.put("speed", r.speed());
-        e.put("verticalRate", r.verticalRate());
+        // Fields the sending ship has no instrument for are left out, which reads as nil in Lua
+        if (r.altitude() != null) e.put("altitude", r.altitude());
+        if (r.heading() != null) e.put("heading", r.heading());
+        if (r.speed() != null) e.put("speed", r.speed());
+        if (r.verticalRate() != null) e.put("verticalRate", r.verticalRate());
         e.put("signal", signal);
         e.put("age", Math.max(0, ageTicks) / 20.0);
         return e;

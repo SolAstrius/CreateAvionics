@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RadioTest {
 
     private static ShipReport report(final String callsign) {
-        return new ShipReport("ABC123", callsign, "1200", 0, 100, 0, 0, 0, 0);
+        return new ShipReport("ABC123", callsign, "1200", 100.0, null, null, null);
     }
 
     @Test
