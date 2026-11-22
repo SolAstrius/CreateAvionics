@@ -4,6 +4,7 @@ import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.network.wired.WiredNode;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.shared.peripheral.modem.wired.WiredModemElement;
 import dev.simulated_team.simulated.content.blocks.lasers.AbstractLaserBlockEntity;
 import ink.astrius.create_avionics.compat.simulated.peripherals.VelocitySensorPeripheral;
 import dev.ryanhcode.sable.companion.math.BoundingBox3ic;
@@ -40,8 +41,7 @@ import java.util.regex.Pattern;
  * Only one controller per ship publishes (see {@link ShipControllers}); the rest join its
  * network and stand by, so a computer on any of them reaches the whole ship.
  */
-public class ShipBridge implements WiredElement {
-
+public class ShipBridge extends WiredModemElement {
     /** The wired element on a neighbouring block, or null. Set by the loader, like {@link ShipScan#lookup}. */
     public static TriFunction elementAt = (level, pos, side) -> null;
 
@@ -51,7 +51,6 @@ public class ShipBridge implements WiredElement {
     }
 
     private final AvionicsControllerBlockEntity owner;
-    private @Nullable WiredNode node;
     private Map<String, IPeripheral> published = Map.of();
     /** Peripheral objects handed to CC, kept per block entity so a rescan doesn't swap them. */
     private final Map<BlockEntity, IPeripheral> stable = new HashMap<>();
@@ -79,14 +78,6 @@ public class ShipBridge implements WiredElement {
     }
 
     @Override
-    public WiredNode getNode() {
-        if (this.node == null) {
-            this.node = ComputerCraftAPI.createWiredNodeForElement(this);
-        }
-        return this.node;
-    }
-
-    @Override
     public Level getLevel() {
         return this.owner.getLevel();
     }
@@ -99,6 +90,19 @@ public class ShipBridge implements WiredElement {
     @Override
     public String getSenderID() {
         return "avionics_controller";
+    }
+
+    @Override
+    protected void attachPeripheral(
+            final String name,
+            final IPeripheral peripheral
+    ) {
+        this.owner.peripheral().attachPeripheral(name, peripheral);
+    }
+
+    @Override
+    protected void detachPeripheral(final String name) {
+        this.owner.peripheral().detachPeripheral(name);
     }
 
     /** Connect to the wired blocks around the controller (cables, modems, computers). */
@@ -334,9 +338,18 @@ public class ShipBridge implements WiredElement {
         if (found.blockEntity().getBlockState().is(NOT_BRIDGED)) {
             return false;
         }
-        return switch (found.peripheral().getType()) {
-            case "modem", "computer", "turtle", "avionics_controller" -> false;
-            default -> true;
+    
+        final IPeripheral peripheral = found.peripheral();
+    
+        return !isExcludedType(peripheral.getType())
+            && peripheral.getAdditionalTypes().stream().noneMatch(ShipBridge::isExcludedType);
+    }
+    
+
+    private static boolean isExcludedType(final String type) {
+        return switch (type) {
+            case "modem", "computer", "turtle", "avionics_controller" -> true;
+            default -> false;
         };
     }
 
@@ -351,10 +364,7 @@ public class ShipBridge implements WiredElement {
 
     /** Leave the network: called when the controller is removed or unloaded. */
     public void remove() {
-        if (this.node != null) {
-            this.node.remove();
-            this.node = null;
-        }
+        this.getNode().remove();
         this.published = Map.of();
         this.peers.clear();
         this.stable.clear();

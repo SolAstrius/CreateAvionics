@@ -276,6 +276,10 @@ public class AvionicsControllerBlockEntity extends BlockEntity {
     @Override
     public void setRemoved() {
         super.setRemoved();
+        if (this.peripheral != null) {
+            this.peripheral.removed();
+        }
+
         if (this.level != null && !this.level.isClientSide) {
             this.leaveShip();
             this.bridge.remove();
