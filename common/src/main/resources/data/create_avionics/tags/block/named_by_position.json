@@ -79,6 +79,38 @@
     {
       "id": "simulated:black_portable_engine",
       "required": false
+    },
+    {
+      "id": "createpropulsion:thruster",
+      "required": false
+    },
+    {
+      "id": "createpropulsion:ion_thruster",
+      "required": false
+    },
+    {
+      "id": "createpropulsion:vector_thruster",
+      "required": false
+    },
+    {
+      "id": "createpropulsion:liquid_vector_thruster",
+      "required": false
+    },
+    {
+      "id": "createpropulsion:solid_fuel_thruster",
+      "required": false
+    },
+    {
+      "id": "createpropulsion:advanced_tilt_adapter",
+      "required": false
+    },
+    {
+      "id": "createpropulsion:tilt_adapter",
+      "required": false
+    },
+    {
+      "id": "createaddition:servo_motor",
+      "required": false
     }
   ]
 }

@@ -13,6 +13,48 @@
     "create:gearbox",
     "create:encased_chain_drive",
     "create:belt",
-    "create:chain_conveyor"
+    "create:chain_conveyor",
+
+    {
+      "id": "create_connected:encased_chain_cogwheel",
+      "required": false
+    },
+    {
+      "id": "create_connected:crank_wheel",
+      "required": false
+    },
+    {
+      "id": "create_connected:inverted_clutch",
+      "required": false
+    },
+    {
+      "id": "create_connected:inverted_gearshift",
+      "required": false
+    },
+    {
+      "id": "create_connected:parell_gearbox",
+      "required": false
+    },
+    {
+      "id": "create_connected:six_way_gearbox",
+      "required": false
+    },
+    {
+      "id": "create_connected:brass_gearbox",
+      "required": false
+    },
+
+    {
+      "id": "copycats:copycat_shaft",
+      "required": false
+    },
+    {
+      "id": "copycats:copycat_cogwheel",
+      "required": false
+    },
+    {
+      "id": "copycats:large_copycat_cogwheel",
+      "required": false
+    }
   ]
 }
