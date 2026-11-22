@@ -17,6 +17,7 @@ subprojects {
         maven { url = "https://maven.createmod.net" }
         maven { url = "https://mvn.devos.one/snapshots" }
         maven { url = "https://maven.theillusivec4.top/" }
+        maven { url = "https://maven.ithundxr.dev/snapshots" }
 
         maven {
             name = 'Jared maven'

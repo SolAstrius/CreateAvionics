@@ -2,7 +2,13 @@ package ink.astrius.create_avionics.content.controller;
 
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.api.peripheral.IComputerAccess;
+import dan200.computercraft.shared.peripheral.modem.ModemState;
+import dan200.computercraft.shared.peripheral.modem.wired.WiredModemLocalPeripheral;
+import dan200.computercraft.shared.peripheral.modem.wired.WiredModemPeripheral;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.phys.Vec3;
+import java.util.Set;
 
 /**
  * The avionics controller's transponder. The transponder is the ship's: switching any controller
@@ -11,11 +17,20 @@ import org.jetbrains.annotations.Nullable;
  *
  * @cc.module avionics_controller
  */
-public class AvionicsControllerPeripheral implements IPeripheral {
+public class AvionicsControllerPeripheral extends WiredModemPeripheral {
 
     private final AvionicsControllerBlockEntity blockEntity;
 
-    public AvionicsControllerPeripheral(final AvionicsControllerBlockEntity blockEntity) {
+    public AvionicsControllerPeripheral(
+        final AvionicsControllerBlockEntity blockEntity
+    ) {
+        super(
+            new ModemState(),
+            blockEntity.bridge(),
+            new WiredModemLocalPeripheral(side -> null),
+            blockEntity
+        );
+
         this.blockEntity = blockEntity;
     }
 
@@ -25,8 +40,8 @@ public class AvionicsControllerPeripheral implements IPeripheral {
     }
 
     @Override
-    public boolean equals(@Nullable final IPeripheral other) {
-        return other instanceof final AvionicsControllerPeripheral o && o.blockEntity == this.blockEntity;
+    public Vec3 getPosition() {
+        return Vec3.atCenterOf(this.blockEntity.getBlockPos());
     }
 
     /**
@@ -37,6 +52,28 @@ public class AvionicsControllerPeripheral implements IPeripheral {
     @LuaFunction
     public final boolean isTransponderOn() {
         return this.blockEntity.transponderOn();
+    }
+
+    @Override
+    public Set<String> getAdditionalTypes() {
+        return Set.of("peripheral_hub");
+    }
+
+    // The controller is also published on the ship network.
+    // Don't recursively attach its modem when it is discovered as a remote peripheral.
+    // Don't attach other computers
+    @Override
+    public void attach(final IComputerAccess computer) {
+        if (!ShipBridge.CONTROLLER_NAME.equals(computer.getAttachmentName())) {
+            super.attach(computer);
+        }
+    }
+
+    @Override
+    public void detach(final IComputerAccess computer) {
+        if (!ShipBridge.CONTROLLER_NAME.equals(computer.getAttachmentName())) {
+            super.detach(computer);
+        }
     }
 
     /**
